@@ -1,6 +1,6 @@
 # Storage Management 
 
-## Filesystems
+## File systems
 
 ### Inode
 - A data structure in the file system that describes a file system object, such as a directory or file.
@@ -32,13 +32,13 @@
     - Create file systems.
     - Standard is `ext2`, but can be specified as `ext4` with `-type ext4`.
 
-## mount and unmounting 
+### mount and unmounting 
 - Mount file systems.
 - Unmount file systems.
 ` mount -a`
 - Mounts everything according to the fstab file.
 
-## /etc/fstab
+### /etc/fstab
 - Dictates how mounting happens at startup.
 - Describes what devices are mounted, where, and with which options.
   - **dump**: If enabled, the dump command makes a backup.
@@ -48,12 +48,7 @@
     - `2`: After root disk.
 
 
-
----
-
-
-
-## du
+### du
 - Disk usage.
 - Estimates file space usage and shows file sizes.
 
