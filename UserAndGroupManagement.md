@@ -1,3 +1,6 @@
+# User, group, and access management 
+
+## User types
 **Root:**
   - super user
   - admin 
@@ -35,8 +38,8 @@
     - Group for granting users `sudo` right
     - Used on distros that do not by default have the `sudo` group
     - e.g. Centos
-    
-**Managing users and groups:**
+
+## **Creating and managing users and groups:**
 - `useradd` - add a user
     - users are stored in `/etc/passwd`
         - it contains: `user:password:uid:gid:some_comment:homedir:defaultshell`
@@ -101,7 +104,15 @@
   - Prints user login, TTY, remote host, login time, idle time, current proess
 - 
 
-# File permissions and ownership
+## File permissions and ownership
+
+### File ownership 
+-  `chown` / `chgrp`
+  - `[chgrp|chown] user path/to/file_or_dir` change owner or group of a file or directory
+  - `[chgrp|chown] -R path/to/file_or_dir` - change group recursively
+  - `chown user:group path/to/file_or_dir` - change owner and group of the file or directory 
+
+### File permissions
 - `ls –la` results in something like this:
 
   - ```bash
@@ -119,7 +130,7 @@
     - `.` - SELinux 
     - `+` - other 
 
-## Changing permissions
+### Changing permissions
 - chmod applies to 
   - `u` - users
   - `g` - group
@@ -158,7 +169,7 @@
   - `umask 777` - restrict `rwx` for everyone
   - `umask  a-e` - remove default execute permissions for everyone
 
-## Access Control Lists
+### Access Control Lists
 - More granular file control than permissions
 - set access to one or multiple directories
 - `getfacl` - Get file ACL It outputs:
@@ -168,14 +179,8 @@
   - `setfacl -x -all path/to/file_or_directory` - remove all permissions for all users. Same as `chmod 0000 path/to/file_or_directory`
   - `-b` - Remove all entries except standard permissions
 
-  ## File ownership 
--  `chown` / `chgrp`
-  - `[chgrp|chown] user path/to/file_or_dir` change owner or group of a file or directory
-  - `[chgrp|chown] -R path/to/file_or_dir` - change group recursively
-  - `chown user:group path/to/file_or_dir` - change owner and group of the file or directory 
 
-
-## Attributes and special permissions
+### Attributes
 
 - `lsattr`
   - list attibutes of files and directories
@@ -207,8 +212,7 @@
   - `-R` - same but recursively
 
 
-
-## Special permissions
+### Special permissions
 Less privileged users are allowed to execute a file by assuming the privileges of the file's owner or group
 
 1. **SUID - Set User ID** (`s`/ `S` on user position)
