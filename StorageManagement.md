@@ -1,18 +1,18 @@
 # Filesystems
 
-## df
-- Report file system disk space.
+- `df`
+    - Report file system disk space.
 
-## lsblk
-- List block devices.
-- Displays the tree of disks and partitions.
+- `lsblk`
+    - List block devices.
+    - Displays the tree of disks and partitions.
 
-## fdisk
-- Manipulate disk partitions.
+- `fdisk`
+    - Manipulate disk partitions.
 
-## mkfs
-- Create file systems.
-- Standard is `ext2`, but can be specified as `ext4` with `-type ext4`.
+- `mkfs`
+    - Create file systems.
+    - Standard is `ext2`, but can be specified as `ext4` with `-type ext4`.
 
 ## mount
 - Mount file systems.
