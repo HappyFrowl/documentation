@@ -23,8 +23,8 @@
     - `route add default gw <ip>` - add a default gateway
 
 
-- `iptables` - Configure tables, chains and rules of the Linux kernel IPv4 firewall.
-    -
+- `iptables` - Configure tables, chains and rules of the Linux kernel IPv4 firewall
+
 
 - `traceroute`
     - Trace the route packets take to a network host.
