@@ -1,4 +1,20 @@
-# Filesystems
+## Filesystems
+
+### Inode
+- A data structure in the file system that describes a file system object, such as a directory or file.
+- Inodes store attributes:
+  - Last time of change, access, modification.
+  - Owner/permission data.
+  - Physical disk location of the object data.
+- Directory is a list of names assigned to inodes:
+  - Contains entries for itself, its parents, and its children.
+- A disk can run out of inodes before running out of disk space, which prevents new file creation.
+- Inodes can be used to delete strangely named files that won’t tab-complete.
+
+### Commands:
+- `ls -i`: See the inode number.
+- `find . -inum <inode number>`: Find file by inode number.
+- `df -i`: Check the inodes being used on a disk (lists inode space).
 
 - `df`
     - Report file system disk space.
@@ -14,31 +30,26 @@
     - Create file systems.
     - Standard is `ext2`, but can be specified as `ext4` with `-type ext4`.
 
-## mount
+## mount and unmounting 
 - Mount file systems.
-
-## umount
 - Unmount file systems.
+` mount -a`
+- Mounts everything according to the fstab file.
+
+## /etc/fstab
+- Dictates how mounting happens at startup.
+- Describes what devices are mounted, where, and with which options.
+  - **dump**: If enabled, the dump command makes a backup.
+  - **pass**: Used by `fsck` to determine the order of file system checks at boot:
+    - `0`: No check.
+    - `1`: Root disk.
+    - `2`: After root disk.
+
+
 
 ---
 
-# Filesystem Integrity
 
-## Inode
-- A data structure in the file system that describes a file system object, such as a directory or file.
-- Inodes store attributes:
-  - Last time of change, access, modification.
-  - Owner/permission data.
-  - Physical disk location of the object data.
-- Directory is a list of names assigned to inodes:
-  - Contains entries for itself, its parents, and its children.
-- A disk can run out of inodes before running out of disk space, which prevents new file creation.
-- Inodes can be used to delete strangely named files that won’t tab-complete.
-
-### Commands:
-- `ls -i`: See the inode number.
-- `find . -inum <inode number>`: Find file by inode number.
-- `df -i`: Check the inodes being used on a disk (lists inode space).
 
 ## du
 - Disk usage.
@@ -65,26 +76,8 @@
 
 ---
 
-# Mounting and Unmounting
 
-## mount
-- By itself, lists all mounts.
-- `cat /proc/self/mounts` shows the same information.
 
-## umount
-- Unmount file systems.
-
-## /etc/fstab
-- Dictates how mounting happens at startup.
-- Describes what devices are mounted, where, and with which options.
-  - **dump**: If enabled, the dump command makes a backup.
-  - **pass**: Used by `fsck` to determine the order of file system checks at boot:
-    - `0`: No check.
-    - `1`: Root disk.
-    - `2`: After root disk.
-
-## mount -a
-- Mounts everything according to the fstab file.
 
 ---
 
@@ -114,29 +107,27 @@
 
 ---
 
-# Creating Hard and Symbolic Links
-
-## Hard Link
-- A link to another file’s inode.
-- Can only occur within the same file system.
+## Creating Hard and Symbolic Links
+- Hard Link
+    - A link to another file’s inode.
+    - Can only occur within the same file system.
   
-## Symbolic (Soft) Link
-- A link to another file name.
-- Can span across different file systems.
-- Akin to shortcuts in Windows.
+- Symbolic (Soft) Link
+    - A link to another file name.
+    - Can span across different file systems.
+    - Akin to shortcuts in Windows.
 
-### Hard Links
-- `ls -la`: Displays hard link count (second column).
-- Directories have a minimum of 2 links: one for itself and one for its parent.
-- Files have a minimum of 1 link.
-- Create hard links with `ln <sourcefile> <destfile>`.
-- Check links with `ls -li`.
+- Hard Links
+    - `ls -la`: Displays hard link count (second column).
+    - Directories have a minimum of 2 links: one for itself and one for its parent.
+    - Files have a minimum of 1 link.
+    - Create hard links with `ln <sourcefile> <destfile>`.
+    - Check links with `ls -li`.
+    - **Note**: Hard links are not allowed for directories.
 
-**Note**: Hard links are not allowed for directories.
-
-### Soft Links
-- Useful for linking files between file systems.
-- Create soft links with `ln -s <sourcefile> <destfile>`.
+- Soft Links
+    - Useful for linking files between file systems.
+    - Create soft links with `ln -s <sourcefile> <destfile>`.
 
 ---
 
