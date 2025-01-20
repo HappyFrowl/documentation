@@ -1,10 +1,7 @@
-# Notes for LFCS/ Linux+/ LPIC-1
-
+# System Management
 - [The boot process](#The-boot-process)
 
-
-
-# The boot process:  
+## The boot process:  
 
 **1. BIOS/ UEFI**
 * Hardware is booted 
@@ -61,9 +58,9 @@ During the boot many messages are shows. Two ways of showing these are:
 * `cat /var/log/dmesg`
 
  
-# Linux System Architecture
+## Linux system Components
 
-## udev
+**udev**
 - **Type**: Device Manager  
 - **Purpose**: Responsible for dynamically managing device nodes in the `/dev/` directory.  
   - Device nodes represent hardware devices like disks, USB drives, network interfaces, and more.  
@@ -73,14 +70,14 @@ During the boot many messages are shows. Two ways of showing these are:
 - **Example**:  
   - Access is provided by a temporary filesystem (`tmpfs`) mounted to `/dev/`
 
-## dbus
+**dbus**
 - **Type**: Inter-Process Communication System  
 - **Purpose**: Facilitates communication between applications and system services.  
   - Allows processes to send messages to each other.  
 - **Example**:  
   - Applications like `NetworkManager` use D-Bus to communicate with the system's networking stack.
 
-## sysfs
+**sysfs**
 - **Type**: Virtual Filesystem  
 - **Purpose**: Exposes kernel device and subsystem information to user space.  
   - Mounted at `/sys` and provides a structured way to view and manipulate kernel objects.  
@@ -91,7 +88,7 @@ During the boot many messages are shows. Two ways of showing these are:
 - **Example**:  
   - Check `/sys/class/net` for network interface details.
 
-## procfs
+**procfs**
 - **Type**: Virtual Filesystem  
 - **Purpose**: Provides an interface to kernel data structures.  
   - Mounted at `/proc` and allows user space to query or control the kernel.  
@@ -105,25 +102,25 @@ During the boot many messages are shows. Two ways of showing these are:
   - The `cmdline` file contains options passed by GRUB during boot.  
   - Linux version and kernel are stored as files in `/proc`.
 
-## tmpfs
+**tmpfs**
 - **Type**: Temporary Filesystem  
 - **Purpose**: A memory-based filesystem used for temporary data storage that does not persist after reboot.  
 - **Example**:  
   - The `/tmp` directory is often mounted as `tmpfs`.
 
-## devtmpfs
+**devtmpfs**
 - **Type**: Virtual Filesystem  
 - **Purpose**: Automatically populates the `/dev` directory with device nodes at boot, which are then managed by `udev`.  
 - **Example**:  
   - Provides base device nodes for hardware detected during boot.
 
-## cgroups
+**cgroups**
 - **Type**: Resource Management Subsystem  
 - **Purpose**: Limits, prioritizes, and accounts for resources (CPU, memory, I/O) used by groups of processes.  
 - **Example**:  
   - Docker and Kubernetes use `cgroups` to manage container resource allocation.
 
-## FUSE (Filesystem in User Space)
+**FUSE** (Filesystem in User Space)
 - **Type**: Virtual Filesystem Framework  
 - **Purpose**: Allows non-privileged users to create and manage filesystems in user space.  
 - **Example**:  
@@ -138,32 +135,22 @@ During the boot many messages are shows. Two ways of showing these are:
   - Remove modules with `rmmod` and add them with `modprobe`.
 
 
-# File System
-
-# The Linux File System
+## The Linux File System
 
 `/` - Root
 - The root directory is the top-level directory in the Linux filesystem hierarchy.
-
----
 
 `/bin` - Essential Binaries
 - Contains binaries or executables that are essential to the entire OS.
 - Commands like `gzip`, `curl`, `ls` are stored here.
 - All users can by default run these 
 
----
-
 `/sbin` - System Binaries
 - Contains system binaries or executables for the superuser (root).
 - Example: `mount`.
 
----
-
 `/lib` - Libraries
 - Shared libraries for essential binaries in `/bin` and `/sbin` are stored here.
-
----
 
 `/usr` - User Directory
 - Contains non-essential binaries or executables intended for the end user.
@@ -178,17 +165,11 @@ During the boot many messages are shows. Two ways of showing these are:
   - All these binaries are mapped together using the `PATH` environment variable (`$PATH`).
   - `which` command shows the location of a binary and gives precedence to `/usr/bin` if the command exists in multiple places.
 
----
-
 `/etc` - Editable Text Config
 - Stores system configuration files (e.g., `.config` files).
 
----
-
 `/home` - User Files
 - Contains user-specific files and configurations.
-
----
 
 `/boot` - Boot Files
 - Contains files required to boot the system:
@@ -197,29 +178,19 @@ During the boot many messages are shows. Two ways of showing these are:
     - `vmlinux`: Uncompressed kernel.
     - `vmlinuz`: Compressed kernel.
 
----
-
 `/dev` - Device Files
 - Provides access to hardware and drivers as if they are files.
 
----
-
 `/opt` - Optional Software
 - Stores optional or add-on software.
-
----
 
 `/var` - Variable Files
 - Contains files that change while the OS is running:
   - Logs are stored here.
 
----
-
-`/tmp` - Temporary Files
+-/tmp` - Temporary Files
 - Stores temporary files.
 - Files in `/tmp` are non-persistent between reboots.
-
----
 
 `/proc` - Process Filesystem
 - An illusionary filesystem created in memory by the Linux kernel.
@@ -227,13 +198,138 @@ During the boot many messages are shows. Two ways of showing these are:
 
 
 
+## Boot Targets
+
+Boot targets are the modern equivalent of runlevels in `systemd`, which has replaced `SysVinit` in most modern Linux distributions. They provide a more flexible and descriptive way of managing system states. Boot targets are particularly useful when troubleshooting the system, especially when it does not want to boot properly.
 
 
+- `systemctl get-default`
+    - Get Current Boot Target
+
+- `sudo systemctl isolate <target>`
+    - Temporarily Change the Boot Target
 
     
 
 
 
 
+## Localization, Internationalization. and Time
+
+### Locale
+- Region-specific settings, including language and country formats.
+- `locale`: View and configure locale settings.
+
+- **Convert between encodings**:
+  - `iconv -f utf-8 -t iso_8653-1 < file.txt > output.txt`
+- **List supported encodings**:
+  - `iconv -l`
+- **Detect file encoding**:
+  - `file <filename>`
+
+### Date and Time Configuration
+
+- View current timezone:
+  - `cat /etc/timezone`
+- System timezone configuration:
+  - `/etc/localtime` (symlinked to the appropriate timezone file).
+- Select a timezone:
+  - `tzselect`
+- View time in another timezone:
+  - Use tools like `date` with `TZ` environment variables or GUI tools.
+
+- `date` - print or set date and time
+- `date +%s` - print time as epoch time
+- `timedatectl` - print or set local time, universal time, time zone, ntp info, etc. 
+
+- Synchronize with NTP servers:
+  - Install the client: `apt install ntpdate`
+  - Sync with NTP pool:
+    - `ntpdate pool.ntp.org`
+- Configure as an NTP server:
+  - Install the daemon: `apt install ntp`
+  - Configuration file: `/etc/ntp.conf`
+
+- The hardware clock is independent of the system and runs even when the machine is powered off.
+- `hwclock --systohc --localtime` - Sync hardware clock with the local clock
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Job Scheduling 
+
+### At
+- Execute commands at a specified time by reading them from `STDIN` or a file.
+- All jobs scheduled to run at the same time are executed simultaneously.
+- `echo "command" | at 1000`: Schedule a command to execute at 10 AM.
+  - The result will be mailed to the user. If no mail server is available, check logs in `/var/log/syslog`.
+- `atq`: Check the list of scheduled jobs.
+- `atrm <job_id>`: Remove a scheduled job.
+- **Access Control**:
+  - `/etc/at.deny`: Users listed here cannot use `at`.
+  - `/etc/at.allow`: Users listed here can use `at`. Overrides `at.deny` if present.
+
+
+### Batch
+- Similar to `at`, but jobs are executed only if the system load drops below 1.5 or a specified threshold set in `atd`.
+- Jobs are executed sequentially, not simultaneously.
+
+
+### Cron
+- Schedules recurring jobs at specified times and intervals.
+- `crontab -e`: Edit or create scheduled jobs.
+- `crontab -l`: List current cron jobs.
+- **Access Control**:
+  - `/etc/cron.allow`: List of users who can use cron. Overrides `/etc/cron.deny`.
+  - `/etc/cron.deny`: List of users who cannot use cron.
+- **Configuration**:
+  - Similar access rules as `at`.
 
  
+
+## Process Management in Linux
+
+### Listing Processes
+
+- `ps` - Lists running processes.
+- **Options**:
+  - `ps`: Shows processes for the current user.
+  - `ps a`: Displays all processes attached to a terminal.
+  - `ps x`: Lists processes for all users, even those not attached to a terminal.
+  - `ps aux`: Formats output for user-oriented listing.
+  - Processes in **square brackets** are system or kernel processes.
+
+
+### Sending Signals to Processes
+- `kill` Command - Sends signals to processes to perform specific actions.
+    **Signals**:
+    - **SIGINT**:
+        - Interrupt signal (Ctrl + C).
+        - Stops the process, allowing it to clean up resources.
+    - **SIGKILL**:
+        - Forces the process to terminate immediately.
+    - **SIGSTOP**:
+        - Pauses the process (Ctrl + Z).
+    - **SIGTERM**:
+        - Requests the process to terminate gracefully.
+        - Allows time for cleanup, but the process can ignore it.
+
+- `killall` - Kills all processes by name.
+    - Only affects the current user's processes unless used with `sudo`.
+    - `kill -9 brave` - SIGKILL brave
+
+- `pkill`- Similar to `killall` but more flexible and potentially dangerous.
+    - Allows matching processes based on name or other attributes.
+
+
+

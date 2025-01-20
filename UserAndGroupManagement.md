@@ -15,7 +15,9 @@
 - No interactive login
 - Runs in the background
 
-**Substitute/ switch user**
+
+## Switching users and access to sudo 
+**Substitute/ switch user:**
 - `su - <username>` - switch to another user account 
 - `su - root` or `sudo su` - switch to root
 - `sudoedit` - gain elevated editing permissions to a specific file if, and only if, the user is member of `editors` group and the group has editing permissions to the file
@@ -33,6 +35,12 @@
     - let `user` use `updatedb` without prompting for password
         - `username ALL=NOPASSWD:/bin/updatedb`
 
+## Groups for sudo-level permissions
+
+- `sudo`
+    - Group for granting users `sudo` right
+    - Used on Debian-based systems
+    - Group access is configured by `/etc/sudoers/` through `visudo` alone, never by editing the file itself
 
 - `wheel` 
     - Group for granting users `sudo` right
@@ -99,17 +107,18 @@
 - `lastlog` - print when users last logged in 
 - `who` - Print who is logged in and related data (processes, boot time)
   - Prints name of the system from which they are connecting 
-  - `-u` - print who is idle and for how long. `old` means in active for over 24h
+  - `-u` - print who is idle and for how long. 
+    - `old` means in active for over 24h
 - `w` - Print who is logged on and what they are doing.
   - Prints user login, TTY, remote host, login time, idle time, current proess
-- 
+
 
 ## File permissions and ownership
 
 ### File ownership 
 -  `chown` / `chgrp`
-  - `[chgrp|chown] user path/to/file_or_dir` change owner or group of a file or directory
-  - `[chgrp|chown] -R path/to/file_or_dir` - change group recursively
+  - `(chgrp|chown) user path/to/file_or_dir` change owner or group of a file or directory
+  - `(chgrp|chown) -R path/to/file_or_dir` - change group recursively
   - `chown user:group path/to/file_or_dir` - change owner and group of the file or directory 
 
 ### File permissions

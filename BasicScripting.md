@@ -332,3 +332,23 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
 `git push -u origin main` - Push commits
 `
 `gh repo delete testrepo2 --yes` - Delete github repo
+
+
+
+
+
+
+
+
+- `set` - set shell options     
+    - `-e` - exit on fail 
+    - `-o` - Set a option 
+        - Noclobber 
+        - Do not permit overwriting when using > 
+        - Xtrace 
+        - Shows full command 
+        - So for ls it shows ls --colour=auto 
+        - +o <option> 
+         
+
+ 

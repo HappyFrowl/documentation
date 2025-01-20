@@ -53,7 +53,7 @@
 - `lsof`
     - Get open ports/files.
 
----
+
 
 ## DNS
 
@@ -96,6 +96,7 @@
     - Get all known hosts.
     - Essentially lists the contents of `/etc/hosts`.
 
----
 
 ## NGINX
+
+

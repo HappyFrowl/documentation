@@ -2,6 +2,8 @@
 
 ## File systems
 
+
+
 ### Inode
 - A data structure in the file system that describes a file system object, such as a directory or file.
 - Inodes store attributes:
@@ -16,10 +18,9 @@
 ### Commands:
 - `ls -i`: See the inode number.
 - `find . -inum <inode number>`: Find file by inode number.
-- `df -i`: Check the inodes being used on a disk (lists inode space).
-
 - `df`
     - Report file system disk space.
+    - `df -i`: Check the inodes being used on a disk (lists inode space).
 
 - `lsblk`
     - List block devices.
@@ -144,3 +145,20 @@
 
 ## /etc/updatedb.conf
 - Configuration for `updatedb`, which defines locations not to search.
+
+
+
+
+
+- `stat`
+    - Display file or file system status 
+    - Output includes details like: 
+    -   File name 
+    -   File size 
+    -   Blocks allocated 
+    -   IO block size 
+    -   File type 
+    -   Device ID 
+    -   Inode number 
+    -   Links 
+    -   Access, Modify, and Change timestamps 

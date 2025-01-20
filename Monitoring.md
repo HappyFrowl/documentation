@@ -62,3 +62,47 @@
   4. Run the following commands:
      - `sudo chown syslog /dev/tty10`
      - `sudo service rsyslog restart`
+
+
+
+
+
+
+last 
+
+See reboots and who logged in  
+
+Shows time and date  
+
+
+
+### `top`
+- Provides a live feed of running processes and their resource usage.
+- Useful for real-time process monitoring.
+
+
+## Modifying Process Execution Priorities
+
+### Nice Value
+- Determines the CPU time allocated to a process.
+- **Range**:
+  - `-20` (highest priority).
+  - `19` (lowest priority).
+  - Default is `0`.
+- **Impact**:
+  - The **nice value** impacts the kernel's **priority (PR)** calculation:
+    - `PR = Nice Value + 20`
+  - Higher priority (lower nice value) processes get more CPU time.
+  - Long-running processes are deprioritized over time.
+
+### `nice` Command
+- Starts a new process with a specified nice value.
+- **Usage**:
+  - `nice -<value> <command>`
+  - Example: `nice --15 ping google.com` (sets a nice value of `-15`).
+
+### `renice` Command
+- Changes the nice value of a running process.
+- **Usage**:
+  - `sudo renice -<value> -p <PID>`
+  - Example: `sudo renice -0 -p 1234` (sets the nice value of process `1234` to `0`).
