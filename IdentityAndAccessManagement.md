@@ -1,6 +1,10 @@
 # Identity and Access Management
 
-## User types
+
+
+## Users and groups
+
+### **User types::**
 **Root:**
   - super user
   - admin 
@@ -16,7 +20,7 @@
 - Runs in the background
 
 
-## Switching users and access to sudo 
+### Switching users and access to sudo 
 **Substitute/ switch user:**
 - `su - <username>` - switch to another user account 
 - `su - root` or `sudo su` - switch to root
@@ -35,7 +39,7 @@
     - let `user` use `updatedb` without prompting for password
         - `username ALL=NOPASSWD:/bin/updatedb`
 
-## Groups for sudo-level permissions
+### Groups for sudo-level permissions
 
 - `sudo`
     - Group for granting users `sudo` right
@@ -47,7 +51,7 @@
     - Used on distros that do not by default have the `sudo` group
     - e.g. Centos
 
-## **Creating and managing users and groups:**
+### **Creating and managing users and groups:**
 - `useradd` - add a user
     - users are stored in `/etc/passwd`
         - it contains: `user:password:uid:gid:some_comment:homedir:defaultshell`
@@ -194,7 +198,7 @@
 - `lsattr`
   - list attibutes of files and directories
 
-  | Position | Attribute | Meaning                                                                |
+| Position | Attribute | Meaning                                                                |
 |----------|-----------|------------------------------------------------------------------------|
 | 1        | a         | Append-only: File can only be opened in append mode.                  |
 | 2        | c         | Compressed: File is compressed on disk automatically by the filesystem.|
