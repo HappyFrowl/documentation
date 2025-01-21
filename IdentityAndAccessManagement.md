@@ -1,4 +1,4 @@
-# User, group, and access management 
+# Identity and Access Management
 
 ## User types
 **Root:**

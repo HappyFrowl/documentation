@@ -93,4 +93,5 @@ systemctl restart sshd
 
 ## Firewall
 
-ufw
+- `ufw` - uncomplicated firewall
+

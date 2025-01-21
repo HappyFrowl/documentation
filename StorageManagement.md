@@ -1,4 +1,4 @@
-# Storage Management 
+# Storage
 
 ## File systems
 
