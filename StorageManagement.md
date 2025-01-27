@@ -15,7 +15,6 @@
 - A disk can run out of inodes before running out of disk space, which prevents new file creation.
 - Inodes can be used to delete strangely named files that won’t tab-complete.
 
-### Commands:
 - `ls -i`: See the inode number.
 - `find . -inum <inode number>`: Find file by inode number.
 - `df`

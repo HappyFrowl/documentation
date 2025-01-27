@@ -105,6 +105,7 @@
     - `-d` - make password blank
     - `-S` - see password status for a user
     - `--expire` - immediately expire a user's password, force password change on next login
+- `groups <$USER>` - print groups of which someone is member 
 - `id`- get user id and group membership
 - `getent` - read entry from `/etc/` files
     - `getent group <group>` -  get the group's entry from `/etc/group`

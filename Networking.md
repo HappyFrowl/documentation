@@ -1,6 +1,8 @@
 # Networking
 
 - [IP and routing](#ip-and-routing)
+- [NetworkManager](#NetworkManager)
+- [DHCP](#DHCP)
 - [DNS](#DNS)
 - [NGINX](#NGINX)
 
@@ -110,7 +112,7 @@
 
 - `getent hosts`
     - Get all known hosts.
-    - Essentially lists the contents of `/etc/hosts`.
+    - Lists the contents of `/etc/hosts`.
 
 
 ## DHCP

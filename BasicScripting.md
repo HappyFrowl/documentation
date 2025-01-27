@@ -1,5 +1,26 @@
 # Linux Commands and Features
 
+## Basic command line
+- **`cp`**
+  - `*` the wildcard of wildcards, it's used to represent all single characters or any string.
+  - `?` used to represent one character
+  - `[]` used to represent any character within the brackets
+
+- **`mv`**
+  - `mv -i dir1 dir2` - overwrite anything in the same directory. So you can use the -i flag to prompt you before overwriting anything
+  - `mv -b directory1 directory2` -  make a backup of that file and it will just rename the old version with a ~.
+
+- **`mkdir`**
+  - `-p` - include the parent directories if not existing
+
+
+- **`find`**
+  - 
+
+
+## Basic 
+
+
 ## Man Pages
 
 - Man pages may have multiple sources, indicated by the `(x)` in the corner.

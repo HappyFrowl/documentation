@@ -1,5 +1,7 @@
-# System Management
+# System Administration
 - [The boot process](#The-boot-process)
+- [Linux system Components](Linux-system-Components)
+- [The Linux File System](The-Linux-File-System)
 
 ## The boot process:  
 
