@@ -204,7 +204,6 @@ During the boot many messages are shows. Two ways of showing these are:
 
 Boot targets are the modern equivalent of runlevels in `systemd`, which has replaced `SysVinit` in most modern Linux distributions. They provide a more flexible and descriptive way of managing system states. Boot targets are particularly useful when troubleshooting the system, especially when it does not want to boot properly.
 
-
 - `systemctl get-default`
     - Get Current Boot Target
 
@@ -264,10 +263,6 @@ Boot targets are the modern equivalent of runlevels in `systemd`, which has repl
 
 
 
-
-
-
-
 ## Job Scheduling 
 
 ### At
@@ -301,15 +296,15 @@ Boot targets are the modern equivalent of runlevels in `systemd`, which has repl
 
 ## Process Management in Linux
 
-### Listing Processes
-
 - `ps` - Lists running processes.
-- **Options**:
   - `ps`: Shows processes for the current user.
   - `ps a`: Displays all processes attached to a terminal.
   - `ps x`: Lists processes for all users, even those not attached to a terminal.
   - `ps aux`: Formats output for user-oriented listing.
   - Processes in **square brackets** are system or kernel processes.
+
+* `top`
+  * 
 
 
 ### Sending Signals to Processes

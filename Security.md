@@ -1,9 +1,57 @@
 # Host Security
 
+## Securing the system
 
-## Securing Data with Encryption
+- `/etc/hosts.allow`
+    - List hosts, domains, or IPs that are allowed services on the system
+    - Takes precedence over `hosts.deny`
+    -   `sshd: 192.168.1.0/24`
+        `sshd: mytrustedhost.example.com`
+    - kinda old shit
 
-### SSH
+- `/etc/hosts.deny`
+    - Deny access.
+    - Access is granted by default.
+    - `sshd: ALL` 
+    - kinda old shit. Just use firewalls
+
+- `/etc/nologin`
+    - This is a file that locks down the entire system
+    - If this file exists, only root can access.
+
+- `xinetd`
+    - X Internet Daemon.
+    - Listens to incoming requests over the network.
+    - Launches the appropriate program to handle the request.
+    - Requests are often for specific ports.
+    - Manages which services can be open at specific times.
+
+- `tcpd`
+    - Monitor incoming requests.
+    - Program triggered by `xinetd`.
+    - `xinetd` starts `tcpd` instead of the desired server.
+    - `tcpd` logs the request.
+    - Logs are sent to `syslog`.
+    - After logging, `tcpd` runs the program.
+
+
+
+##  Encryption
+
+* `**OpenSSL**`
+
+* `**
+
+
+* `**gpg**`
+- Free implementation of PGP.
+- Used to get, create, and send encryption keys.
+- Encrypt files using `gpg`.
+
+*
+
+
+## SSH
 - `/etc/ssh/ssh.config`
     - Configure outbound SSH connections.
     - Example: Turn off password-based authentication, allowing only certificate-based authentication.
@@ -48,50 +96,36 @@ systemctl restart sshd
 
 
 
-### gpg
-- Free implementation of PGP.
-- Used to get, create, and send encryption keys.
-- Encrypt files using `gpg`.
 
 
 
-## Securing the system
 
 
-- `/etc/hosts.allow`
-    - List hosts, domains, or IPs that are allowed services on the system
-    - Takes precedence over `hosts.deny`
-    -   `sshd: 192.168.1.0/24`
-        `sshd: mytrustedhost.example.com`
-    - kinda old shit
 
-- `/etc/hosts.deny`
-    - Deny access.
-    - Access is granted by default.
-    - `sshd: ALL` 
-    - kinda old shit. Just use firewalls
 
-- `/etc/nologin`
-    - This is a file that locks down the entire system
-    - If this file exists, only root can access.
 
-- `xinetd`
-    - X Internet Daemon.
-    - Listens to incoming requests over the network.
-    - Launches the appropriate program to handle the request.
-    - Requests are often for specific ports.
-    - Manages which services can be open at specific times.
-
-- `tcpd`
-    - Monitor incoming requests.
-    - Program triggered by `xinetd`.
-    - `xinetd` starts `tcpd` instead of the desired server.
-    - `tcpd` logs the request.
-    - Logs are sent to `syslog`.
-    - After logging, `tcpd` runs the program.
 
 
 ## Firewall
 
-- `ufw` - uncomplicated firewall
+* `ufw` - uncomplicated firewall
+    * interface for IP tables and is desgiend to simplify the process of configuring firewalls 
+    * Like any firewall, allow and block traffic by port number and IP address
+    * `status` - active/ inactive
+    * `status verbose` - print more info
+    * `status numbered` - what rules and currently running
+        * list the firewall rules
+    * `enable` / `disable`
+    * `reset` - resets firewall to default configuration
+    * `default (allow|deny) (incoming|outgoing)` 
+    * `(allow|deny) (service|subnet|IP)`  
+        * `allow ssh` - allow incoming ssh traffic
+            * `allow 22` - same but with the port number
+        * `deny http` - deny http
+        * `deny proto (tcp|udp) from (any|IP) to any port <port numbers>` 
+        * `(allow|deny) from (subnet|IP) to any port <port numbers>`
+    * `delete <rule number>` - delete a firewall by specifying its number
+
+
+
 

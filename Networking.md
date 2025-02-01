@@ -43,7 +43,7 @@
     - `Netstat -atn`
             - Get ports that are actively being listened to.
             - Shows all active internet connections.
-           
+
 - `nmap`
     - Look for open ports.
 
@@ -87,19 +87,6 @@
     - The ‘hosts’ section is most important:
     - First, it looks in its hosts file, then checks DNS.
 
-- `host <domain>`
-    - Look up IP addresses.
-    - Shows which servers handle the mail.
-
-- `nslookup`
-    - Query DNS servers.
-
-- `dig`
-    - Domain Information Groper.
-    - Query nameservers.
-    - `dig @<server> <domain> <record-type>`
-        - `@server` is optional for a remote query.
-    
 - `/etc/hosts`
     - Local hostnames and IPs.
 
@@ -114,8 +101,56 @@
     - Get all known hosts.
     - Lists the contents of `/etc/hosts`.
 
+- `host <domain>`
+    - Look up IP addresses.
+    - Shows which servers handle the mail.
+
+- `nslookup`
+    - Query DNS servers.
+
+- `dig`
+    - Domain Information Groper.
+    - Query nameservers.
+    - `dig @<server> <domain> <record-type>`
+        - `@server` - for a remote query
+    
+
 
 ## DHCP
+
+
+
+
+
+## File & data transfer
+
+* `scp` - secure copy
+    * copying over SSH
+
+* `sftp`
+    * more complex
+
+
+* `rsync`
+    * supports resuming transfers and only copies changes
+
+
+* `curl` - client url
+    * interaction with REST API
+    * By default, it perform the GET operation on the website's API
+    * `-o </destination/file> <source.com>` - output website contents to a file 
+    * `-O` - use original file name as specified on the server 
+    * `-L` - follow any redirect
+    * `-s` - silent mode
+    * `-S` - show error (when using with `-s`)
+    * `-F` - 
+    * `-d` - push data to a REST API
+    * `-H` - Header. It is defined as a case insensitive name, followed by a colon, followed by a value
+        * `content-type:`
+    * `-v` - view request headers and connection details, e.g. TLS handshake
+
+
+
 
 
 
@@ -126,6 +161,9 @@
 
 
 ## NGINX
+
+
+
 
 
 
