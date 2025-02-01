@@ -303,8 +303,36 @@ Boot targets are the modern equivalent of runlevels in `systemd`, which has repl
   - `ps aux`: Formats output for user-oriented listing.
   - Processes in **square brackets** are system or kernel processes.
 
-* `top`
-  * 
+* `top` / `htop`
+  * display Linyx processes
+  * print how much CPU, RAM, swap is used, its uptime, idle 
+  * **Row information:**
+    * time, uptime, signed in users, load average
+    * **tasks:** zombie tasks are orphan processes - unparented child processes 
+      * show process relations with `Shift+V`
+    * **CPU:** 
+      * `us` - user space
+      * `sys` - system space
+      * `ni` - niceness aka priority
+      * `id` - idleness - how much time has the CPU been idle for
+      * `wa` - waiting: how much has a task been waiting for input/output. So, lower is better 
+      * `hi` / `si` - hardware and software interrupts. Not so important nowadays
+      * `st` - how much time has a virtual CPU been waiting for a physical CPU
+    * **memory:** memory installed/ free/ used/ cached
+    * **swap:** swap space installed/ free/ used/ total 
+  * Columns information:
+    * `PR` - priority
+    * `VIRT` - virtual memory being used
+    * `RES` - physical memory used 
+    * `SHR` - shared memory used
+    * `%CPU` / `%MEM` - CPU / memory used
+    * `TIME+` - uptime process
+    * `command` - process name
+  * Column sorting
+    * `P` - sort by CPU usage
+    * `M` - sort by memory
+    * `k` - kill using the PID
+    
 
 
 ### Sending Signals to Processes
