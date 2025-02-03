@@ -258,39 +258,33 @@ Boot targets are the modern equivalent of runlevels in `systemd`, which has repl
 
 
 
-
-
-
-
-
 ## Job Scheduling 
 
-### At
-- Execute commands at a specified time by reading them from `STDIN` or a file.
-- All jobs scheduled to run at the same time are executed simultaneously.
-- `echo "command" | at 1000`: Schedule a command to execute at 10 AM.
-  - The result will be mailed to the user. If no mail server is available, check logs in `/var/log/syslog`.
-- `atq`: Check the list of scheduled jobs.
-- `atrm <job_id>`: Remove a scheduled job.
-- **Access Control**:
-  - `/etc/at.deny`: Users listed here cannot use `at`.
-  - `/etc/at.allow`: Users listed here can use `at`. Overrides `at.deny` if present.
+* `at`
+  - Execute commands at a specified time by reading them from `STDIN` or a file.
+  - All jobs scheduled to run at the same time are executed simultaneously.
+  - `echo "command" | at 1000`: Schedule a command to execute at 10 AM.
+    - The result will be mailed to the user. If no mail server is available, check logs in `/var/log/syslog`.
+  - `atq`: Check the list of scheduled jobs.
+  - `atrm <job_id>`: Remove a scheduled job.
+  - **Access Control**:
+    - `/etc/at.deny`: Users listed here cannot use `at`.
+    - `/etc/at.allow`: Users listed here can use `at`. Overrides `at.deny` if present.
 
 
-### Batch
-- Similar to `at`, but jobs are executed only if the system load drops below 1.5 or a specified threshold set in `atd`.
-- Jobs are executed sequentially, not simultaneously.
+* `batch`
+  - Similar to `at`, but jobs are executed only if the system load drops below 1.5 or a specified threshold set in `atd`.
+  - Jobs are executed sequentially, not simultaneously.
 
-
-### Cron
-- Schedules recurring jobs at specified times and intervals.
-- `crontab -e`: Edit or create scheduled jobs.
-- `crontab -l`: List current cron jobs.
-- **Access Control**:
-  - `/etc/cron.allow`: List of users who can use cron. Overrides `/etc/cron.deny`.
-  - `/etc/cron.deny`: List of users who cannot use cron.
-- **Configuration**:
-  - Similar access rules as `at`.
+* `cron`
+  - Schedules recurring jobs at specified times and intervals.
+  - `crontab -e`: Edit or create scheduled jobs.
+  - `crontab -l`: List current cron jobs.
+  - **Access Control**:
+    - `/etc/cron.allow`: List of users who can use cron. Overrides `/etc/cron.deny`.
+    - `/etc/cron.deny`: List of users who cannot use cron.
+  - **Configuration**:
+    - Similar access rules as `at`.
 
  
 
@@ -303,8 +297,17 @@ Boot targets are the modern equivalent of runlevels in `systemd`, which has repl
   - `ps aux`: Formats output for user-oriented listing.
   - Processes in **square brackets** are system or kernel processes.
 
-* `top` / `htop`
-  * display Linyx processes
+* `lsof` - list open files
+  * `-c` - filter on process name
+  * `-p` - filter on PID
+  * `-u` - filter on a specific user
+
+* `fuser`
+    * Display process IDs currently using files or sockets
+    * 
+
+* `top`
+  * display Linux processes
   * print how much CPU, RAM, swap is used, its uptime, idle 
   * **Row information:**
     * time, uptime, signed in users, load average
@@ -332,10 +335,11 @@ Boot targets are the modern equivalent of runlevels in `systemd`, which has repl
     * `P` - sort by CPU usage
     * `M` - sort by memory
     * `k` - kill using the PID
-    
 
 
-### Sending Signals to Processes
+
+
+## Ending Processes
 - `kill` Command - Sends signals to processes to perform specific actions.
     **Signals**:
     - **SIGINT**:

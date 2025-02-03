@@ -104,34 +104,7 @@
 
 ---
 
-## Disk and Archive Management
-- **`df`**: Display filesystem usage.
-  - Use `df -h` for human-readable format (e.g., MiBs, GiBs).
 
-- **`tar`**: Archive files.
-  - Common options:
-    - `c`: Create an archive.
-    - `v`: Verbose (list files being processed).
-    - `f`: Specify the filename.
-    - `z`: Compress or decompress with gzip.
-    - `t`: List archive contents.
-  - Examples:
-    ```bash
-    tar cvf archive.tar file1 file2
-    tar zcvf archive.tar.gz file1 file2
-    tar tvf archive.tar
-    ```
-
-- **`gzip`**: Compress files using the DEFLATE algorithm.
-  - Use `gunzip` to decompress.
-
-- **`dd`**: Copy and convert files.
-  - Example: Backup the MBR (Master Boot Record):
-    ```bash
-    dd if=/dev/sda of=mbr.bak bs=446 count=1
-    ```
-
-- **`xxd`**: Hexdump files.
 
 ---
 
