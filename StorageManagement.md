@@ -1,5 +1,67 @@
 # Storage
 
+## The Linux File System
+
+`/` - Root
+- The root directory is the top-level directory in the Linux filesystem hierarchy.
+
+`/bin` - Essential Binaries
+- Contains binaries or executables that are essential to the entire OS.
+- Commands like `gzip`, `curl`, `ls` are stored here.
+- All users can by default run these 
+
+`/sbin` - System Binaries
+- Contains system binaries or executables for the superuser (root).
+- Example: `mount`.
+
+`/lib` - Libraries
+- Shared libraries for essential binaries in `/bin` and `/sbin` are stored here.
+
+`/usr` - User Directory
+- Contains non-essential binaries or executables intended for the end user.
+- Includes:
+  - `/usr/bin`: Non-essential binaries.
+  - `/usr/sbin`: Non-essential system binaries.
+  - `/usr/lib`: Libraries for `/usr/bin` and `/usr/sbin`.
+- `/usr/local`:
+  - Contains manually compiled binaries in `/usr/local/bin`.
+  - Provides a safe place to avoid conflicts with system-installed packages.
+- Path and Precedence
+  - All these binaries are mapped together using the `PATH` environment variable (`$PATH`).
+  - `which` command shows the location of a binary and gives precedence to `/usr/bin` if the command exists in multiple places.
+
+`/etc` - Editable Text Config
+- Stores system configuration files (e.g., `.config` files).
+
+`/home` - User Files
+- Contains user-specific files and configurations.
+
+`/boot` - Boot Files
+- Contains files required to boot the system:
+  - `initrd`
+  - The Linux kernel:
+    - `vmlinux`: Uncompressed kernel.
+    - `vmlinuz`: Compressed kernel.
+
+`/dev` - Device Files
+- Provides access to hardware and drivers as if they are files.
+
+`/opt` - Optional Software
+- Stores optional or add-on software.
+
+`/var` - Variable Files
+- Contains files that change while the OS is running:
+  - Logs are stored here.
+
+- `/tmp` - Temporary Files
+- Stores temporary files.
+- Files in `/tmp` are non-persistent between reboots.
+
+`/proc` - Process Filesystem
+- An illusionary filesystem created in memory by the Linux kernel.
+- Used to keep track of running processes.
+
+
 ## inodes
 - A data structure in the file system that describes a file system object, such as a directory or file.
 - Inodes store attributes:
@@ -15,13 +77,59 @@
 - `find . -inum <inode number>`: Find file by inode number.
 
 
+## File localization
+
+* `type`
+    - Determines if a command is a shell built-in, alias, or external command.
+
+* `whereis`
+    - Outputs the location of a command and its man pages.
+
+* `locate`
+    - Locate a file quickly (requires updatedb).
+
+* `updatedb`
+    - Must be run in order to use `locate`.
+
+* `/etc/updatedb.conf`
+    - Configuration for `updatedb`, which defines locations not to search.
+
+- `stat`
+    - Display file or file system status 
+    - Output includes details like: 
+    -   File name 
+    -   File size 
+    -   Blocks allocated 
+    -   IO block size 
+    -   File type 
+    -   Device ID 
+    -   Inode number 
+    -   Links 
+    -   Access, Modify, and Change timestamps 
 
 
-### Examples:
-- `ps -aux | grep <pid>`: Find the process details.
-- `ps -auxf`: Shows a tree overview of all processes.
+## Hard and Symbolic Links
+- Hard Link
+    - A link to another file’s inode.
+    - Can only occur within the same file system.
+  
+- Symbolic (Soft) Link
+    - A link to another file name.
+    - Can span across different file systems.
+    - Akin to shortcuts in Windows.
 
----
+- Hard Links
+    - `ls -la`: Displays hard link count (second column).
+    - Directories have a minimum of 2 links: one for itself and one for its parent.
+    - Files have a minimum of 1 link.
+    - Create hard links with `ln <sourcefile> <destfile>`.
+    - Check links with `ls -li`.
+    - **Note**: Hard links are not allowed for directories.
+
+- Soft Links
+    - Useful for linking files between file systems.
+    - Create soft links with `ln -s <sourcefile> <destfile>`.
+
 
 ## Disk Quotas
 * to start using disk quotes, the package `quotas` is required
@@ -32,8 +140,6 @@
 * To implement quotas:
     * modify `/etc/fstab` file
     * add `,usrquota` after `defaults`
-
-
 
 
 
@@ -78,20 +184,6 @@
     * wipe the file system 
     * does not wipe the files themselves
 
-- **`dd`** - data duplicator / disk destroyer
-    * commonly used for disk imaging, data recovery, and even wiping data securely
-        * `if` - input file 
-        * `of` - output file 
-    * disk cloning and imaging
-        * `dd if=/dev/sdX of=/path/to/backup.img bs=4M status=progress` 
-            * create a disk image
-    * converting files to lowercase
-    * secure wiping
-        * `dd if=/dev/zero of=/dev/sd# bs=1M status=progress`
-    * Backup the MBR (Master Boot Record):
-        * `dd if=/dev/sda of=mbr.bak bs=446 count=1`
-    * disk performance tests
-        * measuring read / write speed
 
 * `mkfs.<type> /dev/sd#` - make file system
     - Build a Linux filesystem on a hard disk partition
@@ -153,11 +245,29 @@ So in order to take a used disk and repurpose it:
     - `tune2fs <disk> -L <volume name>`: Assign a volume name to a disk.
 
 
+## LVM
+* `pvcreate`
+* `vgcreate`
+* `lvcreate`
+* `resize2fs`
+
+
+## RAID basics
+* `mdadm`
+
+
+## NFS & samba file sharing
+
+
+## Swap management
+* `swapon`
+* `swapoff`
+* `mkswap`
+
 
 ## Backup & Recovery
 
-
-- **`tar`**: Archive files.
+- **`tar`** - Archive files.
   - Common options:
     - `c`: Create an archive.
     - `v`: Verbose (list files being processed).
@@ -175,58 +285,21 @@ So in order to take a used disk and repurpose it:
   - Use `gunzip` to decompress.
 
 
-
-## Locating files
-
-* `type`
-    - Determines if a command is a shell built-in, alias, or external command.
-
-* `whereis`
-    - Outputs the location of a command and its man pages.
-
-* `locate`
-    - Locate a file quickly (requires updatedb).
-
-* `updatedb`
-    - Must be run in order to use `locate`.
-
-* `/etc/updatedb.conf`
-    - Configuration for `updatedb`, which defines locations not to search.
-
-- `stat`
-    - Display file or file system status 
-    - Output includes details like: 
-    -   File name 
-    -   File size 
-    -   Blocks allocated 
-    -   IO block size 
-    -   File type 
-    -   Device ID 
-    -   Inode number 
-    -   Links 
-    -   Access, Modify, and Change timestamps 
+- **`dd`** - data duplicator / disk destroyer
+    * commonly used for disk imaging, data recovery, and even wiping data securely
+        * `if` - input file 
+        * `of` - output file 
+    * disk cloning and imaging
+        * `dd if=/dev/sdX of=/path/to/backup.img bs=4M status=progress` 
+            * create a disk image
+    * converting files to lowercase
+    * secure wiping
+        * `dd if=/dev/zero of=/dev/sd# bs=1M status=progress`
+    * Backup the MBR (Master Boot Record):
+        * `dd if=/dev/sda of=mbr.bak bs=446 count=1`
+    * disk performance tests
+        * measuring read / write speed
 
 
-## Hard and Symbolic Links
-- Hard Link
-    - A link to another file’s inode.
-    - Can only occur within the same file system.
-  
-- Symbolic (Soft) Link
-    - A link to another file name.
-    - Can span across different file systems.
-    - Akin to shortcuts in Windows.
-
-- Hard Links
-    - `ls -la`: Displays hard link count (second column).
-    - Directories have a minimum of 2 links: one for itself and one for its parent.
-    - Files have a minimum of 1 link.
-    - Create hard links with `ln <sourcefile> <destfile>`.
-    - Check links with `ls -li`.
-    - **Note**: Hard links are not allowed for directories.
-
-- Soft Links
-    - Useful for linking files between file systems.
-    - Create soft links with `ln -s <sourcefile> <destfile>`.
 
 

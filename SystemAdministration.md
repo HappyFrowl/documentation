@@ -1,165 +1,5 @@
 # System Administration
 
-
-
-
-
- 
-## Linux system Components
-
-**udev**
-- **Type**: Device Manager  
-- **Purpose**: Responsible for dynamically managing device nodes in the `/dev/` directory.  
-  - Device nodes represent hardware devices like disks, USB drives, network interfaces, and more.  
-- **Capabilities**:  
-  - Low-level access to the Linux device tree  
-  - Handles user-space events (e.g., loading firmware, adding hardware)  
-- **Example**:  
-  - Access is provided by a temporary filesystem (`tmpfs`) mounted to `/dev/`
-
-**dbus**
-- **Type**: Inter-Process Communication System  
-- **Purpose**: Facilitates communication between applications and system services.  
-  - Allows processes to send messages to each other.  
-- **Example**:  
-  - Applications like `NetworkManager` use D-Bus to communicate with the system's networking stack.
-
-**sysfs**
-- **Type**: Virtual Filesystem  
-- **Purpose**: Exposes kernel device and subsystem information to user space.  
-  - Mounted at `/sys` and provides a structured way to view and manipulate kernel objects.  
-  - Presents information about:  
-    - Various kernel subsystems  
-    - Hardware devices  
-    - Drivers  
-- **Example**:  
-  - Check `/sys/class/net` for network interface details.
-
-**procfs**
-- **Type**: Virtual Filesystem  
-- **Purpose**: Provides an interface to kernel data structures.  
-  - Mounted at `/proc` and allows user space to query or control the kernel.  
-  - Presents information about:  
-    - Processes  
-    - System information  
-- **Example**:  
-  - Access `/proc/cpuinfo` for CPU details or `/proc/meminfo` for memory usage.  
-  - Run `ls /proc` to list all running processes.  
-  - Interface with the kernel to change parameters on the fly.  
-  - The `cmdline` file contains options passed by GRUB during boot.  
-  - Linux version and kernel are stored as files in `/proc`.
-
-**tmpfs**
-- **Type**: Temporary Filesystem  
-- **Purpose**: A memory-based filesystem used for temporary data storage that does not persist after reboot.  
-- **Example**:  
-  - The `/tmp` directory is often mounted as `tmpfs`.
-
-**devtmpfs**
-- **Type**: Virtual Filesystem  
-- **Purpose**: Automatically populates the `/dev` directory with device nodes at boot, which are then managed by `udev`.  
-- **Example**:  
-  - Provides base device nodes for hardware detected during boot.
-
-**cgroups**
-- **Type**: Resource Management Subsystem  
-- **Purpose**: Limits, prioritizes, and accounts for resources (CPU, memory, I/O) used by groups of processes.  
-- **Example**:  
-  - Docker and Kubernetes use `cgroups` to manage container resource allocation.
-
-**FUSE** (Filesystem in User Space)
-- **Type**: Virtual Filesystem Framework  
-- **Purpose**: Allows non-privileged users to create and manage filesystems in user space.  
-- **Example**:  
-  - Filesystems like `SSHFS` or `NTFS-3G` use FUSE.
-
-## Modules
-- **Type**: Loadable Kernel Module (LKM)  
-- **Purpose**: Extend the running kernel without needing to recompile or reboot the system.  
-  - LKMs are object files dynamically loaded and unloaded into the kernel as needed.  
-- **Examples**:  
-  - Use `lsmod` to list currently loaded kernel modules and their usage.  
-  - Remove modules with `rmmod` and add them with `modprobe`.
-
-
-## The Linux File System
-
-`/` - Root
-- The root directory is the top-level directory in the Linux filesystem hierarchy.
-
-`/bin` - Essential Binaries
-- Contains binaries or executables that are essential to the entire OS.
-- Commands like `gzip`, `curl`, `ls` are stored here.
-- All users can by default run these 
-
-`/sbin` - System Binaries
-- Contains system binaries or executables for the superuser (root).
-- Example: `mount`.
-
-`/lib` - Libraries
-- Shared libraries for essential binaries in `/bin` and `/sbin` are stored here.
-
-`/usr` - User Directory
-- Contains non-essential binaries or executables intended for the end user.
-- Includes:
-  - `/usr/bin`: Non-essential binaries.
-  - `/usr/sbin`: Non-essential system binaries.
-  - `/usr/lib`: Libraries for `/usr/bin` and `/usr/sbin`.
-- `/usr/local`:
-  - Contains manually compiled binaries in `/usr/local/bin`.
-  - Provides a safe place to avoid conflicts with system-installed packages.
-- Path and Precedence
-  - All these binaries are mapped together using the `PATH` environment variable (`$PATH`).
-  - `which` command shows the location of a binary and gives precedence to `/usr/bin` if the command exists in multiple places.
-
-`/etc` - Editable Text Config
-- Stores system configuration files (e.g., `.config` files).
-
-`/home` - User Files
-- Contains user-specific files and configurations.
-
-`/boot` - Boot Files
-- Contains files required to boot the system:
-  - `initrd`
-  - The Linux kernel:
-    - `vmlinux`: Uncompressed kernel.
-    - `vmlinuz`: Compressed kernel.
-
-`/dev` - Device Files
-- Provides access to hardware and drivers as if they are files.
-
-`/opt` - Optional Software
-- Stores optional or add-on software.
-
-`/var` - Variable Files
-- Contains files that change while the OS is running:
-  - Logs are stored here.
-
--/tmp` - Temporary Files
-- Stores temporary files.
-- Files in `/tmp` are non-persistent between reboots.
-
-`/proc` - Process Filesystem
-- An illusionary filesystem created in memory by the Linux kernel.
-- Used to keep track of running processes.
-
-
-
-## Boot Targets
-
-Boot targets are the modern equivalent of runlevels in `systemd`, which has replaced `SysVinit` in most modern Linux distributions. They provide a more flexible and descriptive way of managing system states. Boot targets are particularly useful when troubleshooting the system, especially when it does not want to boot properly.
-
-- `systemctl get-default`
-    - Get Current Boot Target
-
-- `sudo systemctl isolate <target>`
-    - Temporarily Change the Boot Target
-
-    
-
-
-
-
 ## Localization and time 
 
 * `locale`
@@ -199,11 +39,6 @@ Boot targets are the modern equivalent of runlevels in `systemd`, which has repl
 - `hwclock --systohc --localtime` - Sync hardware clock with the local clock
 
 
-
-
-
-
- 
 
 ## Process management
 
@@ -295,7 +130,7 @@ Boot targets are the modern equivalent of runlevels in `systemd`, which has repl
 * `iostat` 
 * `free`
 
-## log management
+## Log management
 * `rsyslog`
 * `logrotate`
 * 
@@ -307,7 +142,7 @@ Boot targets are the modern equivalent of runlevels in `systemd`, which has repl
 * `lsmod`
 * `modprobe`
 
-## Boot process
+## Boot process and GRUB management
 
 **1. BIOS/ UEFI**
 * Hardware is booted 
@@ -332,6 +167,14 @@ Boot targets are the modern equivalent of runlevels in `systemd`, which has repl
     * It contains programs to perform hardware detection and load the necessary modules to get the actual file system mounted 
     * Once the actual file system is mounted, the OS continues to load from the real file system 
     * Initfs (initial file system) is the successor of initrd  
+* `/etc/default/grub`
+  * this file must be saved to the boot folder. To do so:
+    * In RHEL: `sudo grub2-mkconfig -o /boot/grub2/grub.cfg`
+    * In Ubuntu: `sudo update-grub2` 
+  * `/etc/grub.d/`
+    * directory containing all config files for grub
+    * 
+  
 
 **3. Kernel** 
 * Once the kernel is loaded into memory, the kernel takes to finish the startup process 
@@ -360,3 +203,95 @@ Boot targets are the modern equivalent of runlevels in `systemd`, which has repl
  
 
 
+**GRUB:**
+
+
+
+
+## Boot Targets
+
+Boot targets are the modern equivalent of runlevels in `systemd`, which has replaced `SysVinit` in most modern Linux distributions. They provide a more flexible and descriptive way of managing system states. Boot targets are particularly useful when troubleshooting the system, especially when it does not want to boot properly.
+
+- `systemctl get-default`
+    - Get Current Boot Target
+
+- `sudo systemctl isolate <target>`
+    - Temporarily Change the Boot Target
+
+
+
+## Linux system Components & virtual file systems
+
+**udev**
+- **Type**: Device Manager  
+- **Purpose**: Responsible for dynamically managing device nodes in the `/dev/` directory.  
+  - Device nodes represent hardware devices like disks, USB drives, network interfaces, and more.  
+- **Capabilities**:  
+  - Low-level access to the Linux device tree  
+  - Handles user-space events (e.g., loading firmware, adding hardware)  
+- **Example**:  
+  - Access is provided by a temporary filesystem (`tmpfs`) mounted to `/dev/`
+
+**dbus**
+- **Type**: Inter-Process Communication System  
+- **Purpose**: Facilitates communication between applications and system services.  
+  - Allows processes to send messages to each other.  
+- **Example**:  
+  - Applications like `NetworkManager` use D-Bus to communicate with the system's networking stack.
+
+**sysfs**
+- **Type**: Virtual Filesystem  
+- **Purpose**: Exposes kernel device and subsystem information to user space.  
+  - Mounted at `/sys` and provides a structured way to view and manipulate kernel objects.  
+  - Presents information about:  
+    - Various kernel subsystems  
+    - Hardware devices  
+    - Drivers  
+- **Example**:  
+  - Check `/sys/class/net` for network interface details.
+
+**procfs**
+- **Type**: Virtual Filesystem  
+- **Purpose**: Provides an interface to kernel data structures.  
+  - Mounted at `/proc` and allows user space to query or control the kernel.  
+  - Presents information about:  
+    - Processes  
+    - System information  
+- **Example**:  
+  - Access `/proc/cpuinfo` for CPU details or `/proc/meminfo` for memory usage.  
+  - Run `ls /proc` to list all running processes.  
+  - Interface with the kernel to change parameters on the fly.  
+  - The `cmdline` file contains options passed by GRUB during boot.  
+  - Linux version and kernel are stored as files in `/proc`.
+
+**tmpfs**
+- **Type**: Temporary Filesystem  
+- **Purpose**: A memory-based filesystem used for temporary data storage that does not persist after reboot.  
+- **Example**:  
+  - The `/tmp` directory is often mounted as `tmpfs`.
+
+**devtmpfs**
+- **Type**: Virtual Filesystem  
+- **Purpose**: Automatically populates the `/dev` directory with device nodes at boot, which are then managed by `udev`.  
+- **Example**:  
+  - Provides base device nodes for hardware detected during boot.
+
+**cgroups**
+- **Type**: Resource Management Subsystem  
+- **Purpose**: Limits, prioritizes, and accounts for resources (CPU, memory, I/O) used by groups of processes.  
+- **Example**:  
+  - Docker and Kubernetes use `cgroups` to manage container resource allocation.
+
+**FUSE** (Filesystem in User Space)
+- **Type**: Virtual Filesystem Framework  
+- **Purpose**: Allows non-privileged users to create and manage filesystems in user space.  
+- **Example**:  
+  - Filesystems like `SSHFS` or `NTFS-3G` use FUSE.
+
+## Modules
+- **Type**: Loadable Kernel Module (LKM)  
+- **Purpose**: Extend the running kernel without needing to recompile or reboot the system.  
+  - LKMs are object files dynamically loaded and unloaded into the kernel as needed.  
+- **Examples**:  
+  - Use `lsmod` to list currently loaded kernel modules and their usage.  
+  - Remove modules with `rmmod` and add them with `modprobe`.

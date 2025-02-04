@@ -2,56 +2,44 @@
 
 
 
-## Users and groups
+## user and group management
 
 ### **User types::**
-**Root:**
+* **Root:**
   - super user
   - admin 
   - UID 0 
 
-**Regular user:**
+* **Regular user:**
   - Runs apps
   - Configures databases, websites, etc
 
-**Service user:**
+* **Service user:**
 - Specific to the service (webserver, database)
 - No interactive login
 - Runs in the background
 
 
-### Switching users and access to sudo 
-**Substitute/ switch user:**
-- `su - <username>` - switch to another user account 
-- `su - root` or `sudo su` - switch to root
-- `sudoedit` - gain elevated editing permissions to a specific file if, and only if, the user is member of `editors` group and the group has editing permissions to the file
-    - `%editors ALL = sudoedit /path/to/file`
-- `visudo`
-    - edits `/etc/sudoers`
-    - Add users to `sudo` group 
-    - `visudo -c` checks the sudoers file for errors
-    - add user to sudoers
-        - `username ALL=(ALL) All:ALL`
-    - ensure all user can use `command`
-        - `ALL ALL=(ALL) /bin/last`
-    - give `user` access to `command` and to `updatedb`
-        - `user ALL=/path/to/command, /bin/updatedb`
-    - let `user` use `updatedb` without prompting for password
-        - `username ALL=NOPASSWD:/bin/updatedb`
+* **Substituting/ switching users:**
+  - `su - <username>` - switch to another user account 
+  - `su - root` or `sudo su` - switch to root
+  - `sudoedit` - gain elevated editing permissions to a specific file if, and only if, the user is member of `editors` group and the group has editing permissions to the file
+      - `%editors ALL = sudoedit /path/to/file`
+  - `visudo`
+      - edits `/etc/sudoers`
+      - Add users to `sudo` group 
+      - `visudo -c` checks the sudoers file for errors
+      - add user to sudoers
+          - `username ALL=(ALL) All:ALL`
+      - ensure all user can use `command`
+          - `ALL ALL=(ALL) /bin/last`
+      - give `user` access to `command` and to `updatedb`
+          - `user ALL=/path/to/command, /bin/updatedb`
+      - let `user` use `updatedb` without prompting for password
+          - `username ALL=NOPASSWD:/bin/updatedb`
 
-### Groups for sudo-level permissions
 
-- `sudo`
-    - Group for granting users `sudo` right
-    - Used on Debian-based systems
-    - Group access is configured by `/etc/sudoers/` through `visudo` alone, never by editing the file itself
-
-- `wheel` 
-    - Group for granting users `sudo` right
-    - Used on distros that do not by default have the `sudo` group
-    - e.g. Centos
-
-### **Creating and managing users and groups:**
+**Creating and managing users and groups:**
 - `useradd` - add a user
     - users are stored in `/etc/passwd`
         - it contains: `user:password:uid:gid:some_comment:homedir:defaultshell`
@@ -118,15 +106,32 @@
   - Prints user login, TTY, remote host, login time, idle time, current proess
 
 
+
+* **sudoers management**
+- `sudo` & `visudo`
+    - Group for granting users `sudo` right
+    - Used on Debian-based systems
+    - Group access is configured by `/etc/sudoers/` through `visudo` alone, never by editing the file itself
+
+- `wheel` 
+    - Group for granting users `sudo` right
+    - Used on distros that do not by default have the `sudo` group
+    - e.g. Centos
+
+
+## PAM configuration
+* `/etc/pam.d`
+  * 
+
 ## File permissions and ownership
 
-### File ownership 
+**File ownership** 
 -  `chown` / `chgrp`
   - `(chgrp|chown) user path/to/file_or_dir` change owner or group of a file or directory
   - `(chgrp|chown) -R path/to/file_or_dir` - change group recursively
   - `chown user:group path/to/file_or_dir` - change owner and group of the file or directory 
 
-### File permissions
+**File permissions**
 - `ls –la` results in something like this:
 
   - ```bash
@@ -144,14 +149,14 @@
     - `.` - SELinux 
     - `+` - other 
 
-### Changing permissions
+**Changing permissions**
 - chmod applies to 
   - `u` - users
   - `g` - group
   - `o` - other
   - `a` - all
 
-- permissions operator 
+- permissions operators 
   - `+` - add permissions
   - `-` - remove permissions
   - `=` - set exact permissions
@@ -183,7 +188,7 @@
   - `umask 777` - restrict `rwx` for everyone
   - `umask  a-e` - remove default execute permissions for everyone
 
-### Access Control Lists
+**Access Control Lists**
 - More granular file control than permissions
 - set access to one or multiple directories
 - `getfacl` - Get file ACL It outputs:
@@ -194,7 +199,7 @@
   - `-b` - Remove all entries except standard permissions
 
 
-### Attributes
+**Attributes**
 
 - `lsattr`
   - list attibutes of files and directories
@@ -226,7 +231,7 @@
   - `-R` - same but recursively
 
 
-### Special permissions
+**Special permissions**
 Less privileged users are allowed to execute a file by assuming the privileges of the file's owner or group
 
 1. **SUID - Set User ID** (`s`/ `S` on user position)
