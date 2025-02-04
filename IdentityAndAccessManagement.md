@@ -253,3 +253,14 @@ Less privileged users are allowed to execute a file by assuming the privileges o
 - **Symbol:**
   - `t` replaces `x` in the others execute field if executable `rwxr-xr-t`
   - `T` appears if the directory lacks execute permissions `rwxr-xr-T`
+
+
+  ## **LDAP basics**
+
+* `sssd`
+
+* `ldapsearch`
+
+* `ldapadd`
+
+

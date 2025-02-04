@@ -1,63 +1,8 @@
 # System Administration
-- [The boot process](#The-boot-process)
-- [Linux system Components](Linux-system-Components)
-- [The Linux File System](The-Linux-File-System)
 
-## The boot process:  
 
-**1. BIOS/ UEFI**
-* Hardware is booted 
-* BIOS/UEFI runs POST 
-    * Power On Self Test 
-    * Tests whether all hardware pieces are working properly 
-    * If there is an error it is shown on the screen 
-* If no error was encountered, the BIOS/ UEFI must find the bootloader software 
-    * Hard drive 
-    * USB 
-    * CD 
-    * PXE 
 
-**2. GRUB2** 
-* GRand Unified Bootloader 
-* Its jobs 
-    * Locate the kernel on the disk 
-    * Load the kernel into the computer memory  
-    * Run the kernel code 
-* The bootloader starts the OS by using initrd – initial ram disk 
-    * This is a temporary file system which is loaded into memory to assist in the boot process 
-    * It contains programs to perform hardware detection and load the necessary modules to get the actual file system mounted 
-    * Once the actual file system is mounted, the OS continues to load from the real file system 
-    * Initfs (initial file system) is the successor of initrd  
 
-**3. Kernel** 
-* Once the kernel is loaded into memory, the kernel takes to finish the startup process 
-* It starts 
-    * Kernel modules 
-    * Device drivers 
-    * Background processes 
-* First it decompresses itself onto memory, check the hardware, and load device drivers and other device drivers 
-* Then init takes off 
-
-**4. Init**
-* Initialization system 
-* Brings up and maintains user space services 
-* Once the kernel has attached the boot file system, init is run  
-* Init is the first process run by Linux 
-    * So process number is always pID 1 
-    * Check with ps –aux | head 
-    * Always run in the background 
-* For many distros, systemd is the used init system 
-    * Another is sysv or upstart 
-    * Systemd was spearheaded by RedHat 
-* Systemd is a collection of units (e.g. services, mounts, etc) 
-    * Systemctl, journalctl, loginct, notify, analyze, cgls, cgtop, nspawn 
-    * To query all units, run: systemctl list-unit-files 
-    * Also see which are enabled, disabled, masked 
- 
-
-During the boot many messages are shows. Two ways of showing these are: 
-* `dmesg` 
-* `cat /var/log/dmesg`
 
  
 ## Linux system Components
@@ -215,11 +160,11 @@ Boot targets are the modern equivalent of runlevels in `systemd`, which has repl
 
 
 
-## Localization, Internationalization. and Time
+## Localization and time 
 
-### Locale
-- Region-specific settings, including language and country formats.
-- `locale`: View and configure locale settings.
+* `locale`
+  - Region-specific settings, including language and country formats.
+  - View and configure locale settings.
 
 - **Convert between encodings**:
   - `iconv -f utf-8 -t iso_8653-1 < file.txt > output.txt`
@@ -228,7 +173,6 @@ Boot targets are the modern equivalent of runlevels in `systemd`, which has repl
 - **Detect file encoding**:
   - `file <filename>`
 
-### Date and Time Configuration
 
 - View current timezone:
   - `cat /etc/timezone`
@@ -258,37 +202,10 @@ Boot targets are the modern equivalent of runlevels in `systemd`, which has repl
 
 
 
-## Job Scheduling 
-
-* `at`
-  - Execute commands at a specified time by reading them from `STDIN` or a file.
-  - All jobs scheduled to run at the same time are executed simultaneously.
-  - `echo "command" | at 1000`: Schedule a command to execute at 10 AM.
-    - The result will be mailed to the user. If no mail server is available, check logs in `/var/log/syslog`.
-  - `atq`: Check the list of scheduled jobs.
-  - `atrm <job_id>`: Remove a scheduled job.
-  - **Access Control**:
-    - `/etc/at.deny`: Users listed here cannot use `at`.
-    - `/etc/at.allow`: Users listed here can use `at`. Overrides `at.deny` if present.
-
-
-* `batch`
-  - Similar to `at`, but jobs are executed only if the system load drops below 1.5 or a specified threshold set in `atd`.
-  - Jobs are executed sequentially, not simultaneously.
-
-* `cron`
-  - Schedules recurring jobs at specified times and intervals.
-  - `crontab -e`: Edit or create scheduled jobs.
-  - `crontab -l`: List current cron jobs.
-  - **Access Control**:
-    - `/etc/cron.allow`: List of users who can use cron. Overrides `/etc/cron.deny`.
-    - `/etc/cron.deny`: List of users who cannot use cron.
-  - **Configuration**:
-    - Similar access rules as `at`.
 
  
 
-## Process Management in Linux
+## Process management
 
 - `ps` - Lists running processes.
   - `ps`: Shows processes for the current user.
@@ -305,6 +222,7 @@ Boot targets are the modern equivalent of runlevels in `systemd`, which has repl
 * `fuser`
     * Display process IDs currently using files or sockets
     * 
+
 
 * `top`
   * display Linux processes
@@ -336,10 +254,12 @@ Boot targets are the modern equivalent of runlevels in `systemd`, which has repl
     * `M` - sort by memory
     * `k` - kill using the PID
 
+* `nice`
+  * 
 
+* `renice`
+  * 
 
-
-## Ending Processes
 - `kill` Command - Sends signals to processes to perform specific actions.
     **Signals**:
     - **SIGINT**:
@@ -360,5 +280,83 @@ Boot targets are the modern equivalent of runlevels in `systemd`, which has repl
 - `pkill`- Similar to `killall` but more flexible and potentially dangerous.
     - Allows matching processes based on name or other attributes.
 
+
+
+## Service management
+
+* `systemctl`
+* `jounalctl`
+* `chkconfig`
+* `rc.local`
+
+## System monitoring
+* `uptime` 
+* `vmstat` 
+* `iostat` 
+* `free`
+
+## log management
+* `rsyslog`
+* `logrotate`
+* 
+
+## Kernel management
+* `uname`
+* `sysctl`
+* `dmesg`
+* `lsmod`
+* `modprobe`
+
+## Boot process
+
+**1. BIOS/ UEFI**
+* Hardware is booted 
+* BIOS/UEFI runs POST 
+    * Power On Self Test 
+    * Tests whether all hardware pieces are working properly 
+    * If there is an error it is shown on the screen 
+* If no error was encountered, the BIOS/ UEFI must find the bootloader software 
+    * Hard drive 
+    * USB 
+    * CD 
+    * PXE 
+
+**2. GRUB2** 
+* GRand Unified Bootloader 
+* Its jobs 
+    * Locate the kernel on the disk 
+    * Load the kernel into the computer memory  
+    * Run the kernel code 
+* The bootloader starts the OS by using initrd – initial ram disk 
+    * This is a temporary file system which is loaded into memory to assist in the boot process 
+    * It contains programs to perform hardware detection and load the necessary modules to get the actual file system mounted 
+    * Once the actual file system is mounted, the OS continues to load from the real file system 
+    * Initfs (initial file system) is the successor of initrd  
+
+**3. Kernel** 
+* Once the kernel is loaded into memory, the kernel takes to finish the startup process 
+* It starts 
+    * Kernel modules 
+    * Device drivers 
+    * Background processes 
+* First it decompresses itself onto memory, check the hardware, and load device drivers and other device drivers 
+* Then init takes off 
+
+**4. Init**
+* Initialization system 
+* Brings up and maintains user space services 
+* Once the kernel has attached the boot file system, init is run  
+* Init is the first process run by Linux 
+    * So process number is always pID 1 
+    * Check with ps –aux | head 
+    * Always run in the background 
+* For many distros, systemd is the used init system 
+    * Another is sysv or upstart 
+    * Systemd was spearheaded by RedHat 
+* Systemd is a collection of units (e.g. services, mounts, etc) 
+    * Systemctl, journalctl, loginct, notify, analyze, cgls, cgtop, nspawn 
+    * To query all units, run: systemctl list-unit-files 
+    * Also see which are enabled, disabled, masked 
+ 
 
 

@@ -8,7 +8,7 @@
 - [NGINX](#NGINX)
 
 
-## IP and routing 
+## Configuring network interfaces
 - `ifconfig`
     - Display or configure network interfaces.
     - `ifconfig interface_name ip_address` - assign an IP ddress to an interface
@@ -28,7 +28,41 @@
     - `route add -net <ip> netmask <netmask> gw <gw_address>` - add a route rule
     - `route add default gw <ip>` - add a default gateway
 
-- `iptables` - Configure tables, chains and rules of the Linux kernel IPv4 firewall
+
+* **NetworkManager**
+- Entire suits of programs to manage networking
+- changes made are persistent
+- `nmcli` - CLI tool 
+- `nmtui` - Text user interface 
+* **network scripts**
+    - `network scripts` are scripts in `/etc/init.d/network` or `/etc/network` and any other script NetworkManager calls
+    - When `ifdown` is executed, scripts in `/etc/network/if-down.d` are run
+    - Although NetworkManager provides the default networking service, scripts and NetworkManager can run in parallel and work together
+    - Running Network scripts should only be done using `systemctl` 
+        - `systemctl start|stop|restart|status network`
+* `nmcli`
+    - `nmcli device` - manage device interface settings 
+        - `status` - Print networking devices. Also see whether devices are managed by NetworkManger
+        - `show` - Print extensive network information on the devices, e.g. IP, MTU, Gateway, DNS, Routes
+    - `nmcli connection` - manage network connection settings
+        - `show <ConnectionName>` - Print conenction info, DNS, DHCP server, lease time, etc.
+        - `add type ethernet con-name <connection-name> ifname <interface-name>` - adding a dynamic connection
+        - `modify <connection name> +ipv4.routes "<dst IP> <nhop IP>"` - add a route
+    - options
+        - `-t` - terse output: instead of a table format, seperate items with `:`
+        - `-f` - field: specific which fields you wanted printed
+            - especially good in combination for scripting
+        - `-p` - make it pretty - always good to use in combination with `show`
+
+
+* `netplan`
+    * 
+
+
+
+## Network troubleshooting
+* `ping` 
+    * 
 
 - `traceroute`
     - Trace the route packets take to a network host.
@@ -48,38 +82,20 @@
             - Get ports that are actively being listened to.
             - Shows all active internet connections.
 
-- `nmap`
+* `ss` - socket statistics
+  * prints similar information to `netstat`
+  * `-t | -u` - print tcp / udp connections
+  * `-l` - print listening connection
+  * `-s` - print statistics 
+  * `-4 | -6` - print ipv4 / ipv6 connection
+  * `sport == : <port> and dport == : <port>` - specify specific ports
+
+
+- `nmap` - network map
     - Look for open ports.
 
-- `lsof`
-    - Get open ports/files.
 
-## NetworkManager
-- Entire suits of programs to manage networking
-- changes made are persistent
-- `nmcli` - CLI tool 
-- `nmtui` - Text user interface 
 
-**Network Scripts**
-- `network scripts` are scripts in `/etc/init.d/network` or `/etc/network` and any other script NetworkManager calls
-- When `ifdown` is executed, scripts in `/etc/network/if-down.d` are run
-- Although NetworkManager provides the default networking service, scripts and NetworkManager can run in parallel and work together
-- Running Network scripts should only be done using `systemctl` 
-    - `systemctl start|stop|restart|status network`
-
-### `nmcli`
-- `nmcli device` - manage device interface settings 
-    - `status` - Print networking devices. Also see whether devices are managed by NetworkManger
-    - `show` - Print extensive network information on the devices, e.g. IP, MTU, Gateway, DNS, Routes
-- `nmcli connection` - manage network connection settings
-    - `show <ConnectionName>` - Print conenction info, DNS, DHCP server, lease time, etc.
-    - `add type ethernet con-name <connection-name> ifname <interface-name>` - adding a dynamic connection
-    - `modify <connection name> +ipv4.routes "<dst IP> <nhop IP>"` - add a route
-- options
-    - `-t` - terse output: instead of a table format, seperate items with `:`
-    - `-f` - field: specific which fields you wanted printed
-        - especially good in combination for scripting
-    - `-p` - make it pretty - always good to use in combination with `show`
 
 
 ## DNS
@@ -138,10 +154,8 @@
 * `sftp`
     * more complex
 
-
 * `rsync`
     * supports resuming transfers and only copies changes
-
 
 * `curl` - client url
     * interaction with REST API
@@ -161,6 +175,12 @@
 
 
 ## Firewall
+
+* `iptables` - 
+    * Configure tables, chains and rules of the Linux kernel IPv4 firewall
+
+* `firewalld`
+    * 
 
 * `ufw` - uncomplicated firewall
     * interface for IP tables and is desgiend to simplify the process of configuring firewalls 

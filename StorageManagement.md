@@ -1,8 +1,6 @@
 # Storage
 
-## File systems
-
-### Inode
+## inodes
 - A data structure in the file system that describes a file system object, such as a directory or file.
 - Inodes store attributes:
   - Last time of change, access, modification.
@@ -19,15 +17,6 @@
 
 
 
-
-
-
----
-
-# Fuser
-- Shows which process is using a particular directory.
-- Outputs the process ID.
-
 ### Examples:
 - `ps -aux | grep <pid>`: Find the process details.
 - `ps -auxf`: Shows a tree overview of all processes.
@@ -35,49 +24,20 @@
 ---
 
 ## Disk Quotas
-
-## Changing fstab
-- After `defaults`, add `,usrquota`.
-
-## Prerequisite
-- Install the package `quotas`.
-
-### Commands:
-- `quotacheck`: Scan a file system for disk usage and create/repair quota files.
-- `edquota`: Edit the disk quota for a user.
+* to start using disk quotes, the package `quotas` is required
+* `quotacheck`: Scan a file system for disk usage and create/repair quota files.
+* `edquota`: Edit the disk quota for a user.
   - Specifies disk usage, inode usage, and the specific file system to which it applies.
-- `quotaon`: Enable quotas and apply the configuration set in `edquota`.
-
----
-
-## Hard and Symbolic Links
-- Hard Link
-    - A link to another file’s inode.
-    - Can only occur within the same file system.
-  
-- Symbolic (Soft) Link
-    - A link to another file name.
-    - Can span across different file systems.
-    - Akin to shortcuts in Windows.
-
-- Hard Links
-    - `ls -la`: Displays hard link count (second column).
-    - Directories have a minimum of 2 links: one for itself and one for its parent.
-    - Files have a minimum of 1 link.
-    - Create hard links with `ln <sourcefile> <destfile>`.
-    - Check links with `ls -li`.
-    - **Note**: Hard links are not allowed for directories.
-
-- Soft Links
-    - Useful for linking files between file systems.
-    - Create soft links with `ln -s <sourcefile> <destfile>`.
-
----
+* `quotaon`: Enable quotas and apply the configuration set in `edquota`.
+* To implement quotas:
+    * modify `/etc/fstab` file
+    * add `,usrquota` after `defaults`
 
 
 
 
-## Disk Management
+
+## File system management
 
 - **`df`**: 
     * Display filesystem usage.
@@ -93,9 +53,9 @@
     * `-t` - specify target
     * `--mkdir` - create directory if not exists
     * `-a` - mount all file systems defined in `/etc/fstab`
+
 * `umount` - unmount
     * 
-
 
 * `smartctl` - SMART control
     * Self-Monitoring, Analysis, and Reporting Technology
@@ -103,6 +63,12 @@
     * `--health` - print overall health 
     * `-t (short|long)` - do a disk drive test 
     * `-all` - print all info, including test result
+
+* `fsck`- file system check
+    - Check the integrity of a filesystem or repair it
+    - **Note**: Do not run on mounted disks.
+    - `-a` - immediately repair all damaged blocks
+
 
 * `lsblk` - list blocks
     - Lists information about storage devices
@@ -131,6 +97,8 @@
     - Build a Linux filesystem on a hard disk partition
     - `mkfs.ext4 /dev/sda1`
     - `-c` - check for bad blocks
+
+## Partitioning
 
 * `fdisk`
     * Manage partition tables and partitions on a hard disk
@@ -173,10 +141,6 @@ So in order to take a used disk and repurpose it:
     * print the UUID of devices 
     * this is used to add the devices to `/etc/fstab`
 
-* `fsck`- file system check
-    - Check the integrity of a filesystem or repair it
-    - **Note**: Do not run on mounted disks.
-    - `-a` - immediately repair all damaged blocks
 
 * `dumpe2fs` 
     - Displays all information about a disk (for `ext2`, `ext3`, or `ext4`).
@@ -190,7 +154,7 @@ So in order to take a used disk and repurpose it:
 
 
 
-## File management
+## Backup & Recovery
 
 
 - **`tar`**: Archive files.
@@ -229,7 +193,6 @@ So in order to take a used disk and repurpose it:
 * `/etc/updatedb.conf`
     - Configuration for `updatedb`, which defines locations not to search.
 
-
 - `stat`
     - Display file or file system status 
     - Output includes details like: 
@@ -242,5 +205,28 @@ So in order to take a used disk and repurpose it:
     -   Inode number 
     -   Links 
     -   Access, Modify, and Change timestamps 
+
+
+## Hard and Symbolic Links
+- Hard Link
+    - A link to another file’s inode.
+    - Can only occur within the same file system.
+  
+- Symbolic (Soft) Link
+    - A link to another file name.
+    - Can span across different file systems.
+    - Akin to shortcuts in Windows.
+
+- Hard Links
+    - `ls -la`: Displays hard link count (second column).
+    - Directories have a minimum of 2 links: one for itself and one for its parent.
+    - Files have a minimum of 1 link.
+    - Create hard links with `ln <sourcefile> <destfile>`.
+    - Check links with `ls -li`.
+    - **Note**: Hard links are not allowed for directories.
+
+- Soft Links
+    - Useful for linking files between file systems.
+    - Create soft links with `ln -s <sourcefile> <destfile>`.
 
 
