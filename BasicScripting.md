@@ -1,6 +1,13 @@
 # Linux Commands and Features
 
-## Basic command line
+- [Basic commands](#Basic-commands)
+- [Streams and Redirection](Streams-and-Redirection)
+- [if Statements](if-Statements)
+- [Regular Expressions](Regular-Expressions)
+- [vim](#vim)
+- [git](#git)
+
+## Basic commands
 - **`cp`**
   - `*` the wildcard of wildcards, it's used to represent all single characters or any string.
   - `?` used to represent one character
@@ -18,10 +25,10 @@
   - 
 
 
-## Basic 
 
 
-## Man Pages
+
+**Man Pages:**
 
 - Man pages may have multiple sources, indicated by the `(x)` in the corner.
 - Sections are identified by their number:
@@ -34,33 +41,14 @@
   7. Misc  
   8. System admin commands/daemons  
 
-### Searching the Man Pages
+**Searching the Man Pages:**
 - **Search**: Press `/` and type your query to search within a man page.
 - **`apropos`**: Search the name section of all man pages (great for finding commands).
 - **`whatis`**: Display a brief description of a command.
 - **`info`**: Display the info page of a command.
 
----
 
-## GNU and Unix Commands
-
-### Environment and Basics
-- **`env`**: Display user environment variables (temporary, only for the session).
-- **`pwd`**: Print working (current) directory.
-- **`$HISTFILE`**: Path to the history file (e.g., `~/.bash_history`).
-  - View history: `cat ~/.bash_history` or use the `history` command.
-  - Export session history:
-    ```bash
-    export HISTFILE=<path>
-    ```
-  - Defaults back after logout.
-
-### System Information
-- **`uname`**: Print system information.
-- `uname -r` - Print kernel versiokn
-- `uname -n` - Print node name, i.e. Distro
-
-### File Operations
+**File Operations:**
 - **`cut`**: Extract portions of a file.
   - `-c`: Extract specific characters (e.g., `cut -c 3-5 file`).
   - `-d`: Specify delimiter.
@@ -102,10 +90,21 @@
 - **`expr`**: Perform mathematical operations.
   - Example: `expr 5 \* 3`.
 
+* **Environment and Basics**
+  - **`env`**: Display user environment variables (temporary, only for the session).
+  - **`pwd`**: Print working (current) directory.
+  - **`$HISTFILE`**: Path to the history file (e.g., `~/.bash_history`).
+    - View history: `cat ~/.bash_history` or use the `history` command.
+    - Export session history:
+      ```bash
+      export HISTFILE=<path>
+      ```
+    - Defaults back after logout.
+
+
 ---
 
-
-## Streams and Redirection
+## Stream manipulation
 - **Streams**:
   - `STDIN` (0): Input.
   - `STDOUT` (1): Output.
@@ -153,13 +152,38 @@
     ```
 
 
-## `if` Statements in Shell Scripting
+* `grep` - Globally (search for a) Regular Expression and Print
+  - Uses symbols and regular expressions to search plain text.
+  - **`grep`**: Basic search.
+  - **`egrep`**: Extended `grep`, allowing regular expression quantifiers without escaping.
+  - **`fgrep`**: Literal search; no interpretation of special characters.
 
-Conditional expressions in shell scripting allow you to evaluate strings, files, and directories. Below are some commonly used conditions.
+  - `grep <pattern> *`: Search files in the current directory.
+  - `grep -v 'e$' *`: Find strings that do not end with "e".
+  - `egrep 'l+' *`: Match one or more occurrences of "l" without escaping.
+  - `fgrep 'l\+' *`: Search for a literal `\` and `+`.
+
+
+* `sed` - Stream Editor
+  - Replace characters in a regular expression.
+  - Syntax:
+    ```bash
+    sed 's/<pattern>/<replacement>/' <file>
+
+* `awk` - pattern scanning and text processing language
+
+
+
+
 
 ---
 
-### String Conditions
+## `if` Statements
+
+Conditional expressions in shell scripting allow you to evaluate strings, files, and directories. Below are some commonly used conditions.
+
+
+**String Conditions:**
 - **`-z <string>`**:  
   True if the length of `<string>` is zero.
 - **`-n <string>`**:  
@@ -171,9 +195,8 @@ Conditional expressions in shell scripting allow you to evaluate strings, files,
 - **`<string>`**:  
   True if `<string>` is not empty.
 
----
 
-### File and Directory Conditions
+**File and Directory Conditions:**
 - **`-e <file>`**:  
   True if `<file>` exists.
 - **`-f <file>`**:  
@@ -189,13 +212,10 @@ Conditional expressions in shell scripting allow you to evaluate strings, files,
 
 ---
 
-
-# Searching Text Files Using Regular Expressions
-
 ## Regular Expressions
 Regular expressions (regex) are sequences of symbols and characters used to express patterns for searching text.
 
-### Symbols
+**Symbols:**
 - `|`: OR  
   Example: `grey|gray` matches either "grey" or "gray".
 - `()`: Grouping  
@@ -206,7 +226,7 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
   Example: `^Hello` matches lines starting with "Hello".
 - `.`: Matches any single character.
 
-### Quantifiers
+**Quantifiers:**
 - `?`: 0 or 1 occurrence of the preceding element.
 - `*`: 0 or more occurrences of the preceding element.
 - `+`: 1 or more occurrences of the preceding element.
@@ -216,50 +236,23 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
 
 ---
 
-## `grep`
-- Stands for **Globally search for a Regular Expression and Print**.
-- Uses symbols and regular expressions to search plain text.
-
-### Commands
-- **`grep`**: Basic search.
-- **`egrep`**: Extended `grep`, allowing regular expression quantifiers without escaping.
-- **`fgrep`**: Literal search; no interpretation of special characters.
-
-### Examples
-- `grep <pattern> *`: Search files in the current directory.
-- `grep -v 'e$' *`: Find strings that do not end with "e".
-- `egrep 'l+' *`: Match one or more occurrences of "l" without escaping.
-- `fgrep 'l\+' *`: Search for a literal `\` and `+`.
-
----
-
-## `sed` - Stream Editor
-- Replace characters in a regular expression.
-- Syntax:
-  ```bash
-  sed 's/<pattern>/<replacement>/' <file>
 
 
-
-# Performing File Editing Using `vim`
+## vim 
 
 `vim` is a powerful text editor in Linux with two primary modes: **Command Mode** and **Insert Mode**.
 
----
-
-## Modes
-
-### 1. Command Mode
+Modes
+1. Command Mode
 - Used for navigating and manipulating text without typing.
 - Key bindings control movement and text actions.
 
-### 2. Insert Mode
+2. Insert Mode
 - Used for directly editing text.
 - Entered using specific keys (e.g., `i`, `a`, `o`) from Command Mode.
 
----
 
-## Navigation in Command Mode
+**Navigation in Command Mode:**
 - **`h`**: Move left.
 - **`l`**: Move right.
 - **`j`**: Move down.
@@ -270,59 +263,87 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
   - Use **`n`** for the next occurrence.
 - **`Shift+g`**: Move to the end of the file.
 
----
 
-## Editing in Command Mode
+**Editing in Command Mode:**
 
-### Deleting Text
-- **`x`**: Delete the character under the cursor.
-- **`dd`**: Delete the current line.
+* **Deleting Text:**
+  - **`x`**: Delete the character under the cursor.
+  - **`dd`**: Delete the current line.
 
-### Pasting Text
-- **`p`**: Paste below the current line.
-- **`P`**: Paste above the current line.
+* **Pasting Text**
+  - **`p`**: Paste below the current line.
+  - **`P`**: Paste above the current line.
 
-### Entering Insert Mode
-- **`i`**: Insert before the cursor.
-- **`a`**: Insert after the cursor.
-- **`o`**: Insert a new line below the current line.
-- **`O`**: Insert a new line above the current line.
+**Entering Insert Mode:**
+  - **`i`**: Insert before the cursor.
+  - **`a`**: Insert after the cursor.
+  - **`o`**: Insert a new line below the current line.
+  - **`O`**: Insert a new line above the current line.
 
----
+**Saving and Exiting:**
+* Without Saving
+  - **`:q`**: Exit without saving.
+  - **`:q!`**: Force exit without saving.
 
-## Saving and Exiting
+* Saving
+  - **`:w`**: Save the file.
+  - **`:wq`**: Save and exit.
+  - **`Shift+ZZ`**: Save and exit.
 
-### Without Saving
-- **`:q`**: Exit without saving.
-- **`:q!`**: Force exit without saving.
-
-### Saving
-- **`:w`**: Save the file.
-- **`:wq`**: Save and exit.
-- **`Shift+ZZ`**: Save and exit.
-
----
-
-## Additional Commands
-- **`/`**: Search forward for a term.
-- **`?`**: Search backward for a term.
-- **`n`**: Jump to the next search result.
-- **`N`**: Jump to the previous search result.
+**Additional Commands:**
+  - **`/`**: Search forward for a term.
+  - **`?`**: Search backward for a term.
+  - **`n`**: Jump to the next search result.
+  - **`N`**: Jump to the previous search result.
 
 ---
 
 ## Git
 
-`git init`: Create an empty Git repository or reinitialize an existing one.
-`gh repo create <repository-name> --public` - Create a github repo
+* `git init`: Create an empty git repository or reinitialize an existing one.
+  * 
 
-`git add README.md` - Add file contents to the index
-`git commit -m "first commit"` - Record changes to the repository.
-`git branch -M main` - Move a branch 
-`git remote add origin git@github.com:HappyFrowl/testrepo.git` - Add a remote named <name> for the repo at <URL>
-`git push -u origin main` - Push commits
-`
-`gh repo delete testrepo2 --yes` - Delete github repo
+* `git add`
+  *  `<file>` - Add file contents to the staging area
+
+* `git commit`
+  * `-m "<text>"` - Record changes to the repository.
+  * 
+
+* `git branch`
+  * `-m <oldname> <newname>` - move or rename a branch
+
+* `git remote`
+  * `add origin <repo-url>/git.git` - Add a remote named <name> for the repo at <URL>
+  * 
+* `git push` 
+  * `-u <local-repo> <remote-repo>` - Push commits
+  * 
+
+* `git checkout`
+  * `checkout <branch name>` - switch to another branch
+  * `checkout -` - switch to the branch previously checked out 
+  * `checkout <path/to/file>` - discard unstaged changes to a given file:
+
+* `git rebase` 
+  * Commonly used to "move" an entire branch to another base, creating copies of the commits in the new location
+    * `git rebase <new_base_branch>` - Rebase the current branch on top of another specified branch
+  * Reapply commits from one branch on top of another branch.
+    * `-i HEAD~#` - reapply commits for the last # commits. This is good for squashing commits and cleaning up the history
+      * after going this route, run `git push origin HEAD:<branch> --force` to push 
+  
+
+* `git reset` - Undo commits or unstage changes
+  * `<path/to/file1> <path/to/file2>` - unstage files
+  * can do a quick and dirty variant of what git rebase does with uncommiting commits
+    * `git reset --soft HEAD~#` 
+      * after this, make the new commit and this will replace all # above mentioned
+      * after making the final commit, run: `git push --force` to apply the changes 
+
+
+**github:**
+* `gh repo create <repository-name> --public` - Create a github repo
+* `gh repo delete testrepo2 --yes` - Delete github repo
 
 
 
@@ -343,11 +364,6 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
          
 
  
-
-
-
-## git
-
 
 
 

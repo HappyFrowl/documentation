@@ -1,11 +1,13 @@
 # Networking
 
-- [IP and routing](#ip-and-routing)
-- [NetworkManager](#NetworkManager)
+- [Configuring network interfaces](#Configuring-network-interfaces)
+- [Network Troubleshooting](#Network-Troubleshooting)
+- [Firewall](#Firewall)
 - [DNS](#DNS)
 - [DHCP](#DHCP)
-- [Firewall](#Firewall)
-- [NGINX](#NGINX)
+- [SSH](#SSH)
+
+
 
 
 ## Configuring network interfaces
@@ -56,8 +58,9 @@
 
 
 * `netplan`
-    * 
-
+    * YAML network configuration abstraction for various backends
+    * it is a way of declaratively ocnfigure interface devices 
+    * `/etc/netplan/*` - location for the yaml files 
 
 
 ## Network troubleshooting
@@ -93,9 +96,6 @@
 
 - `nmap` - network map
     - Look for open ports.
-
-
-
 
 
 ## DNS
@@ -151,11 +151,22 @@
 * `scp` - secure copy
     * copying over SSH
 
+* `rsync` - remote sync
+    * transfer files either to or from a remote host
+        * can also be entirely local or mounts for remote directories
+    * supports resuming transfers and only copies changes
+    * it uses the ssh protocol
+    * `rsync <file or dir> <dir2>`
+    * `rsync <directory> -rv --dry-run user@192.168.1.10:/home/user/backup` - transfer the contents of directory recursively and verbosely to /home/user/backup on remote host with IP 192.1681.1.10, but dry run it   
+        * this is not a sync utility, for it never removes files only appends and does nothing about similarly named duplicates
+    * `rsync --delete -rv <dir> <host>:<dir>` - delete all the files in the target directory that are **not** included in the source directory
+    * `-a` - archive option. This makes sure the metadata (the date) is the same between directories
+    * `-z` - compress files 
+
+
 * `sftp`
     * more complex
 
-* `rsync`
-    * supports resuming transfers and only copies changes
 
 * `curl` - client url
     * interaction with REST API
@@ -177,10 +188,45 @@
 ## Firewall
 
 * `iptables` - 
-    * Configure tables, chains and rules of the Linux kernel IPv4 firewall
+    * Configure tables, chains and rules 
+
+* `nftables`
+    * 
+
 
 * `firewalld`
+    * Red Hat firewall manager
+    * Used by
+        * RHEL
+        * CentOS
+        * Alma Linux
+        * Rocky Linux
+        * Oracle Enterprise Linux
+    * **Terminology**
+        * `netfilter`
+            * actual Linux firewall
+            * packet filtering code that is built-in the Linux Kernel
+            * to interact with it, a helper program is needed
+        * `iptables`
+            * default firewall manager for many distros
+        * `nftables`
+            * newer, better, easier than `iptables`
+        * `firewalld` 
+            * command line frontend for `iptables` or `nftables`
+            * this injects the rules into `iptables` or `nftables` 
+    * **zones**
+        * collection of open ports for that zone
+        * located `/etc/firewalld/zones/`
+        * by default, there always is a `public.xml` zone
+    * **basic commands:**
+        * `firewall-cmd --add-port=8080/tcp` - open up port 8080/tcp
+            * this configuration will be visible in `nft list ruleset`
+        * `--permenant` - make permanent changes 
     * 
+    * 
+    * 
+    * 
+
 
 * `ufw` - uncomplicated firewall
     * interface for IP tables and is desgiend to simplify the process of configuring firewalls 
@@ -209,10 +255,48 @@
 
 
 
+## SSH
+- `/etc/ssh/ssh.config`
+    - Configure outbound SSH connections.
+    - Example: Turn off password-based authentication, allowing only certificate-based authentication.
+
+- `/etc/ssh/sshd.config`
+    - Configure the SSH server.
+    - Manages incoming SSH connections.
+    - Configure the port to which it listens for SSH connections.
+
+-`ssh-keygen`
+    - `ssh-keygen -t <ed25519> -f <path/to/file>` - Create SSH key
+- `ssh-copy-id <IP>`
+    - Copy and add the public key to `~/.ssh/authorized_keys` on the remote machine.
+    - Enter the password of the account on the remote PC.
+    - Once done, you can SSH without entering a password.
+- `ssh-add` - add the efault SSH keys in ~/.ssh to the ssh-agent
+- `ssh -X`
+    - X11 forwarding.
 
 
+SSH: 
 
-## nginx
+Default root cannot use password to login 
+
+Disallow root login completely 
+
+Add ‘PermirootLogin no’ in /etc/sshd/ssh_config 
+
+Allow root login using password 
+
+Make sure the following lines are included: 
+
+PermitRootLogin yes 
+
+PasswordAuthentication yes 
+
+After changing the config file restart sshd 
+
+systemctl restart sshd 
+
+
 
 
 
