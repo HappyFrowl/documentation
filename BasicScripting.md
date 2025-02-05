@@ -22,7 +22,7 @@
 
 
 - **`find`**
-  - 
+  - s
 
 
 
@@ -298,39 +298,95 @@ Modes
 
 ---
 
-## Git
+## git
 
-* `git init`: Create an empty git repository or reinitialize an existing one.
-  * 
+### **git basics**
+* `git init`- initialize a git repository or reinitialize an existing one.
 
 * `git add`
   *  `<file>` - Add file contents to the staging area
 
 * `git commit`
   * `-m "<text>"` - Record changes to the repository.
-  * 
+  * each commits receives a unique hash with which it can be recognized
+  * after the first commit, all commits are related to the previous commit
 
-* `git branch`
+* `git log` - see commit history
+  * `--oneline` - make it compact
+  * `HEAD -> main, origin/main` - 
+
+* `git push` 
+  * `-u <local-repo> <remote-repo>` - Push commits
+
+* `git status` - Show the changes to files in a Git repository.
+  * `--verbose --verbose` - see information on changes in both the statging are and working directory
+
+### **configuring git:**
+* `git config --global` - configure git: user info, default text editor
+  * `user.name "<name>"`
+  * `user.email "<email>"`
+  * `core.editor <e.g. nano, vim, code --wait>` - configure default text editor
+
+* `.gitignore`
+  * mention all files that should be ignored from tracking
+    * e.g. `.env`
+ 
+* `~/.gitconfig`
+  * config file for git
+  * contains user, email, text editor, signin key 
+
+* `.git` - inside each init directory.
+  * **key directories:**
+    * **`refs/`** → Stores branch (`refs/heads/`) and tag (`refs/tags/`) pointers.  
+    * **`objects/`** → Stores commit, tree, and file data using SHA-1 hashes.  
+    * **`logs/`** → Tracks branch updates and movements.  
+    * **`hooks/`** → Contains scripts for automation (e.g., pre-commit checks).  
+    * **`info/`** → Holds repository-specific settings (e.g., ignored files).  
+  * **key files:**
+    - **`COMMIT_EDITMSG`** → Stores the last commit message.  
+    - **`config`** → Repository settings (overrides global `~/.gitconfig`).  
+    - **`description`** → Used by GitWeb, not relevant for local repos.  
+    - **`HEAD`** → Points to the currently checked-out branch.  
+
+### **git branching and merging**
+* `git branch` - by default it shows existing branches
+  * branches are like timelines that can diverge and converge
+  * `git branch <name>` - create a new branch
   * `-m <oldname> <newname>` - move or rename a branch
+  * In doubt, keep an eye on the git folder to see where HEAD is pointing to
+
+* `git checkout`
+  * `git checkout <name>` - switch to another branch
+  * `git checkout -b <name>` - create a branch and move there
+
+* `git merge` - merge two branches
+  * `checkout master` - then merge from there
 
 * `git remote`
   * `add origin <repo-url>/git.git` - Add a remote named <name> for the repo at <URL>
-  * 
-* `git push` 
-  * `-u <local-repo> <remote-repo>` - Push commits
-  * 
+  * this is done during the initial push after initializing the repo
 
-* `git checkout`
-  * `checkout <branch name>` - switch to another branch
-  * `checkout -` - switch to the branch previously checked out 
-  * `checkout <path/to/file>` - discard unstaged changes to a given file:
+* `git merge` - converge two branches
 
+**git conflicts:**
+  * resolving must be done manually in the code editor
+  * the conflict is shown highlighted in green and blue 
+  * Green - branch that you are on
+  * Blue - conflict that came from another branch (merge)
+  * Keep what you want, **remove markers** and save 
+
+### Managing changes
+* `git diff`
+
+* `git stash`
+
+
+### git history and rewrites
 * `git rebase` 
   * Commonly used to "move" an entire branch to another base, creating copies of the commits in the new location
     * `git rebase <new_base_branch>` - Rebase the current branch on top of another specified branch
-  * Reapply commits from one branch on top of another branch.
-    * `-i HEAD~#` - reapply commits for the last # commits. This is good for squashing commits and cleaning up the history
-      * after going this route, run `git push origin HEAD:<branch> --force` to push 
+  * `git rebase -i HEAD~#` - reapply commits for the last `n#` commits. This is good for squashing commits and cleaning up the history
+    * after going this route, run `git push origin HEAD:<branch> --force` to push 
   
 
 * `git reset` - Undo commits or unstage changes
@@ -339,6 +395,10 @@ Modes
     * `git reset --soft HEAD~#` 
       * after this, make the new commit and this will replace all # above mentioned
       * after making the final commit, run: `git push --force` to apply the changes 
+
+
+
+
 
 
 **github:**
