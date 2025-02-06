@@ -358,12 +358,15 @@ Modes
 * `git checkout`
   * `git checkout <name>` - switch to another branch
   * `git checkout -b <name>` - create a branch and move there
+  * `git checkout <hash>` - move to a specific commit using its hash
+  * `git checkout HEAD~#` - go n# commits back 
+    * `git reflog` - go back to the previous place where you were  
 
 * `git merge` - merge two branches
-  * `checkout master` - then merge from there
+  * `git checkout master` - then merge from there
 
 * `git remote`
-  * `add origin <repo-url>/git.git` - Add a remote named <name> for the repo at <URL>
+  * `git add origin <repo-url>/git.git` - Add a remote named <name> for the repo at <URL>
   * this is done during the initial push after initializing the repo
 
 * `git merge` - converge two branches
@@ -381,11 +384,25 @@ Modes
   * symbols indicate how files have changed
     * `------` is an indication for file 1
     * `++++++` is an indication for file 2
-  * `--staged` - compare between the latest commit file and the staged file  
-  * `<commit id1>..<commit id2>` - compare two commits
+  * `git diff --staged` - compare between the latest commit file and the staged file  
+  * `git diff <commit id1>..<commit id2>` - compare two commits
 
-* `git stash` - stashing
+* `git stash` - Stash local Git changes in a temporary area.
+  * `git stash` is about saving your work temporarily
+  * it can also be a solution for when **conflicts** arise due to having uncommited changes in an existing branch and existing file 
+  * Let's walk through how it can be reproduced:
+    * Be on any branch (e.g., main).
+    * Modify an existing file (a file that has already been committed).
+    * Try to switch to another branch (e.g., bugfix).
+    * If the changes in your working directory conflict with the target branch, Git will prevent you from switching branches unless you either:
+      * Commit the changes.
+      * Stash the changes using git stash.
+  * `git stash pop` - bring the changes back
+    * it works also between branches
+  * `git stash list` - list all stashes
+  * `git stash apply stash@{#}` - choose which stash to apply
   * 
+    * 
 
 
 ### git history and rewrites
