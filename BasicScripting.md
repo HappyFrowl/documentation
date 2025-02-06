@@ -376,9 +376,16 @@ Modes
   * Keep what you want, **remove markers** and save 
 
 ### Managing changes
-* `git diff`
+* `git diff` - differences
+  * compare a file between different commits or between different branches
+  * symbols indicate how files have changed
+    * `------` is an indication for file 1
+    * `++++++` is an indication for file 2
+  * `--staged` - compare between the latest commit file and the staged file  
+  * `<commit id1>..<commit id2>` - compare two commits
 
-* `git stash`
+* `git stash` - stashing
+  * 
 
 
 ### git history and rewrites
@@ -401,9 +408,13 @@ Modes
 
 
 
-**github:**
-* `gh repo create <repository-name> --public` - Create a github repo
-* `gh repo delete testrepo2 --yes` - Delete github repo
+### github
+* `gh repo create <repo-name> --public` - Create a github repo
+* `gh repo delete <repo-name> --yes` - Delete github repo
+
+
+
+
 
 
 
