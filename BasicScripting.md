@@ -4,8 +4,9 @@
 - [Streams and Redirection](Streams-and-Redirection)
 - [if Statements](if-Statements)
 - [Regular Expressions](Regular-Expressions)
-- [vim](#vim)
-- [git](#git)
+- [Vim](#vim)
+- [Git](#git)
+
 
 ## Basic commands
 - **`cp`**
@@ -315,9 +316,6 @@ Modes
   * `--oneline` - make it compact
   * `HEAD -> main, origin/main` - 
 
-* `git push` 
-  * `-u <local-repo> <remote-repo>` - Push commits
-
 * `git status` - Show the changes to files in a Git repository.
   * `--verbose --verbose` - see information on changes in both the statging are and working directory
 
@@ -364,12 +362,7 @@ Modes
 
 * `git merge` - merge two branches
   * `git checkout master` - then merge from there
-
-* `git remote`
-  * `git add origin <repo-url>/git.git` - Add a remote named <name> for the repo at <URL>
-  * this is done during the initial push after initializing the repo
-
-* `git merge` - converge two branches
+  
 
 **git conflicts:**
   * resolving must be done manually in the code editor
@@ -417,17 +410,35 @@ Modes
   * `<path/to/file1> <path/to/file2>` - unstage files
   * can do a quick and dirty variant of what git rebase does with uncommiting commits
     * `git reset --soft HEAD~#` 
-      * after this, make the new commit and this will replace all # above mentioned
+      * after this, make the new commit and this will replace all #-amount commits previously done
       * after making the final commit, run: `git push --force` to apply the changes 
+      * don't do this on branches where you collaborate
 
 
+### remote repos - e.g. github
+* `git remote` - manage set a tracked repos
+  * `git remote -v` - check the current connection with remote repo
+  * `git remote add origin https://github.com<username>/<repo-name>.git` - Add a remote named <name> for the repo at <URL>
+    * this is done during the initial push after initializing the repo
+    * 'origin' is the remote branch
+  * `git remote rename <oldname> <newname> - change the remote branch name. By default it is 'origin' and this can be changed
+
+* `git push` - push code to the remote repo
+  * `git push --set-upstream origin <name>` - link the remote to the current branch. This is done as the initial push, after which it is remembered
+    * `git push -u <remote-repo> <local-repo>` - `-u` is synonym for `--set-upstream` 
+    * 
+
+* `git pull` - fetch branch from a remote repo
+
+* `git fetch` - Download objects and refs from a remote repo
+  * it brings it into the local repo
+  * not into the working area, like `git pull`
+  * `git pull` = `git fetch` + `git merge`
 
 
-
-
-### github
-* `gh repo create <repo-name> --public` - Create a github repo
-* `gh repo delete <repo-name> --yes` - Delete github repo
+* `gh repo` - github specific commands
+  * `gh repo create <repo-name> --public` - Create a github repo
+  * `gh repo delete <repo-name> --yes` - Delete github repo
 
 
 
