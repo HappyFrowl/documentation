@@ -11,7 +11,7 @@
 
 
 ## Configuring network interfaces
-- `ifconfig`
+- `ifconfig` - interface configuration 
     - Display or configure network interfaces.
     - `ifconfig interface_name ip_address` - assign an IP ddress to an interface
         - changes are non-persistent between reboots
@@ -21,10 +21,10 @@
     - `ip link set <interface> (up|down)` - bring an interface up or down 
     - Non persistent
     
-- `ifdown / ipup`
+* `ifdown / ifup` - interface down / up 
     - Bring an interface down.
 
-- `route` - Show route tables.
+* `route` - Show route tables.
     - Like `ip` changes made with `route` are not persistent
     - `route -n` - Show the IP addresses, rather than `default`
     - `route add -net <ip> netmask <netmask> gw <gw_address>` - add a route rule
@@ -65,19 +65,18 @@
 
 ## Network troubleshooting
 * `ping` 
-    * 
 
-- `traceroute`
+* `traceroute`
     - Trace the route packets take to a network host.
 
-- `nc` - `netcat`
+* `nc` - `netcat`
     - Read and write traffic over a network.
     - `nc –l [port]`: Listen mode.
     - `nc [ip] [port]`: Write mode.
     - Used to test connectivity.
     - Afges from a remote computer on the network using netcat.
 
-- `netstat` - network interface stats.
+* `netstat` - network interface stats.
     - Active internet connections.
     - What remote machines are you connected to.
     - Active UNIX domain sockets.
@@ -156,7 +155,7 @@
         * can also be entirely local or mounts for remote directories
     * supports resuming transfers and only copies changes
     * it uses the ssh protocol
-    * `rsync <file or dir> <dir2>`
+    * `rsync <file or dir> <dir2>`d
     * `rsync <directory> -rv --dry-run user@192.168.1.10:/home/user/backup` - transfer the contents of directory recursively and verbosely to /home/user/backup on remote host with IP 192.1681.1.10, but dry run it   
         * this is not a sync utility, for it never removes files only appends and does nothing about similarly named duplicates
     * `rsync --delete -rv <dir> <host>:<dir>` - delete all the files in the target directory that are **not** included in the source directory

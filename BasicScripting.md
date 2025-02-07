@@ -4,6 +4,7 @@
 - [Streams and Redirection](Streams-and-Redirection)
 - [if Statements](if-Statements)
 - [Regular Expressions](Regular-Expressions)
+- [Job scheduling](Job-Scheduling)
 - [Vim](#vim)
 - [Git](#git)
 
@@ -297,6 +298,42 @@ Modes
   - **`n`**: Jump to the next search result.
   - **`N`**: Jump to the previous search result.
 
+
+
+
+
+## Job Scheduling 
+
+* `at`
+  - Execute commands at a specified time by reading them from `STDIN` or a file.
+  - All jobs scheduled to run at the same time are executed simultaneously.
+  - `echo "command" | at 1000`: Schedule a command to execute at 10 AM.
+    - The result will be mailed to the user. If no mail server is available, check logs in `/var/log/syslog`.
+  - `atq`: Check the list of scheduled jobs.
+  - `atrm <job_id>`: Remove a scheduled job.
+  - **Access Control**:
+    - `/etc/at.deny`: Users listed here cannot use `at`.
+    - `/etc/at.allow`: Users listed here can use `at`. Overrides `at.deny` if present.
+
+
+* `batch`
+  - Similar to `at`, but jobs are executed only if the system load drops below 1.5 or a specified threshold set in `atd`.
+  - Jobs are executed sequentially, not simultaneously.
+
+* `cron`
+  - Schedules recurring jobs at specified times and intervals.
+  - `crontab -e`: Edit or create scheduled jobs.
+  - `crontab -l`: List current cron jobs.
+  - **Access Control**:
+    - `/etc/cron.allow`: List of users who can use cron. Overrides `/etc/cron.deny`.
+    - `/etc/cron.deny`: List of users who cannot use cron.
+  - **Configuration**:
+    - Similar access rules as `at`.
+
+
+
+
+
 ---
 
 ## git
@@ -466,34 +503,4 @@ Modes
 
 
 
-
-
-
-## Job Scheduling 
-
-* `at`
-  - Execute commands at a specified time by reading them from `STDIN` or a file.
-  - All jobs scheduled to run at the same time are executed simultaneously.
-  - `echo "command" | at 1000`: Schedule a command to execute at 10 AM.
-    - The result will be mailed to the user. If no mail server is available, check logs in `/var/log/syslog`.
-  - `atq`: Check the list of scheduled jobs.
-  - `atrm <job_id>`: Remove a scheduled job.
-  - **Access Control**:
-    - `/etc/at.deny`: Users listed here cannot use `at`.
-    - `/etc/at.allow`: Users listed here can use `at`. Overrides `at.deny` if present.
-
-
-* `batch`
-  - Similar to `at`, but jobs are executed only if the system load drops below 1.5 or a specified threshold set in `atd`.
-  - Jobs are executed sequentially, not simultaneously.
-
-* `cron`
-  - Schedules recurring jobs at specified times and intervals.
-  - `crontab -e`: Edit or create scheduled jobs.
-  - `crontab -l`: List current cron jobs.
-  - **Access Control**:
-    - `/etc/cron.allow`: List of users who can use cron. Overrides `/etc/cron.deny`.
-    - `/etc/cron.deny`: List of users who cannot use cron.
-  - **Configuration**:
-    - Similar access rules as `at`.
 

@@ -1,5 +1,15 @@
 # Storage
 
+- [The Linux File System](#the-linux-file-system)
+- [File localization](#File-localization)
+- 
+- [File system management](#file-system-management)
+- [LVM](#LVM)
+- [RAID basics](#raid-basics)
+- [NFS & samba file sharing](#nfs--samba-file-sharing)
+- [Archiving, Backup & Recovery](#archiving,-backup--recovery)
+
+
 ## The Linux File System
 
 `/` - Root
@@ -62,19 +72,19 @@
 - Used to keep track of running processes.
 
 
-## inodes
-- A data structure in the file system that describes a file system object, such as a directory or file.
-- Inodes store attributes:
-  - Last time of change, access, modification.
-  - Owner/permission data.
-  - Physical disk location of the object data.
-- Directory is a list of names assigned to inodes:
-  - Contains entries for itself, its parents, and its children.
-- A disk can run out of inodes before running out of disk space, which prevents new file creation.
-- Inodes can be used to delete strangely named files that won’t tab-complete.
+* **inode**
+    - A data structure in the file system that describes a file system object, such as a directory or file.
+    - Inodes store attributes:
+      - Last time of change, access, modification.
+      - Owner/permission data.
+      - Physical disk location of the object data.
+    - Directory is a list of names assigned to inodes:
+      - Contains entries for itself, its parents, and its children.
+    - A disk can run out of inodes before running out of disk space, which prevents new file creation.
+    - Inodes can be used to delete strangely named files that won’t tab-complete.
 
-- `ls -i`: See the inode number.
-- `find . -inum <inode number>`: Find file by inode number.
+    - `ls -i`: See the inode number.
+    - `find . -inum <inode number>`: Find file by inode number.
 
 
 ## File localization
@@ -112,13 +122,6 @@
 - Hard Link
     - A link to another file’s inode.
     - Can only occur within the same file system.
-  
-- Symbolic (Soft) Link
-    - A link to another file name.
-    - Can span across different file systems.
-    - Akin to shortcuts in Windows.
-
-- Hard Links
     - `ls -la`: Displays hard link count (second column).
     - Directories have a minimum of 2 links: one for itself and one for its parent.
     - Files have a minimum of 1 link.
@@ -126,20 +129,18 @@
     - Check links with `ls -li`.
     - **Note**: Hard links are not allowed for directories.
 
-- Soft Links
+  
+- Symbolic (Soft) Link
+    - A link to another file name.
+    - Can span across different file systems.
+    - Akin to shortcuts in Windows.
     - Useful for linking files between file systems.
     - Create soft links with `ln -s <sourcefile> <destfile>`.
 
 
+
 ## Disk Quotas
-* to start using disk quotes, the package `quotas` is required
-* `quotacheck`: Scan a file system for disk usage and create/repair quota files.
-* `edquota`: Edit the disk quota for a user.
-  - Specifies disk usage, inode usage, and the specific file system to which it applies.
-* `quotaon`: Enable quotas and apply the configuration set in `edquota`.
-* To implement quotas:
-    * modify `/etc/fstab` file
-    * add `,usrquota` after `defaults`
+
 
 
 
@@ -244,6 +245,15 @@ So in order to take a used disk and repurpose it:
     - `tune2fs -l <disk>`: List all details of the disk.
     - `tune2fs <disk> -L <volume name>`: Assign a volume name to a disk.
 
+* **quotas**
+    * to start using disk quotes, the package `quotas` is required
+    * `quotacheck`: Scan a file system for disk usage and create/repair quota files.
+    * `edquota`: Edit the disk quota for a user.
+    - Specifies disk usage, inode usage, and the specific file system to which it applies.
+    * `quotaon`: Enable quotas and apply the configuration set in `edquota`.
+    * To implement quotas:
+        * modify `/etc/fstab` file
+        * add `,usrquota` after `defaults`
 
 ## LVM
 * `pvcreate`
@@ -265,7 +275,7 @@ So in order to take a used disk and repurpose it:
 * `mkswap`
 
 
-## Backup & Recovery
+## Archiving, Backup & Recovery
 
 - **`tar`** - Archive files.
   - Common options:
