@@ -1,5 +1,15 @@
 # System Administration
 
+- [Localisation and time](#Localization-and-time)
+- [Process management](#Process-management)
+- [Service management](#service-management)
+- [System monitoring](#system-monitoring)
+- [Log management](#log-management)
+- [Kernel management](#kernel-management)
+- [Boot process and GRUB management](#boot-process-and-grub-management)
+- [Linux system Components & virtual file systems](#linux-system-components--virtual-file-systems)
+
+
 ## Localization and time 
 
 * `locale`
@@ -168,7 +178,7 @@
     * Once the actual file system is mounted, the OS continues to load from the real file system 
     * Initfs (initial file system) is the successor of initrd  
 * `/etc/default/grub`
-  * this file must be saved to the boot folder. To do so:
+  * this file must be saved to the boot folder /boot/grub2. To do so:
     * In RHEL: `sudo grub2-mkconfig -o /boot/grub2/grub.cfg`
     * In Ubuntu: `sudo update-grub2` 
   * `/etc/grub.d/`
@@ -208,7 +218,7 @@
 
 
 
-## Boot Targets
+**Boot Targets**
 
 Boot targets are the modern equivalent of runlevels in `systemd`, which has replaced `SysVinit` in most modern Linux distributions. They provide a more flexible and descriptive way of managing system states. Boot targets are particularly useful when troubleshooting the system, especially when it does not want to boot properly.
 
