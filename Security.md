@@ -49,9 +49,12 @@
 - Encrypt files using `gpg`.
 
 
+## System auditing
+* `auditd`
+* `ausearch`
 
 
-
+## AppArmor & SELinux basics
 
 
 

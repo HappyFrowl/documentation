@@ -22,7 +22,9 @@
 
 * **Substituting/ switching users:**
   - `su - <username>` - switch to another user account 
-  - `su - root` or `sudo su` - switch to root
+    * using the `-` ensures full access to the target user environment
+    * it starts a new login shell giving access to the user environment variables
+  - `su -`, `su - root` or `sudo su` - switch to root
   - `sudoedit` - gain elevated editing permissions to a specific file if, and only if, the user is member of `editors` group and the group has editing permissions to the file
       - `%editors ALL = sudoedit /path/to/file`
   - `visudo`
@@ -107,16 +109,15 @@
 
 
 
-* **sudoers management**
-- `sudo` & `visudo`
+* **sudo groups**
+- `sudo`
     - Group for granting users `sudo` right
     - Used on Debian-based systems
     - Group access is configured by `/etc/sudoers/` through `visudo` alone, never by editing the file itself
-
 - `wheel` 
     - Group for granting users `sudo` right
     - Used on distros that do not by default have the `sudo` group
-    - e.g. Centos
+    - e.g. CentOS, RedHat
 
 
 ## PAM configuration

@@ -142,6 +142,8 @@
 
 ## Log management
 * `rsyslog`
+  * sent system logs from all kinds of devices to a centralized server
+
 * `logrotate`
 * 
 
@@ -149,8 +151,18 @@
 * `uname`
 * `sysctl`
 * `dmesg`
-* `lsmod`
-* `modprobe`
+
+* `lsmod` - List all currently loaded kernel modules
+
+* `modprobe` - Add and remove modules from the Linux Kernel
+  * `modprobe <module_name>` - load a module into the kernel
+  * `modprobe --remove <module_name>` - remove it
+  * to add modules by default into the kernel each time the system boot add the module name to 
+    * `/etc/modules`
+  * to prevent modules from being loaded into the kernel, add them to a `blacklist` file in 
+    * /etc/modprobe.d
+  * 
+
 
 ## Boot process and GRUB management
 
@@ -168,13 +180,17 @@
 
 **2. GRUB2** 
 * GRand Unified Bootloader 
+* boot loader is a small program stored in ROM
 * **Functions**:
     * Locate the kernel on the disk 
-    * Load the kernel into the computer memory  
+    * Load the kernel into memory  
     * Run the kernel code 
 * The bootloader starts the OS by using `initrd` – initial ram disk 
-    * This is a temporary file system which is loaded into memory to assist in the boot process 
-    * It contains programs to perform hardware detection and load the necessary modules to get the actual file system mounted 
+    * This is a temporary file system 
+    * loaded into memory to assist in the boot process 
+    * **features and functions** 
+      * contains programs to perform hardware detection 
+      * loads the necessary modules to get the actual file system mounted 
     * Once the actual file system is mounted, the OS continues to load from the real file system 
     * `initfs` (initial file system) is the successor of initrd  
 * `/etc/default/grub`
@@ -192,7 +208,7 @@
     * Device drivers 
     * Background processes 
 * Process
-  * iIt decompresses itself onto memory
+  * it decompresses itself onto memory
   * checks the hardware
   * loads device drivers and other device drivers 
   * then `init` takes off 
@@ -214,19 +230,56 @@
     * Also see which are enabled, disabled, masked 
  
 
+ **Run levels**
+* Way of booting the system 
+* Only used in SysV systems, not in Systemd systems
+* take particular note of run level 1 - single user mode
+  * this boots the system into a single user mode, requiring no password
+  * THIS is the way to reset the root's password 
 
+* For Debian based systems:
+  0. halt
+  1. single user mode 
+  2. full, multi user, GUI if installed
+  3. nothing
+  4. nothing
+  5. nothing
+  6. reboot (into system default)
 
+* For CentOS/ SuSe:
+  0. Halt
+  1. single user mode
+  2. multi user, no net
+  3. mutli user, with net
+  4. nothing
+  5. multi user GUI
+  6. reboot 
 
 
 **Boot Targets**
-
-Boot targets are the modern equivalent of runlevels in `systemd`, which has replaced `SysVinit` in most modern Linux distributions. They provide a more flexible and descriptive way of managing system states. Boot targets are particularly useful when troubleshooting the system, especially when it does not want to boot properly.
-
-- `systemctl get-default`
-    - Get Current Boot Target
-
+* Boot targets are the modern equivalent of runlevels 
+* used in systemd
+* More flexible and descriptive way of managing system states
+* Boot targets are particularly useful when troubleshooting the system, especially when it does not want to boot properly.
+* available modes and its equivalent runlevel
+  * poweroff    ~ runlevel 0 
+  * rescue      ~ runlevel 1
+  * multi-user  ~ runlevel 3
+  * graphical   ~ runlevel 5
+  * reboot      ~ runlevel 6
+* like the associated runlevel, `rescue mode` is used to change root's password 
+* `systemctl get-default`
+    - Get default mode
+* `systemctl set-default <mode_name>` - set default boot target
+  * this only takes effect after rebooting
 - `sudo systemctl isolate <target>`
-    - Temporarily Change the Boot Target
+    - Temporarily change the boot target
+    - this takes effect immedadiately
+
+
+## Bootloader 
+
+
 
 
 

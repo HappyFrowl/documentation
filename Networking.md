@@ -63,6 +63,19 @@
     * `/etc/netplan/*` - location for the yaml files 
 
 
+
+* network bonds
+    * same as NIC teaming
+    * several mode, but two are important:
+        1. Mode 4: 802.3ad - industry standard for network bonds. It does require switch support
+        2. Mode 5: balance-alb (all load balance). Incoming and outgoing traffic is distributed over all available NICs. This mode does not require switch support
+    * configuring it:
+        * modify `/etc/netplan` file   
+        * add section `bonds:` etc 
+            * just look this up 
+
+
+
 ## Network troubleshooting
 * `ping` 
 
@@ -127,17 +140,20 @@
 - `host <domain>`
     - Look up IP addresses.
     - Shows which servers handle the mail.
+    - simple and concise 
+    - 
 
 - `nslookup`
-    - Query DNS servers.
+    - Query DNS server
+    - simple and interactive 
+    - `nslookup <custom_DNS_server> <host>` - query a custom DNS server 
 
-- `dig`
-    - Domain Information Groper.
+- `dig` - Domain Information Groper.
     - Query nameservers.
     - `dig @<server> <domain> <record-type>`
-        - `@server` - for a remote query
+        - `@<server_name>` - is used to query a custom DNS server 
+    - verbose and detailed
     
-
 
 ## DHCP
 
@@ -221,10 +237,6 @@
         * `firewall-cmd --add-port=8080/tcp` - open up port 8080/tcp
             * this configuration will be visible in `nft list ruleset`
         * `--permenant` - make permanent changes 
-    * 
-    * 
-    * 
-    * 
 
 
 * `ufw` - uncomplicated firewall

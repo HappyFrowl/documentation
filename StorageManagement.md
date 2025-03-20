@@ -206,11 +206,11 @@
 * `parted`
     * Newer standard for partition management of disks 
     * benefits over `fdisk`
-        * in cotnrast to `fdisk`, `parted` allows for resizing of partitions
+        * in contrast to `fdisk`, `parted` allows for resizing of partitions
         * works better for GPT
         * works with large disks
         * allow scripting
-    * `mklabel gpt` - create a new disk / partition table
+    * `mklabel gpt /dev/sd#` - create a new disk / partition table
     * `mkpart <name> <FS-type> <start> <end>` - create a partition
     * `resizepart <part number> <new size>` - resize a partition
 

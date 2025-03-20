@@ -10,6 +10,34 @@
 
 
 ## Basic commands
+
+
+* `man` - manual
+  * find info on commands
+  - Man pages may have multiple sources, indicated by the `(x)` in the corner.
+  - Sections are identified by their number:
+    1. General commands  
+    2. System calls  
+    3. C library functions  
+    4. Special files  
+    5. File formats and conventions  
+    6. Games and screensavers  
+    7. Misc  
+    8. System admin commands/daemons 
+  - **Search**: Press `/` and type your query to search within a man page.
+
+**Searching the Man Pages:**
+* There are tools to help find the command when you do not know which one to use, or forgot the same
+* they use `mandb` which indexes the man through a daily cron job. 
+  * `mandb` - updates the manual database
+* tools finding commands:
+  - **`man -k`** - Search the name section of all man pages (great for finding commands).
+    * this is exactly the same as `apropos`
+  - **`whatis`**: Display a brief description of a command.
+  - **`info`**: Display the info page of a command.
+
+
+
 - **`cp`**
   - `*` the wildcard of wildcards, it's used to represent all single characters or any string.
   - `?` used to represent one character
@@ -30,24 +58,8 @@
 
 
 
-**Man Pages:**
 
-- Man pages may have multiple sources, indicated by the `(x)` in the corner.
-- Sections are identified by their number:
-  1. General commands  
-  2. System calls  
-  3. C library functions  
-  4. Special files  
-  5. File formats and conventions  
-  6. Games and screensavers  
-  7. Misc  
-  8. System admin commands/daemons  
 
-**Searching the Man Pages:**
-- **Search**: Press `/` and type your query to search within a man page.
-- **`apropos`**: Search the name section of all man pages (great for finding commands).
-- **`whatis`**: Display a brief description of a command.
-- **`info`**: Display the info page of a command.
 
 
 **File Operations:**
