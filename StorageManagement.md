@@ -1,13 +1,264 @@
 # Storage
-
+- [File System introduction](#File-System-introduction)
+- [File system management](#file-system-management)
 - [The Linux File System](#the-linux-file-system)
 - [File localization](#File-localization)
 - 
-- [File system management](#file-system-management)
 - [LVM](#LVM)
-- [RAID basics](#raid-basics)
+- [RAID](#raid)
 - [NFS & samba file sharing](#nfs--samba-file-sharing)
 - [Archiving, Backup & Recovery](#archiving,-backup--recovery)
+
+
+## File System introduction
+
+
+* **inode** - index node 
+    - it is an object storing meta deta about a file or directory on a given file system
+    - It contains:
+      - Last time of change, access, modification.
+      - Owner/permission data.
+      - block-level location data, aka physical disk location of the object data.
+    - Directory is a list of names assigned to inodes:
+      - Contains entries for itself, its parents, and its children.
+    - A disk can run out of inodes before running out of disk space, which prevents new file creation.
+    - Inodes can be used to delete strangely named files that won’t tab-complete.
+
+    - `ls -i`: See the inode number.
+    - `find . -inum <inode number>`: Find file by inode number.
+
+
+
+## File System management
+
+The storage structure is governed by **three** main layers:
+* **Partition table** (GPT/MBT)
+    * AKA disklabel or label
+    * This defines how a disk is partitioned
+    * it is the same for the whole disk 
+    * Examples: MBR (old, limited to 2TB) and GPT (modern, supports larger disks and more partitions).
+    * Created using `parted mklabel`. See below
+
+* **Partition**
+    * Section of the storage drive that logically acts as a separate drive 
+    * **Partition types**
+        * Primary   - contain one file system or logical drive. Sometimes called a Volume. 
+            * Boot partition and swap space are normally created in the primary partition
+        * Extended  - contains several file systems which are referrred to as logical drives
+        * Logical   - partitioned and allocated as an independent unit and functions as a seperate drive
+
+* **File system**
+    * A data structure used by an OS to store, retrieve, organize,  and manage files and riectories on storage devices 
+    * examples
+        * FAT
+            * older
+            * compatible with most other OS
+        * ext2/3/4
+            * Native Linux
+        * XFS
+            * high-performance journalisting file system
+            * fast recovery
+            * handles large files very well
+        * BTRFS
+            * supports huge volumes, 16 exabytes
+
+
+    * **VFS** - virtual file system
+        * This is common software interface that sits between the kernel and the real file system
+        * It translates the real file system's details over to the kernel
+        * It looks like a real file system
+        * **Functionality**
+            * It enables having multiple different file systems on the same Linux installation
+            * They will all look uniform to the system and the user
+        * They will be recognizible by their file system labels
+            * These can be up to 16 characters long
+            * `e2label` - see or change ext-based file systems
+            * `xfs_admin` - same but for XFS-based file systems 
+
+* `fdisk </dev/>`
+    * Manage partition tables and partitions on a hard disk
+    * bit of an old tool
+    * **options:**
+        * `-l` - list partitions 
+        * `-b` - Specify number of drive sectors
+        * `-H` - specify number of drive heads
+        * `-S` - specify number of sectors per tracks
+        * `-s` - print partition size in blocks
+    * within the fdisk tool, there are several options:
+        * `g` - create gpt disk label type
+        * `p` - print disk partition info
+        * `n` - create a new partition table
+        * `w` - write the changes
+        * `q` - cancel and quit
+
+* `parted`
+    * Newer standard for table and partition management of disks 
+    * benefits over `fdisk`
+        * in contrast to `fdisk`, `parted` allows for resizing of partitions
+        * works better for GPT
+        * works with large disks
+        * allows scripting
+    * `mklabel gpt /dev/sd#` - create a new disk / partition table
+    * `mkpart <name> <FS-type> <start> <end>` - create a partition
+        * <start> and <end> can be in (kilo/mega/giga/tera)bytes or percentages
+        * Note: specifiying the filesystem is purely administrative. It can be left out or mismatch the specification at the mkfs.# level. See below
+    * `resizepart <part number> <new size>` - resize a partition
+
+* `wipefs` - wipe file system
+    * wipe the file system using the `--all </dev/>` option
+    * it does not wipe the files themselves
+
+* `mkfs.<type> /dev/sd#` - make file system
+    - Build a filesystem on a hard disk partition
+        - e.g. `mkfs.ext2/3/4` & `mkfs.xfs` and `mkfs.btrfs`
+    - Some options:
+        - `-v` - verbose
+        - `-c` - check for bad blocks before building the file system
+
+* `partprobe` 
+    * inform the OS of partition table changes
+    * This updates the kernels with changes that now exist within the partition table
+    * It eliminates the necessity to reboot the system
+
+
+* `/etc/fstab`
+    - Dictates how mounting happens at startup.
+    - Describes what devices are mounted, where, and with which options.
+    - **components**
+        * File system
+            * UUID of the partition
+            * this can be found using `blkid`
+        * mount points
+            * location on the file system where it needs to be mounted
+        * type
+            * type of file system used by the partition
+        * options 
+            * set of comma-separated options that will be activated when the file system is mounted
+        - **dump**: If enabled, the dump command makes a backup.
+        - **pass**: Used by `fsck` to determine the order of file system checks at boot:
+            - `0`: No check.
+            - `1`: Root disk.
+            - `2`: After root disk
+
+* `/etc/crypttab` 
+    * file storing information about encrypted devices and partitions that must be unlocked and mounted on system boot
+
+* `lsblk` - list block
+    - Lists information about storage devices, such as
+        - device and partition name
+        - `MAJ:MIN` - Major Number (Maj): Identifies the device type (e.g., 8 is for SCSI/SATA disks) and Minor Number (Min): Differentiates individual devices or partitions under the same major number.
+        - size of the device or partition
+        - `RO` - Read-Only value. `0` for read-write and `1` for read-only
+        - mount points
+    - partially same info as `fdisk -l`
+
+* `blkid` - block id
+    * print the UUID of devices 
+    * this is used to add the devices to `/etc/fstab` 
+
+So in order to take a used disk and repurpose it:
+    * wipe disk using `dd` (see below). If wiping the file system without deleting the files `wipefs` works as well 
+    * create a new drive label with `parted mklabel` and a new partition using `parted mkpart`
+    * format the partition `mkfs.<type>`
+    * add formatted partition to `/etc/fstab` so it can configured by the system to run at boot up
+    * run `partprobe` if needing to use the drive immediately without rebooting
+
+
+* `dumpe2fs` 
+    - Displays all information about a disk (for `ext2`, `ext3`, or `ext4`).
+    - Includes block and superblock data, and metadata about the file system
+
+* `tune2fs` 
+    - Used to change variable file system parameters.
+    - `tune2fs -l <disk>`: List all details of the disk.
+    - `tune2fs <disk> -L <volume name>`: Assign a volume name to a disk.
+
+
+* `mount <dev> <mountpoint>`  
+    * mount a file system
+    * `-t` - specify target
+    * `--mkdir` - create directory if not exists
+    * `-a` - mount all file systems defined in `/etc/fstab`
+
+* `umount <dev>` - unmount
+    * unmount a file system
+
+- **`df`**: 
+    * Display filesystem usage.
+    * `-h` - human-readable format (e.g., MiBs, GiBs).
+    * `-i` - show inodes 
+
+* `du` - disk usage 
+    * `-h` - human readable 
+    * `-s` - show only total 
+
+
+* `smartctl` - SMART control
+    * Self-Monitoring, Analysis, and Reporting Technology
+    * tool for tracking disk drive health, predict failures, and log error and self-tests
+    * `--health` - print overall health 
+    * `-t (short|long)` - do a disk drive test 
+    * `-all` - print all info, including test result
+
+* `fsck`- file system check
+    - Check the integrity of a filesystem or repair it
+    - **Note**: Do not run on mounted disks.
+    - `-a` - immediately repair all damaged blocks
+
+
+
+## RAID
+* RAID types
+    * Striping
+    * Mirroring
+    * Parity
+* RAID configurations
+    * RAID 0 - Striping 
+    * RAID 1 - Mirroring
+    * RAID 5 -  parity, min. 3 drives
+    * RAID 6 - 5+1, min. 4 drives
+    * RAID 10 - 1+0, striped mirrors. min. 4 drives
+
+
+* `mdadm`
+    * tool for managing software-based RAID arrays
+    * 
+
+* `/proc/mdstat`
+    * offers information on the current RAID configuration 
+    * contains a snapshot of the kernel's RAID/ md state
+    * 
+
+
+## LVM 
+* LVM - Logical Volume Manager
+    * Tool for mapping whole physical devices and partitions into one or more virtual containers called **volume groups**
+    * Within these volume groups, are one or more logical volumes
+    * It is analogous to Storage Spaces in Windows
+    * So
+        * Bunch of disks
+        * Partitions on those disks
+        * Physical volumes
+        * Volume Group comprising of multiple of these physical volumes
+        * Virtual Volumes carved from the Volume Group
+        * File Systems created from these Virtual Volumes
+    * `/dev/mapper` contains alls the logical volumes on a given system managed by LVM
+
+* Physical volume tools
+    * `pvscan`      - scan for all physical devices being used as physical volumes
+    * `pvcreate`    - Initializes a drive or partition to use as a physical volume
+    * `pvdisplay`   - lists attributes of physical volumes
+    * `pvchange`    - changes attributes of a physical volumes
+    * `pvs`         - displays information about physical volumes   
+
+
+* `vgcreate`
+* `lvcreate`
+* `resize2fs`
+
+
+
+
 
 
 ## The Linux File System
@@ -72,19 +323,7 @@
 - Used to keep track of running processes.
 
 
-* **inode**
-    - A data structure in the file system that describes a file system object, such as a directory or file.
-    - Inodes store attributes:
-      - Last time of change, access, modification.
-      - Owner/permission data.
-      - Physical disk location of the object data.
-    - Directory is a list of names assigned to inodes:
-      - Contains entries for itself, its parents, and its children.
-    - A disk can run out of inodes before running out of disk space, which prevents new file creation.
-    - Inodes can be used to delete strangely named files that won’t tab-complete.
-
-    - `ls -i`: See the inode number.
-    - `find . -inum <inode number>`: Find file by inode number.
+    
 
 
 ## File localization
@@ -140,111 +379,6 @@
 
 
 ## Disk Quotas
-
-
-
-
-## File system management
-
-- **`df`**: 
-    * Display filesystem usage.
-    * `-h` - human-readable format (e.g., MiBs, GiBs).
-    * `-i` - show inodes 
-
-* `du` - disk usage 
-    * `-h` - human readable 
-    * `-s` - show only total 
-
-* `mount`  
-    * mount a file system
-    * `-t` - specify target
-    * `--mkdir` - create directory if not exists
-    * `-a` - mount all file systems defined in `/etc/fstab`
-
-* `umount` - unmount
-    * 
-
-* `smartctl` - SMART control
-    * Self-Monitoring, Analysis, and Reporting Technology
-    * tool for tracking disk drive health, predict failures, and log error and self-tests
-    * `--health` - print overall health 
-    * `-t (short|long)` - do a disk drive test 
-    * `-all` - print all info, including test result
-
-* `fsck`- file system check
-    - Check the integrity of a filesystem or repair it
-    - **Note**: Do not run on mounted disks.
-    - `-a` - immediately repair all damaged blocks
-
-
-* `lsblk` - list blocks
-    - Lists information about storage devices
-    - partially same info as `fdisk -l`
-
-* `wipefs` - wipe file system
-    * wipe the file system 
-    * does not wipe the files themselves
-
-
-* `mkfs.<type> /dev/sd#` - make file system
-    - Build a Linux filesystem on a hard disk partition
-    - `mkfs.ext4 /dev/sda1`
-    - `-c` - check for bad blocks
-
-## Partitioning
-
-* `fdisk`
-    * Manage partition tables and partitions on a hard disk
-    * bit of an old tool
-    * `fdisk -l` - list partitions 
-    * within the fdisk tool, there are several options:
-        * `g` - create gpt disk label type
-        * `p` - print disk partition info
-        * `n` - create a new partition table
-        * `w` - write the changes
-
-* `parted`
-    * Newer standard for partition management of disks 
-    * benefits over `fdisk`
-        * in contrast to `fdisk`, `parted` allows for resizing of partitions
-        * works better for GPT
-        * works with large disks
-        * allow scripting
-    * `mklabel gpt /dev/sd#` - create a new disk / partition table
-    * `mkpart <name> <FS-type> <start> <end>` - create a partition
-    * `resizepart <part number> <new size>` - resize a partition
-
-So in order to take a used disk and repurpose it:
-    * wipe disk using `dd`. If you don't need to delete the files `wipefs` works as well 
-    * create a new drive label with `parted mklabel` and a new partition using `parted mkpart`
-    * format the partition `mkfs.<type>`
-
-
-* `/etc/fstab`
-    - Dictates how mounting happens at startup.
-    - Describes what devices are mounted, where, and with which options.
-    - **dump**: If enabled, the dump command makes a backup.
-    - **pass**: Used by `fsck` to determine the order of file system checks at boot:
-        - `0`: No check.
-        - `1`: Root disk.
-        - `2`: After root disk
-
-
-* `blkid` - block id
-    * print the UUID of devices 
-    * this is used to add the devices to `/etc/fstab`
-
-
-* `dumpe2fs` 
-    - Displays all information about a disk (for `ext2`, `ext3`, or `ext4`).
-    - Includes block and superblock data, and metadata about the file system
-    - 
-
-* `tune2fs` 
-    - Used to change variable file system parameters.
-    - `tune2fs -l <disk>`: List all details of the disk.
-    - `tune2fs <disk> -L <volume name>`: Assign a volume name to a disk.
-
 * **quotas**
     * to start using disk quotes, the package `quotas` is required
     * `quotacheck`: Scan a file system for disk usage and create/repair quota files.
@@ -255,15 +389,10 @@ So in order to take a used disk and repurpose it:
         * modify `/etc/fstab` file
         * add `,usrquota` after `defaults`
 
-## LVM
-* `pvcreate`
-* `vgcreate`
-* `lvcreate`
-* `resize2fs`
 
 
-## RAID basics
-* `mdadm`
+
+
 
 
 ## NFS & samba file sharing
