@@ -10,8 +10,8 @@
 - [Archiving, Backup & Recovery](#archiving,-backup--recovery)
 
 
-## File System introduction
 
+## File System management
 
 * **inode** - index node 
     - it is an object storing meta deta about a file or directory on a given file system
@@ -24,14 +24,11 @@
     - A disk can run out of inodes before running out of disk space, which prevents new file creation.
     - Inodes can be used to delete strangely named files that won’t tab-complete.
 
-    - `ls -i`: See the inode number.
+    - `ls -i` - See the inode number.
     - `find . -inum <inode number>`: Find file by inode number.
+    - `df -ih` - see inode usage on a partition level
 
-
-
-## File System management
-
-The storage structure is governed by **three** main layers:
+### The storage structure is governed by **three** main layers:
 * **Partition table** (GPT/MBT)
     * AKA disklabel or label
     * This defines how a disk is partitioned
@@ -61,7 +58,6 @@ The storage structure is governed by **three** main layers:
             * handles large files very well
         * BTRFS
             * supports huge volumes, 16 exabytes
-
 
     * **VFS** - virtual file system
         * This is common software interface that sits between the kernel and the real file system
@@ -121,13 +117,13 @@ The storage structure is governed by **three** main layers:
     * It eliminates the necessity to reboot the system
 
 
-* `/etc/fstab`
+* `/etc/fstab` - file system table
     - Dictates how mounting happens at startup.
     - Describes what devices are mounted, where, and with which options.
     - **components**
         * File system
-            * UUID of the partition
-            * this can be found using `blkid`
+            * name or UUID of the partition
+            * UUID can be found using `blkid`
         * mount points
             * location on the file system where it needs to be mounted
         * type
@@ -151,46 +147,108 @@ The storage structure is governed by **three** main layers:
         - `RO` - Read-Only value. `0` for read-write and `1` for read-only
         - mount points
     - partially same info as `fdisk -l`
-
+    - options:
+        - `-a` - list empty devices
+        - `-r` - use raw output format
+        - `-f` - output info about filesystems, e.g. UUID 
+        - `-l` - output list instead of tree
+        - `-m` - display device permission info
+    
 * `blkid` - block id
     * print the UUID of devices 
     * this is used to add the devices to `/etc/fstab` 
 
-So in order to take a used disk and repurpose it:
+
+
+* `mount [options] <dev> <mountpoint>`  
+    * mount a file system
+    * `-t` - specify target
+    * `--mkdir` - create directory if not exists
+    * `-a` - mount all file systems defined in `/etc/fstab`
+    * options are normally added in the `/etc/fstab` file
+        * auto      - device must be mounted automatically
+        * noauto    - device should not be mounted automatically
+        * nouser    - Only root user can mount a device or file system
+        * user      - all users can mount 
+        * exec      - allow binaries in a file system to be executed
+        * noexec    - do not allow binaries in a file system to be executed
+        * ro        - mount file system as read only
+        * rw        - mount file system with read/write permissions
+        * sync      - input and output operations should be done synchronously
+        * async     - input and output operations can be done asynchronously
+
+* `umount <mount point>` - unmount
+    * unmount a file system
+    * options
+        * `-f` - force
+        * `-l` - perform a lazy unmount. File system is detached from a hierarchy, but refereneces to that file system are not cleaned up until the file system is not being used
+        * `-R` - recursively unmounts the directories mount points
+        * `-t <fs type>` - unmount all file system types specified
+        * `-O` - unmount only the file systems with specified options in the `/etc/fstab` file
+        * `-fake` - dryrun it
+
+* **So in order to take a used disk and repurpose it:**
     * wipe disk using `dd` (see below). If wiping the file system without deleting the files `wipefs` works as well 
     * create a new drive label with `parted mklabel` and a new partition using `parted mkpart`
     * format the partition `mkfs.<type>`
     * add formatted partition to `/etc/fstab` so it can configured by the system to run at boot up
     * run `partprobe` if needing to use the drive immediately without rebooting
+    * mount it using `mount`
+
+* `/etc/mtab` 
+    * reports the status of currently mounted file systems
+
+* `/proc/mounts`
+    * Same but more accurate and includes more up-to-date info on file systems
+
+* `/proc/partitions`
+    * contains info about each partition attached to the system
+    * contains 
+        * major     - class of device
+        * minor     - divides partitions into physical devices
+        * blocks    - number of physical blocks the partition takes up
+        * name      
+    * similar to `lsblk`
 
 
-* `dumpe2fs` 
-    - Displays all information about a disk (for `ext2`, `ext3`, or `ext4`).
-    - Includes block and superblock data, and metadata about the file system
+### ext-specific file system management tools
+* `e2fsck`
+    * 
 
+* `fsck [options] <dev/fs name>`- file system check
+    - Check the integrity of a filesystem or repair it
+    - **Note**: cannot run on mounted disks.
+    - `-a` - immediately repair all damaged blocks
+    - `-r` - repair
+
+
+* `resize2fs [options] <dev/ fs name> <size>`
+    * resize ext2, ext3, or ext4 file systems
+    
 * `tune2fs` 
-    - Used to change variable file system parameters.
+    - Used to change variable file system parameters
+        * add/ remove reserved blocks
+        * alter reserve block counts
+        * specify number of mounts between chjecks
+        * specify the time interval between checks
+        * etc  
     - `tune2fs -l <disk>`: List all details of the disk.
     - `tune2fs <disk> -L <volume name>`: Assign a volume name to a disk.
 
+* `dumpe2fs` 
+    - Displays all super block and block group information about a disk (for `ext2`, `ext3`, or `ext4`)
+    - Includes block and superblock data, and metadata about the file system
 
-* `mount <dev> <mountpoint>`  
-    * mount a file system
-    * `-t` - specify target
-    * `--mkdir` - create directory if not exists
-    * `-a` - mount all file systems defined in `/etc/fstab`
 
-* `umount <dev>` - unmount
-    * unmount a file system
 
-- **`df`**: 
-    * Display filesystem usage.
-    * `-h` - human-readable format (e.g., MiBs, GiBs).
-    * `-i` - show inodes 
-
-* `du` - disk usage 
-    * `-h` - human readable 
-    * `-s` - show only total 
+### XFS-specific file system management tools
+* `xfs_info`        - display details 
+* `xfs_admin`       - change the parameters 
+* `xfs_metadump`    -  Copy the superblock metadata to a file 
+* `xfs_growfs`      -  expand the XFS file system to fill the drive size
+* `xfs_copy`        -  copy the contents of the XFS file system to another location
+* `xfs_repair`      -  repair and recover a corrupt XFS file system
+* `xfs_db`          -  Debug the XFS file system
 
 
 * `smartctl` - SMART control
@@ -200,11 +258,15 @@ So in order to take a used disk and repurpose it:
     * `-t (short|long)` - do a disk drive test 
     * `-all` - print all info, including test result
 
-* `fsck`- file system check
-    - Check the integrity of a filesystem or repair it
-    - **Note**: Do not run on mounted disks.
-    - `-a` - immediately repair all damaged blocks
 
+- **`df`**: 
+    * Display filesystem usage.
+    * `-h` - human-readable format (e.g., MiBs, GiBs).
+    * `-i` - show inodes 
+
+* `du` - disk usage 
+    * `-h` - human readable 
+    * `-s` - show only total 
 
 
 ## RAID
@@ -229,7 +291,6 @@ So in order to take a used disk and repurpose it:
     * contains a snapshot of the kernel's RAID/ md state
     * 
 
-
 ## LVM 
 * LVM - Logical Volume Manager
     * Tool for mapping whole physical devices and partitions into one or more virtual containers called **volume groups**
@@ -247,18 +308,39 @@ So in order to take a used disk and repurpose it:
 * Physical volume tools
     * `pvscan`      - scan for all physical devices being used as physical volumes
     * `pvcreate`    - Initializes a drive or partition to use as a physical volume
+        * It all starts with this
+        * If creating a physical volume from a physical drive, the partitions and label must be wiped first
     * `pvdisplay`   - lists attributes of physical volumes
     * `pvchange`    - changes attributes of a physical volumes
-    * `pvs`         - displays information about physical volumes   
+    * `pvs`         - displays information about physical volumes
+    * `pvck`        - checks the metadata of physical volumes
+    * `pvremove`    - removes physical volumes
 
+* Volume group tools
+    * `vgscan`      - scan all physical devices for volume groups
+    * `vgcreate`    - creates volumes groups
+    * `vgdisplay`   - lists attributes of volume groups
+    * `vgchange`    - changes attributes of volume groups
+    * `vgs`         - displays information about volume groups
+    * `vgck`        - checks the metadata of volume groups
+    * `vgrename`    - renames a volume group
+    * `vgreduce`    - removes physical volumes from a group to reduce its size
+    * `vgextend`    - add physical volumes from a group to enlarge its size
+    * `vgmerge`     - merges two volume groups
+    * `vgsplit`     - splits a volume group into two
+    * `vgremove`    - removes volume groups
 
-* `vgcreate`
-* `lvcreate`
-* `resize2fs`
-
-
-
-
+* Logical volume tools
+    * `lvscan`      - scan for all physical devices for logical volumes
+    * `lvcreate`    - creates logical volumes in a volume group 
+    * `lvdisplay`   - lists attributes of logical volumes
+    * `lvchange`    - changes attributes of a physical volumes
+    * `lvs`         - displays information about logical volumes
+    * `lvrename`    - renames a logical volume
+    * `lvreduce`    - reduces the size of logical volumes
+    * `lvextend`    - extends the size of logical volumes 
+    * `lvresize`    - resizes logical volumes
+    * `lvremove`    - removes a logical volume
 
 
 ## The Linux File System
@@ -321,9 +403,6 @@ So in order to take a used disk and repurpose it:
 `/proc` - Process Filesystem
 - An illusionary filesystem created in memory by the Linux kernel.
 - Used to keep track of running processes.
-
-
-    
 
 
 ## File localization
