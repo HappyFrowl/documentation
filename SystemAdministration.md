@@ -10,158 +10,99 @@
 - [Linux system Components & virtual file systems](#linux-system-components--virtual-file-systems)
 
 
-## Localization and time 
-
-* `locale`
-  - Region-specific settings, including language and country formats.
-  - View and configure locale settings.
-
-- **Convert between encodings**:
-  - `iconv -f utf-8 -t iso_8653-1 < file.txt > output.txt`
-- **List supported encodings**:
-  - `iconv -l`
-- **Detect file encoding**:
-  - `file <filename>`
-
-
-- View current timezone:
-  - `cat /etc/timezone`
-- System timezone configuration:
-  - `/etc/localtime` (symlinked to the appropriate timezone file).
-- Select a timezone:
-  - `tzselect`
-- View time in another timezone:
-  - Use tools like `date` with `TZ` environment variables or GUI tools.
-
-- `date` - print or set date and time
-- `date +%s` - print time as epoch time
-- `timedatectl` - print or set local time, universal time, time zone, ntp info, etc. 
-
-- Synchronize with NTP servers:
-  - Install the client: `apt install ntpdate`
-  - Sync with NTP pool:
-    - `ntpdate pool.ntp.org`
-- Configure as an NTP server:
-  - Install the daemon: `apt install ntp`
-  - Configuration file: `/etc/ntp.conf`
-
-- The hardware clock is independent of the system and runs even when the machine is powered off.
-- `hwclock --systohc --localtime` - Sync hardware clock with the local clock
-
-
-
-## Process management
-
-- `ps` - Lists running processes.
-  - `ps`: Shows processes for the current user.
-  - `ps a`: Displays all processes attached to a terminal.
-  - `ps x`: Lists processes for all users, even those not attached to a terminal.
-  - `ps aux`: Formats output for user-oriented listing.
-  - Processes in **square brackets** are system or kernel processes.
-
-* `lsof` - list open files
-  * `-c` - filter on process name
-  * `-p` - filter on PID
-  * `-u` - filter on a specific user
-
-* `fuser`
-    * Display process IDs currently using files or sockets
-    * 
-
-
-* `top`
-  * display Linux processes
-  * print how much CPU, RAM, swap is used, its uptime, idle 
-  * **Row information:**
-    * time, uptime, signed in users, load average
-    * **tasks:** zombie tasks are orphan processes - unparented child processes 
-      * show process relations with `Shift+V`
-    * **CPU:** 
-      * `us` - user space
-      * `sys` - system space
-      * `ni` - niceness aka priority
-      * `id` - idleness - how much time has the CPU been idle for
-      * `wa` - waiting: how much has a task been waiting for input/output. So, lower is better 
-      * `hi` / `si` - hardware and software interrupts. Not so important nowadays
-      * `st` - how much time has a virtual CPU been waiting for a physical CPU
-    * **memory:** memory installed/ free/ used/ cached
-    * **swap:** swap space installed/ free/ used/ total 
-  * Columns information:
-    * `PR` - priority
-    * `VIRT` - virtual memory being used
-    * `RES` - physical memory used 
-    * `SHR` - shared memory used
-    * `%CPU` / `%MEM` - CPU / memory used
-    * `TIME+` - uptime process
-    * `command` - process name
-  * Column sorting
-    * `P` - sort by CPU usage
-    * `M` - sort by memory
-    * `k` - kill using the PID
-
-* `nice`
-  * 
-
-* `renice`
-  * 
-
-- `kill` Command - Sends signals to processes to perform specific actions.
-    **Signals**:
-    - **SIGINT**:
-        - Interrupt signal (Ctrl + C).
-        - Stops the process, allowing it to clean up resources.
-    - **SIGKILL**:
-        - Forces the process to terminate immediately.
-    - **SIGSTOP**:
-        - Pauses the process (Ctrl + Z).
-    - **SIGTERM**:
-        - Requests the process to terminate gracefully.
-        - Allows time for cleanup, but the process can ignore it.
-
-- `killall` - Kills all processes by name.
-    - Only affects the current user's processes unless used with `sudo`.
-    - `kill -9 brave` - SIGKILL brave
-
-- `pkill`- Similar to `killall` but more flexible and potentially dangerous.
-    - Allows matching processes based on name or other attributes.
-
-
-
-## Service management
-
-* `systemctl`
-* `jounalctl`
-* `chkconfig`
-* `rc.local`
-
-## System monitoring
-* `uptime` 
-* `vmstat` 
-* `iostat` 
-* `free`
-
-## Log management
-* `rsyslog`
-  * sent system logs from all kinds of devices to a centralized server
-
-* `logrotate`
-* 
-
 ## Kernel management
+
+**Kernel basics**:
+* Kernel is the core of an OS
+* **Tasks**
+  1. Memory management: Keep track of how much memory is used to store what, and where
+  2. Process management: Determine which processes can use the central processing unit (CPU), when, and for how long
+  3. Device drivers: Act as mediator/interpreter between the hardware and processes
+  4. System calls and security: Receive requests for service from the processes
+
+* Software is divided into:
+  * **Kernel space** where the kernel executes services
+  * **user space** is the area of memory outside the kernel space
+* **types of kernels**
+  * **monolithic** - all system modules, e.g. device drivers or file systems, run in kernel space
+    * Linux is a monolithic kernel
+  * **microkernel** - kernel runs the minimum amount of resources necessary to run fully functional OS
+    * smaller in size
+    * more stable
+    * worse performance
 * `uname`
-* `sysctl`
-* `dmesg`
+  * Print details about the current machine and the operating system running on it.
+  * `-r` - print kernel version
 
-* `lsmod` - List all currently loaded kernel modules
+**Kernel Layers**
+* Sytem Call Interface (SCI)
+  * Handles system calls sent from user apps to the kernel
+  * Think: processing time, memory allocation
+* Process management
+  * Handles different processes by allocating separate execution space on the processor 
+* Memory management
+  * manages the computer's memory
+* File system management
+  * storing, organizing, and tracking files and data 
+* Virtual File System (VFS)
+  * Provides an sbstract view of the underlying data that is organized under complex structures
+* Device management
+  * Manages devices by controlling device access and in interfacing between user apps and hardware devices on the computer
 
-* `modprobe` - Add and remove modules from the Linux Kernel
-  * `modprobe <module_name>` - load a module into the kernel
-  * `modprobe --remove <module_name>` - remove it
-  * to add modules by default into the kernel each time the system boot add the module name to 
+
+**Kernel modules**
+* `/usr/lib/modules` contains the modules of different kernel versions
+* the parent directory is specific to a specific kernel version
+* The kernel modules are stored in `./kernel`, e.g.
+  * `./arch`    - architecture
+  * `./crypto`  - cryptographic
+  * `./drivers` - drivers 
+  * `./net`     - networking
+
+* `lsmod` - list modules
+  * List all currently loaded kernel modules
+
+* `modinfo` - module information
+  * display information about a specific module 
+
+* `insmod` - insert module
+  * install a module into the kernel
+  * Does not install dependencies
+    * use `modprobe` for that
+
+* `rmmod` - remove module
+  * removes a module from the kernel
+
+* `modprobe` - module probe
+  * Add or remove modules from the Linux Kernel
+  * options:
+    * `-a` - add a module. This is the default use of `modprobe`, so even running it without `-a` adds a module
+    * `-r` - remove a module
+    * `-f` - force adding or removing
+    * `-s` - print errors to syslog
+    * `-n` - dry run
+  * To add modules by default into the kernel each time the system boot add the module name to 
     * `/etc/modules`
-  * to prevent modules from being loaded into the kernel, add them to a `blacklist` file in 
-    * /etc/modprobe.d
-  * 
+  * To prevent modules from being loaded into the kernel, add them to a `blacklist` file in 
+    * `/etc/modprobe.d`
+
+* `sysctl` - system control
+  * Interface to dynamically change kernel paramters
+  * Kernel parameters are stored in `/proc/sys`
+  * Kernel parameters can be configured to:
+    * Improve performance
+    * Harden security
+    * Configure networking limitations
+    * Change virtual memory settings 
+    * etc
+  * options: 
+    * `-a`                    - print all parameters and the current values
+    * `-w <parameters=value>` - set a parameter value 
+    * `-p <filename>`         - load sysctl settings from a specified file
+    * `-e`                    - ignore errors
+  * `/etc/sysctl.conf` enables configuration changes to a running Linux kernel
+
+* `dmesg`
 
 
 ## Boot process and GRUB management
@@ -351,10 +292,146 @@
 - **Example**:  
   - Filesystems like `SSHFS` or `NTFS-3G` use FUSE.
 
-## Modules
-- **Type**: Loadable Kernel Module (LKM)  
-- **Purpose**: Extend the running kernel without needing to recompile or reboot the system.  
-  - LKMs are object files dynamically loaded and unloaded into the kernel as needed.  
-- **Examples**:  
-  - Use `lsmod` to list currently loaded kernel modules and their usage.  
-  - Remove modules with `rmmod` and add them with `modprobe`.
+
+
+
+
+
+
+## Localization and time 
+
+* `locale`
+  - Region-specific settings, including language and country formats.
+  - View and configure locale settings.
+
+- **Convert between encodings**:
+  - `iconv -f utf-8 -t iso_8653-1 < file.txt > output.txt`
+- **List supported encodings**:
+  - `iconv -l`
+- **Detect file encoding**:
+  - `file <filename>`
+
+
+- View current timezone:
+  - `cat /etc/timezone`
+- System timezone configuration:
+  - `/etc/localtime` (symlinked to the appropriate timezone file).
+- Select a timezone:
+  - `tzselect`
+- View time in another timezone:
+  - Use tools like `date` with `TZ` environment variables or GUI tools.
+
+- `date` - print or set date and time
+- `date +%s` - print time as epoch time
+- `timedatectl` - print or set local time, universal time, time zone, ntp info, etc. 
+
+- Synchronize with NTP servers:
+  - Install the client: `apt install ntpdate`
+  - Sync with NTP pool:
+    - `ntpdate pool.ntp.org`
+- Configure as an NTP server:
+  - Install the daemon: `apt install ntp`
+  - Configuration file: `/etc/ntp.conf`
+
+- The hardware clock is independent of the system and runs even when the machine is powered off.
+- `hwclock --systohc --localtime` - Sync hardware clock with the local clock
+
+
+
+## Process management
+
+- `ps` - Lists running processes.
+  - `ps`: Shows processes for the current user.
+  - `ps a`: Displays all processes attached to a terminal.
+  - `ps x`: Lists processes for all users, even those not attached to a terminal.
+  - `ps aux`: Formats output for user-oriented listing.
+  - Processes in **square brackets** are system or kernel processes.
+
+* `lsof` - list open files
+  * `-c` - filter on process name
+  * `-p` - filter on PID
+  * `-u` - filter on a specific user
+
+* `fuser`
+    * Display process IDs currently using files or sockets
+    * 
+
+
+* `top`
+  * display Linux processes
+  * print how much CPU, RAM, swap is used, its uptime, idle 
+  * **Row information:**
+    * time, uptime, signed in users, load average
+    * **tasks:** zombie tasks are orphan processes - unparented child processes 
+      * show process relations with `Shift+V`
+    * **CPU:** 
+      * `us` - user space
+      * `sys` - system space
+      * `ni` - niceness aka priority
+      * `id` - idleness - how much time has the CPU been idle for
+      * `wa` - waiting: how much has a task been waiting for input/output. So, lower is better 
+      * `hi` / `si` - hardware and software interrupts. Not so important nowadays
+      * `st` - how much time has a virtual CPU been waiting for a physical CPU
+    * **memory:** memory installed/ free/ used/ cached
+    * **swap:** swap space installed/ free/ used/ total 
+  * Columns information:
+    * `PR` - priority
+    * `VIRT` - virtual memory being used
+    * `RES` - physical memory used 
+    * `SHR` - shared memory used
+    * `%CPU` / `%MEM` - CPU / memory used
+    * `TIME+` - uptime process
+    * `command` - process name
+  * Column sorting
+    * `P` - sort by CPU usage
+    * `M` - sort by memory
+    * `k` - kill using the PID
+
+* `nice`
+  * 
+
+* `renice`
+  * 
+
+- `kill` Command - Sends signals to processes to perform specific actions.
+    **Signals**:
+    - **SIGINT**:
+        - Interrupt signal (Ctrl + C).
+        - Stops the process, allowing it to clean up resources.
+    - **SIGKILL**:
+        - Forces the process to terminate immediately.
+    - **SIGSTOP**:
+        - Pauses the process (Ctrl + Z).
+    - **SIGTERM**:
+        - Requests the process to terminate gracefully.
+        - Allows time for cleanup, but the process can ignore it.
+
+- `killall` - Kills all processes by name.
+    - Only affects the current user's processes unless used with `sudo`.
+    - `kill -9 brave` - SIGKILL brave
+
+- `pkill`- Similar to `killall` but more flexible and potentially dangerous.
+    - Allows matching processes based on name or other attributes.
+
+
+
+## Service management
+
+* `systemctl`
+* `jounalctl`
+* `chkconfig`
+* `rc.local`
+
+## System monitoring
+* `uptime` 
+* `vmstat` 
+* `iostat` 
+* `free`
+
+## Log management
+* `rsyslog`
+  * sent system logs from all kinds of devices to a centralized server
+
+* `logrotate`
+* 
+
