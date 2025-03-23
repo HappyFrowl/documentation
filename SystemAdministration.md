@@ -1,13 +1,12 @@
 # System Administration
-
+- [Kernel management](#kernel-management)
+- [Boot process and GRUB management](#boot-process-and-grub-management)
+- [Linux system Components](#linux-system-components)
 - [Localisation and time](#Localization-and-time)
 - [Process management](#Process-management)
 - [Service management](#service-management)
 - [System monitoring](#system-monitoring)
 - [Log management](#log-management)
-- [Kernel management](#kernel-management)
-- [Boot process and GRUB management](#boot-process-and-grub-management)
-- [Linux system Components & virtual file systems](#linux-system-components--virtual-file-systems)
 
 
 ## Kernel management
@@ -102,7 +101,7 @@
     * `-e`                    - ignore errors
   * `/etc/sysctl.conf` enables configuration changes to a running Linux kernel
 
-* `procfs`
+* **`procfs`**
   * The `/proc` directory is a directory that is backed up by the **virtual file system** `procfs`
     * `/proc` is the mount point for procfs, meaning that all files and directories inside `/proc` come from `procfs`
     * `procfs` is a pseudo-filesystem, meaning it doesn’t store real files on disk but instead dynamically presents system and process-related information.
@@ -127,7 +126,7 @@
   * Drivers can also send diagnostics messages to the kernel when they encounter errors
   * Great for troubleshooting and driver validation
 
-  **sysfs**
+* **`sysfs`**
   - **Type**: Virtual Filesystem  
   - **Purpose**: Exposes kernel device and subsystem information to user space.  
     - Mounted at `/sys` and provides a structured way to view and manipulate kernel objects.  
@@ -138,13 +137,13 @@
   - **Example**:  
     - Check `/sys/class/net` for network interface details.
 
-**tmpfs**
+* **`tmpfs`**
 - **Type**: Temporary Filesystem  
 - **Purpose**: A memory-based filesystem used for temporary data storage that does not persist after reboot.  
 - **Example**:  
   - The `/tmp` directory is often mounted as `tmpfs`.
 
-**devtmpfs**
+* **`devtmpfs`**
 - **Type**: Virtual Filesystem  
 - **Purpose**: Automatically populates the `/dev` directory with device nodes at boot, which are then managed by `udev`.  
 - **Example**:  
@@ -153,7 +152,11 @@
 
 ## Boot process and GRUB management
 
-Before going into the actual boot process, first some notes on `initrd` which plays a crucial role in it: 
+### Boot components 
+Before going into the actual boot process, first some notes on some important components of the boot process.
+The main components of the boot process are: BIOS/UEFI, which will be taken as general knowledge, the Linux kernel, discussed above,`initrd` and `grub2, which will be discussed here. 
+
+`initrd` which plays a crucial role in it: 
 * `initrd` - initial ram disk 
   * `initrd` is a root file system that is temporarily loaded into memory upon system boot 
     * It is a temporary file system 
@@ -180,7 +183,33 @@ Before going into the actual boot process, first some notes on `initrd` which pl
   * Tool for creating `initramfs` images to boot the Linux kernel
   * Analogous to `mkinitrd` but applies to `initfs`
 
-**The Boot Process**
+
+* **`GRUB2`** - GRand Unified Bootloader
+* A **boot loader** is a small program stored in ROM of which GRUB2 is an example
+* Among other things, the boot loader enables users to choose which OS and kernel version to boot
+* Moreover, it enables configuring boot laoder through scripts'
+* GRUB knows three important files/ directories:f
+  *  `grub.cfg`
+    * File containing the main config for GRUB 
+    * However, it is never edited itself; use scripts instead
+    * It is located at 
+      * `/boot/grub/grub.cfg`               - BIOS
+      * `/boot/efi/EFI/<distro>/grub.cfg`   - UEFI
+
+  * `/etc/grub.d` 
+    * Directory containing scripts that are used to build the main `grub.cfg` file
+    * Add custom scripts as ##_fileName 
+    * Or add the script to the `40_custom` file
+
+  * `/etc/default/grub`
+    * Contains GRUB2 display menu settings that are read by the `/etc/grub.d`scripts
+    * This file must be saved to the boot folder `/boot/grub2`. 
+    * To generate a new or update an existing `grub.cfg`, run:  
+      * In RHEL: `sudo grub2-mkconfig -o <location>/grub.cfg`
+      * In Ubuntu: `sudo update-grub2` 
+
+
+### **The Boot Process**
 
 **1. BIOS/ UEFI**
 * CPU checks the BIOS/UEFI firmware
@@ -197,21 +226,12 @@ Before going into the actual boot process, first some notes on `initrd` which pl
   * BIOS/UEFI loads the primary boot loader from the MBR or GPT, and loads the partition table with it
 
 
-
-**2. GRUB2** - GRand Unified Bootloader
-* A **boot loader** is a small program stored in ROM of which GRUB2 is an example
+**2. GRUB2** 
 * GRUB2 selects the OS 
 * GRUB2 determines the kernel and locate the kernel binary on the disk  
 * GRUB2 loads the kernel into memory and runs the kernel code 
 
-* `/etc/default/grub`
-  * this file must be saved to the boot folder /boot/grub2. To do so:
-    * In RHEL: `sudo grub2-mkconfig -o /boot/grub2/grub.cfg`
-    * In Ubuntu: `sudo update-grub2` 
-  * `/etc/grub.d/`
-    * directory containing all config files for grub
 
- 
 **3. Linux Kernel** 
 * Once the kernel is loaded into memory, the kernel takes to finish the startup process 
 * The kernel checks the hardware and decompresses the `initrd` image to load the hardware drivers and other device drivers into memory 
@@ -234,8 +254,8 @@ Before going into the actual boot process, first some notes on `initrd` which pl
 * `systemd` searches for the `default.target` file
   * This contains details on the services that need to be started
 * Then it mounts the file system based on the `/etc/fstab` file
+* When using a `graphical.target` then the login screen is loaded and the user can log in
 
-  
 
  **Run levels**
 * Way of booting the system 
@@ -284,13 +304,7 @@ Before going into the actual boot process, first some notes on `initrd` which pl
     - this takes effect immedadiately
 
 
-## Bootloader 
-
-
-
-
-
-## Linux system Components & virtual file systems
+## Linux system Components
 
 **udev**
 - **Type**: Device Manager  
@@ -309,51 +323,64 @@ Before going into the actual boot process, first some notes on `initrd` which pl
 - **Example**:  
   - Applications like `NetworkManager` use D-Bus to communicate with the system's networking stack.
 
-
 **cgroups**
 - **Type**: Resource Management Subsystem  
 - **Purpose**: Limits, prioritizes, and accounts for resources (CPU, memory, I/O) used by groups of processes.  
 - **Example**:  
   - Docker and Kubernetes use `cgroups` to manage container resource allocation.
 
-**FUSE** (Filesystem in User Space)
+**FUSE** - Filesystem in User Space 
 - **Type**: Virtual Filesystem Framework  
 - **Purpose**: Allows non-privileged users to create and manage filesystems in user space.  
 - **Example**:  
   - Filesystems like `SSHFS` or `NTFS-3G` use FUSE.
 
 
-
-
-
-
-
 ## Localization and time 
-
 * `locale`
   - Region-specific settings, including language and country formats.
-  - View and configure locale settings.
+  - View and configure locale settings
 
-- **Convert between encodings**:
-  - `iconv -f utf-8 -t iso_8653-1 < file.txt > output.txt`
-- **List supported encodings**:
-  - `iconv -l`
-- **Detect file encoding**:
-  - `file <filename>`
+- `iconv -f utf-8 -t iso_8653-1 < file.txt > output.txt`
+  - Convert between encodings
+- `iconv -l`
+  -  List supported encodngs
+- `file <filename>`
+  - Detect file encoding
 
-
-- View current timezone:
-  - `cat /etc/timezone`
-- System timezone configuration:
-  - `/etc/localtime` (symlinked to the appropriate timezone file).
-- Select a timezone:
-  - `tzselect`
-- View time in another timezone:
-  - Use tools like `date` with `TZ` environment variables or GUI tools.
+- `cat /etc/timezone`
+  - View current timezone
+- `/etc/localtime` 
+  - Current timezone configuration
+  - file is symlinked to the appropriate timezone file
+- `tzselect`
+  - Select a timezone
 
 - `date` - print or set date and time
-- `date +%s` - print time as epoch time
-- `timedatectl` - print or set local time, universal time, time zone, ntp info, etc. 
+  - options:
+    - `+%A` - print full weekday
+    - `+%B` - print full month
+    - `+%F` - print date in yyy-mm-dd format
+    - `+%H` - print hour in 24hr
+    - `+%I` - print hour in 12hr
+    - `+%J` - print day of the year
+    - `+%j` - print seconds
+    - `+%V` - print week of the year
+    - `+%x` - print date representation based on the locale
+    - `+%S` - print time representation based on the locale
+    - `+%Y` - print year 
+
+- `timedatectl` 
+  - print or set local time, universal time, time zone, ntp info, etc. 
+  - this command should three clocks
+    - local time      - local current time
+    - Universal time  - UTC/ GMT
+    - RTC time        - Hardware clock as measured by the motherboard
+
+- `hwclock` 
+  - view and set the hardware clock
+  - best practice is to keep it in sync with universal time 
+
 
 - Synchronize with NTP servers:
   - Install the client: `apt install ntpdate`
@@ -362,10 +389,6 @@ Before going into the actual boot process, first some notes on `initrd` which pl
 - Configure as an NTP server:
   - Install the daemon: `apt install ntp`
   - Configuration file: `/etc/ntp.conf`
-
-- The hardware clock is independent of the system and runs even when the machine is powered off.
-- `hwclock --systohc --localtime` - Sync hardware clock with the local clock
-
 
 
 ## Process management
@@ -446,11 +469,37 @@ Before going into the actual boot process, first some notes on `initrd` which pl
 
 
 ## Service management
+**Service**
+  * Running programs or processes that provide support for requests and monitoring from other processes or external clients
+  * e.g., postfix, apache, and initd, like systemd
 
-* `systemctl`
-* `jounalctl`
-* `chkconfig`
-* `rc.local`
+* `systemctl` - system control
+  * enables the control of the systemd init daemon
+  * subcommands:
+    * `status`, `start`, `stop`, `restart`, `enable`, `disable` - speak for themselves 
+    * `set-default`   - set the default target for the system to use on boot
+    * `isolate`       - force the system to immedaitely change tot he provided target 
+    * `mask`          - prevent the provided unit file from being enabled or activated
+    * `daemon-reload` - reload the systemd init daemon, including all unit files
+
+* `sysv` specific management: 
+  * `/etc/init.d`
+    * Directory storing initialization scripts for services
+    * These scripts control the initiation of services 
+
+  * `/etc/rc.local`
+    * File that is executed tat the end of the init boot process
+    * Typically used to start custom services
+    * old deprecated shit
+
+  * `chkconfig`
+    * list all available services and view or update their run level settings
+    * control services in each runlevel
+    * start or stop services during system startup
+    * subcommands:
+      * `status`, `start`, `stop`, `restart`, `reload`
+
+
 
 ## System monitoring
 * `uptime` 
