@@ -122,13 +122,10 @@
       - `/proc/stat`        - contains various statistics about hte system's last reboot
       - `/proc/version`     - specifies several points of informations about the Linux Kernel. Similar to `uname`
 
-
-
 * `dmesg` - display / driver messages
   * Prints messages that have been sent to the kernel's mesasge during andd after system boot
   * Drivers can also send diagnostics messages to the kernel when they encounter errors
   * Great for troubleshooting and driver validation
-
 
   **sysfs**
   - **Type**: Virtual Filesystem  
@@ -140,7 +137,6 @@
       - Drivers  
   - **Example**:  
     - Check `/sys/class/net` for network interface details.
-
 
 **tmpfs**
 - **Type**: Temporary Filesystem  
@@ -155,47 +151,59 @@
   - Provides base device nodes for hardware detected during boot.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 ## Boot process and GRUB management
 
+Before going into the actual boot process, first some notes on `initrd` which plays a crucial role in it: 
+* `initrd` - initial ram disk 
+  * `initrd` is a root file system that is temporarily loaded into memory upon system boot 
+    * It is a temporary file system 
+  * The bootloader starts the OS by using `initrd` - see below
+  * `initfs` - initial file system - is the successor of `initrd`  
+  * **Features and functions** 
+    * It contains programs to perform hardware detection 
+    * It loads the necessary modules to get the actual file system mounted 
+  * `initrd` image
+    * Archive fiel that contains all the esxsential files that are required for booting the OS
+    * It can be built or customized to include additional modules, remove unnecessary ones, or update yet other ones
+    * `initrd` image is stored in the `/boot` directory
+
+* `mkinitrd` - make initial ram disk
+  * Tool for creating the `initrd` image for preloading the kernel modules
+  * options: 
+    * `--preload=<module>`  - Load a module in the `initrd` image *before* loading of other modules
+    * `--with=<module>`     - Load a module in the `initrd` image *after* loading other modules
+    * `-f`                  - Overwrite an existing `initrd` image file
+    * `-nocompress`         - Disable the compression of the `initrd` image 
+  * `mkinitrd [options] <initrd image name> <kernel version>` 
+
+* `dracut` 
+  * Tool for creating `initramfs` images to boot the Linux kernel
+  * Analogous to `mkinitrd` but applies to `initfs`
+
+**The Boot Process**
+
 **1. BIOS/ UEFI**
-* Hardware is booted 
+* CPU checks the BIOS/UEFI firmware
 * BIOS/UEFI runs POST 
     * Power On Self Test 
     * Tests whether all hardware pieces are working properly 
     * If there is an error it is shown on the screen 
-* If no error was encountered, the BIOS/ UEFI must find the bootloader software 
+* BIOS/UEFI checks for bootable media
     * Hard drive 
     * USB 
     * CD 
     * PXE 
+    * NFS
+  * BIOS/UEFI loads the primary boot loader from the MBR or GPT, and loads the partition table with it
 
-**2. GRUB2** 
-* GRand Unified Bootloader 
-* boot loader is a small program stored in ROM
-* **Functions**:
-    * Locate the kernel on the disk 
-    * Load the kernel into memory  
-    * Run the kernel code 
-* The bootloader starts the OS by using `initrd` – initial ram disk 
-    * This is a temporary file system 
-    * loaded into memory to assist in the boot process 
-    * **features and functions** 
-      * contains programs to perform hardware detection 
-      * loads the necessary modules to get the actual file system mounted 
-    * Once the actual file system is mounted, the OS continues to load from the real file system 
-    * `initfs` (initial file system) is the successor of initrd  
+
+
+**2. GRUB2** - GRand Unified Bootloader
+* A **boot loader** is a small program stored in ROM of which GRUB2 is an example
+* GRUB2 selects the OS 
+* GRUB2 determines the kernel and locate the kernel binary on the disk  
+* GRUB2 loads the kernel into memory and runs the kernel code 
+
 * `/etc/default/grub`
   * this file must be saved to the boot folder /boot/grub2. To do so:
     * In RHEL: `sudo grub2-mkconfig -o /boot/grub2/grub.cfg`
@@ -203,35 +211,31 @@
   * `/etc/grub.d/`
     * directory containing all config files for grub
 
-  
+ 
 **3. Linux Kernel** 
 * Once the kernel is loaded into memory, the kernel takes to finish the startup process 
-* It starts 
-    * Kernel modules 
-    * Device drivers 
-    * Background processes 
-* Process
-  * it decompresses itself onto memory
-  * checks the hardware
-  * loads device drivers and other device drivers 
-  * then `init` takes off 
+* The kernel checks the hardware and decompresses the `initrd` image to load the hardware drivers and other device drivers into memory 
+* Virtual devices such as RAID and LVM are initialized here
+* The kernel mounts the main root partition and releases unused memory back into the system
+* This starts `init` as the first process 
 
-**4. init**
-* Initialization system 
-* Brings up and maintains user space services 
-* Once the kernel has attached the boot file system, `init` is run  
-* Init is the first process run by Linux 
-    * So process number is always pID 1 
-    * Check with ps –aux | head 
-    * Always run in the background 
-* For many distros, `**systemd**` is the used init system 
-    * Another is `sysv` or `upstart`
-    * Systemd was spearheaded by RedHat 
-* `systemd` is a collection of units (e.g. services, mounts, etc) 
-    * Systemctl, journalctl, loginct, notify, analyze, cgls, cgtop, nspawn 
-    * To query all units, run: systemctl list-unit-files 
-    * Also see which are enabled, disabled, masked 
- 
+
+**4. init** - Initialization system 
+* Background on `init`
+  * `init` brings up and maintains user space services 
+  * Init is the first process run by Linux, so it always has process ID 1
+  * For many distros, `**systemd**` is the used init system 
+      * Another is `sysv` or `upstart`
+      * `systemd` was spearheaded by RedHat 
+  * `systemd` is a collection of units (e.g. services, mounts, etc) 
+      * Systemctl, journalctl, loginct, notify, analyze, cgls, cgtop, nspawn 
+      * To query all units, run: systemctl list-unit-files 
+      * Also see which are enabled, disabled, masked 
+* `systemd` searches for the `default.target` file
+  * This contains details on the services that need to be started
+* Then it mounts the file system based on the `/etc/fstab` file
+
+  
 
  **Run levels**
 * Way of booting the system 

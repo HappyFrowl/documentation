@@ -1,2 +1,2 @@
 # Overview
-This documentation is an amalgam of notes taken when going through courses for LFCS, LPIC-1, Linux+, and on of that supplied with other useful commands, concept exploration, and other procedures. 
+This documentation is an amalgam of notes taken when going through courses for LFCS, LPIC-1, Linux+, and on of that supplied with other useful commands, concept exploration, and other procedures. In other words, it does not strictly follow any exam summary but rather tries to offer a broad and fundamental knowledge of Linux 
