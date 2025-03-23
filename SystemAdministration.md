@@ -102,7 +102,69 @@
     * `-e`                    - ignore errors
   * `/etc/sysctl.conf` enables configuration changes to a running Linux kernel
 
-* `dmesg`
+* `procfs`
+  * The `/proc` directory is a directory that is backed up by the **virtual file system** `procfs`
+    * `/proc` is the mount point for procfs, meaning that all files and directories inside `/proc` come from `procfs`
+    * `procfs` is a pseudo-filesystem, meaning it doesn’t store real files on disk but instead dynamically presents system and process-related information.
+    - **Purpose**: 
+      * Provides an interface to kernel data structures.  
+      - Mounted at `/proc` and allows user space to query or control the kernel.  
+      - Presents information about:  
+        - Processes  
+        - System information  
+    - **Examples**:  
+      - `/proc/cpuinfo`     - CPU details 
+      - `/proc/meminfo`     - memory usage
+      - `/proc/cmdline`     - contains options passed by GRUB during boot
+      - `/proc/devices`     - contains a list of character and block device drivers loaded into the currently running kernel
+      - `/proc/filesystems` - contains a list of file systems types that are supported by the kernel
+      - `/proc/modules`     - contains informatiokns about modules currently installed on the system
+      - `/proc/stat`        - contains various statistics about hte system's last reboot
+      - `/proc/version`     - specifies several points of informations about the Linux Kernel. Similar to `uname`
+
+
+
+* `dmesg` - display / driver messages
+  * Prints messages that have been sent to the kernel's mesasge during andd after system boot
+  * Drivers can also send diagnostics messages to the kernel when they encounter errors
+  * Great for troubleshooting and driver validation
+
+
+  **sysfs**
+  - **Type**: Virtual Filesystem  
+  - **Purpose**: Exposes kernel device and subsystem information to user space.  
+    - Mounted at `/sys` and provides a structured way to view and manipulate kernel objects.  
+    - Presents information about:  
+      - Various kernel subsystems  
+      - Hardware devices  
+      - Drivers  
+  - **Example**:  
+    - Check `/sys/class/net` for network interface details.
+
+
+**tmpfs**
+- **Type**: Temporary Filesystem  
+- **Purpose**: A memory-based filesystem used for temporary data storage that does not persist after reboot.  
+- **Example**:  
+  - The `/tmp` directory is often mounted as `tmpfs`.
+
+**devtmpfs**
+- **Type**: Virtual Filesystem  
+- **Purpose**: Automatically populates the `/dev` directory with device nodes at boot, which are then managed by `udev`.  
+- **Example**:  
+  - Provides base device nodes for hardware detected during boot.
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## Boot process and GRUB management
@@ -243,42 +305,6 @@
 - **Example**:  
   - Applications like `NetworkManager` use D-Bus to communicate with the system's networking stack.
 
-**sysfs**
-- **Type**: Virtual Filesystem  
-- **Purpose**: Exposes kernel device and subsystem information to user space.  
-  - Mounted at `/sys` and provides a structured way to view and manipulate kernel objects.  
-  - Presents information about:  
-    - Various kernel subsystems  
-    - Hardware devices  
-    - Drivers  
-- **Example**:  
-  - Check `/sys/class/net` for network interface details.
-
-**procfs**
-- **Type**: Virtual Filesystem  
-- **Purpose**: Provides an interface to kernel data structures.  
-  - Mounted at `/proc` and allows user space to query or control the kernel.  
-  - Presents information about:  
-    - Processes  
-    - System information  
-- **Example**:  
-  - Access `/proc/cpuinfo` for CPU details or `/proc/meminfo` for memory usage.  
-  - Run `ls /proc` to list all running processes.  
-  - Interface with the kernel to change parameters on the fly.  
-  - The `cmdline` file contains options passed by GRUB during boot.  
-  - Linux version and kernel are stored as files in `/proc`.
-
-**tmpfs**
-- **Type**: Temporary Filesystem  
-- **Purpose**: A memory-based filesystem used for temporary data storage that does not persist after reboot.  
-- **Example**:  
-  - The `/tmp` directory is often mounted as `tmpfs`.
-
-**devtmpfs**
-- **Type**: Virtual Filesystem  
-- **Purpose**: Automatically populates the `/dev` directory with device nodes at boot, which are then managed by `udev`.  
-- **Example**:  
-  - Provides base device nodes for hardware detected during boot.
 
 **cgroups**
 - **Type**: Resource Management Subsystem  
