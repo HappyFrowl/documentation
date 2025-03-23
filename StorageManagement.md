@@ -259,15 +259,6 @@
     * `-all` - print all info, including test result
 
 
-- **`df`**: 
-    * Display filesystem usage.
-    * `-h` - human-readable format (e.g., MiBs, GiBs).
-    * `-i` - show inodes 
-
-* `du` - disk usage 
-    * `-h` - human readable 
-    * `-s` - show only total 
-
 
 ## RAID
 * RAID types
@@ -343,6 +334,53 @@
     * `lvremove`    - removes a logical volume
 
 
+
+## NFS & samba file sharing
+
+
+## Swap management
+* `swapon`
+* `swapoff`
+* `mkswap`
+
+
+## Archiving, Backup & Recovery
+
+- **`tar`** - Archive files.
+  - Common options:
+    - `c`: Create an archive.
+    - `v`: Verbose (list files being processed).
+    - `f`: Specify the filename.
+    - `z`: Compress or decompress with gzip.
+    - `t`: List archive contents.
+  - Examples:
+    ```bash
+    tar cvf archive.tar file1 file2
+    tar zcvf archive.tar.gz file1 file2
+    tar tvf archive.tar
+    ```
+
+- **`gzip`**: Compress files using the DEFLATE algorithm.
+  - Use `gunzip` to decompress.
+
+
+- **`dd`** - data duplicator / disk destroyer
+    * commonly used for disk imaging, data recovery, and even wiping data securely
+        * `if` - input file 
+        * `of` - output file 
+    * disk cloning and imaging
+        * `dd if=/dev/sdX of=/path/to/backup.img bs=4M status=progress` 
+            * create a disk image
+    * converting files to lowercase
+    * secure wiping
+        * `dd if=/dev/zero of=/dev/sd# bs=1M status=progress`
+    * Backup the MBR (Master Boot Record):
+        * `dd if=/dev/sda of=mbr.bak bs=446 count=1`
+    * disk performance tests
+        * measuring read / write speed
+
+
+
 ## The Linux File System
 
 `/` - Root
@@ -414,13 +452,34 @@
     - Outputs the location of a command and its man pages.
 
 * `locate`
-    - Locate a file quickly (requires updatedb).
+    - Locate a file quickly (requires `updatedb`)
+    - options:
+        - `-r` - use regex
+        - `-c` - display or count the bnumber of matching entries found
+        - `-e` - return only files that exist at the time of search
+        - `-I` - ignmore the casing in file names or paths
 
 * `updatedb`
-    - Must be run in order to use `locate`.
+    - Must be run regularly in order to effectively use `locate`
 
 * `/etc/updatedb.conf`
     - Configuration for `updatedb`, which defines locations not to search.
+    - or add them to the $PRUNEPATH variable
+
+- `find` 
+    * combine the results with:
+        * `-print`      - display the location of the files
+        * `-exec`       - execute the comamnd that follows 
+        * `-ok`         - execute the command that follow interactively
+        * `-delete`     - delete the files found
+        * `-fprint`     - tore the results in a target file 
+
+* `which`
+    * locate the location of an executable
+
+* `whereis` 
+    * Locate the binary, source, and manual page files for a command.
+    * gives more info than `which`
 
 - `stat`
     - Display file or file system status 
@@ -457,66 +516,34 @@
 
 
 
-## Disk Quotas
-* **quotas**
+## Storage Troubleshooting
+
+* `ulimit` - user limit 
+    * limits teh system resources for a user in a Linux-based server
+    * `ulimit -n 512`   - limit for max open files is put for a particular user
+    * `ulimit -a`       - see all limits configured
+
+- **`df`**: 
+    * Display filesystem usage.
+    * `-h` - human-readable format (e.g., MiBs, GiBs).
+    * `-i` - show inodes 
+
+* `du` - disk usage 
+    * `-h` - human readable 
+    * `-s` - show only total 
+
+* **quotas** 
     * to start using disk quotes, the package `quotas` is required
     * `quotacheck`: Scan a file system for disk usage and create/repair quota files.
     * `edquota`: Edit the disk quota for a user.
-    - Specifies disk usage, inode usage, and the specific file system to which it applies.
+        - Specifies disk usage, inode usage, and the specific file system to which it applies.
     * `quotaon`: Enable quotas and apply the configuration set in `edquota`.
     * To implement quotas:
         * modify `/etc/fstab` file
         * add `,usrquota` after `defaults`
 
 
-
-
-
-
-
-## NFS & samba file sharing
-
-
-## Swap management
-* `swapon`
-* `swapoff`
-* `mkswap`
-
-
-## Archiving, Backup & Recovery
-
-- **`tar`** - Archive files.
-  - Common options:
-    - `c`: Create an archive.
-    - `v`: Verbose (list files being processed).
-    - `f`: Specify the filename.
-    - `z`: Compress or decompress with gzip.
-    - `t`: List archive contents.
-  - Examples:
-    ```bash
-    tar cvf archive.tar file1 file2
-    tar zcvf archive.tar.gz file1 file2
-    tar tvf archive.tar
-    ```
-
-- **`gzip`**: Compress files using the DEFLATE algorithm.
-  - Use `gunzip` to decompress.
-
-
-- **`dd`** - data duplicator / disk destroyer
-    * commonly used for disk imaging, data recovery, and even wiping data securely
-        * `if` - input file 
-        * `of` - output file 
-    * disk cloning and imaging
-        * `dd if=/dev/sdX of=/path/to/backup.img bs=4M status=progress` 
-            * create a disk image
-    * converting files to lowercase
-    * secure wiping
-        * `dd if=/dev/zero of=/dev/sd# bs=1M status=progress`
-    * Backup the MBR (Master Boot Record):
-        * `dd if=/dev/sda of=mbr.bak bs=446 count=1`
-    * disk performance tests
-        * measuring read / write speed
+ 
 
 
 

@@ -51,8 +51,6 @@
   - `-p` - include the parent directories if not existing
 
 
-- **`find`**
-  - s
 
 
 
@@ -71,7 +69,8 @@
 - **`expand / unexpand`**: Convert tabs to 8 spaces and vice versa.
   - Example: `expand file > file2`.
 
-- **`wc`**: Count lines, words, and bytes in a file.
+- **`wc`** - word count
+  * Count lines, words, and bytes in a file.
 
 - **`fmt`**: Format text.
 
