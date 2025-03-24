@@ -257,7 +257,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 * When using a `graphical.target` then the login screen is loaded and the user can log in
 
 
- **Run levels**
+ #### **Run levels**
 * Way of booting the system 
 * Only used in SysV systems, not in Systemd systems
 * take particular note of run level 1 - single user mode
@@ -273,7 +273,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   5. nothing
   6. reboot (into system default)
 
-* For CentOS/ SuSe:
+* For CentOS/ RedHat:
   0. Halt
   1. single user mode
   2. multi user, no net
@@ -381,7 +381,6 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   - view and set the hardware clock
   - best practice is to keep it in sync with universal time 
 
-
 - Synchronize with NTP servers:
   - Install the client: `apt install ntpdate`
   - Sync with NTP pool:
@@ -394,25 +393,25 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 ## Process management
 
 - `ps` - Lists running processes.
-  - `ps`: Shows processes for the current user.
-  - `ps a`: Displays all processes attached to a terminal.
-  - `ps x`: Lists processes for all users, even those not attached to a terminal.
-  - `ps aux`: Formats output for user-oriented listing.
+  - By default, it only shows processes for the current user.
+  - options:
+    - `a` - displays all user-triggered processes
+    - `u` - list proceses along with the username and start time
+    - `x` - include processes without a terminal
   - Processes in **square brackets** are system or kernel processes.
 
-* `lsof` - list open files
-  * `-c` - filter on process name
-  * `-p` - filter on PID
-  * `-u` - filter on a specific user
+- `pgrep <process name>` - process grep
+  -  identify a process ID based on the process name
 
-* `fuser`
+- `pidof` - PID of 
+  - works similar to pgrep
+
+* `fuser` - file user
     * Display process IDs currently using files or sockets
-    * 
-
 
 * `top`
-  * display Linux processes
-  * print how much CPU, RAM, swap is used, its uptime, idle 
+  * Display Linux processes
+  * Print how much CPU, RAM, swap is used, its uptime, idle 
   * **Row information:**
     * time, uptime, signed in users, load average
     * **tasks:** zombie tasks are orphan processes - unparented child processes 
@@ -427,7 +426,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
       * `st` - how much time has a virtual CPU been waiting for a physical CPU
     * **memory:** memory installed/ free/ used/ cached
     * **swap:** swap space installed/ free/ used/ total 
-  * Columns information:
+  * **Column information**:
     * `PR` - priority
     * `VIRT` - virtual memory being used
     * `RES` - physical memory used 
@@ -441,23 +440,51 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     * `k` - kill using the PID
 
 * `nice`
-  * 
+  * Processes are prioritized based on a number ranging from -20 to 19
+  * The lower the number, the *higher* the priority
+  * 0 is the default
+  * By default, `nice` prints the default nice number
+  * `-n` - increment the nice value
 
 * `renice`
-  * 
+  * Alter the scheduling priority of an already running process
+  * options: 
+    * `-n` - specify the new nice value for a running process
+    * `-g` - alter the nice value of a processes in a process group
+    * `-u` - alter the nice value of the processes associated to a user
+
+* `systemd-analyze` 
+  * Get performance stats for boot operations
+  * Per unit it shows how long it took to start
+  * Use it identify what slows down a boot process
+  * `blame` - subcommand to identify services and other units that make the system really slow during the bootup process
+
+* `lsof` - list open files
+  * `-c` - filter on process name
+  * `-p` - filter on PID
+  * `-u` - filter on a specific user
 
 - `kill` Command - Sends signals to processes to perform specific actions.
     **Signals**:
     - **SIGINT**:
-        - Interrupt signal (Ctrl + C).
-        - Stops the process, allowing it to clean up resources.
+      - Interrupt signal 
+      - Stops the process, allowing it to clean up resources.
+      - like Ctrl + C
+      - value 2
     - **SIGKILL**:
-        - Forces the process to terminate immediately.
-    - **SIGSTOP**:
-        - Pauses the process (Ctrl + Z).
+      - Forces the process to terminate immediately
+      - value 9
     - **SIGTERM**:
-        - Requests the process to terminate gracefully.
-        - Allows time for cleanup, but the process can ignore it.
+      - Request the process to terminate gracefully
+      - Allows time for cleanup, but the process can ignore it.
+      - value 15
+    - **SIGSTOP**:
+      - Pauses the process 
+      - like Ctrl + z
+      - value 17, 19, 23
+    - **SIGSTP**
+      - Pause a proces from the terminal
+      - value 18, 20, 24
 
 - `killall` - Kills all processes by name.
     - Only affects the current user's processes unless used with `sudo`.
@@ -466,6 +493,20 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 - `pkill`- Similar to `killall` but more flexible and potentially dangerous.
     - Allows matching processes based on name or other attributes.
 
+* `fg` - foreground
+  * Bring a process back to foreground
+
+* `bg` - background
+  * Move a process to the background
+  * Alternatively, use ctrl+z
+  * or start a command with `&` at the end 
+
+* `jobs`
+  * Prints all foreground and background jobs running
+
+* `nohup` - no hiccup
+  * prevent a command from stopping when the user that initiated it logs off
+  * `nohup.script.sh` 
 
 
 ## Service management
@@ -500,12 +541,21 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
       * `status`, `start`, `stop`, `restart`, `reload`
 
 
-
 ## System monitoring
 * `uptime` 
+  * print time since last boot
+
+
+
 * `vmstat` 
+
 * `iostat` 
+
 * `free`
+
+
+
+
 
 ## Log management
 * `rsyslog`
