@@ -311,8 +311,6 @@ Modes
 
 
 
-
-
 ## Job Scheduling 
 
 * `at`
@@ -399,7 +397,7 @@ Modes
   * branches are like timelines that can diverge and converge
   * `git branch <name>` - create a new branch
   * `-m <oldname> <newname>` - move or rename a branch
-  * In doubt, keep an eye on the git folder to see where HEAD is pointing to
+  * When in doubt, keep an eye on the git folder to see where HEAD is pointing to
 
 * `git checkout`
   * `git checkout <name>` - switch to another branch
@@ -411,8 +409,7 @@ Modes
 * `git merge` - merge two branches
   * `git checkout master` - then merge from there
   
-
-**git conflicts:**
+### **git conflicts:**
   * resolving must be done manually in the code editor
   * the conflict is shown highlighted in green and blue 
   * Green - branch that you are on
@@ -431,7 +428,7 @@ Modes
 * `git stash` - Stash local Git changes in a temporary area.
   * `git stash` is about saving your work temporarily
   * it can also be a solution for when **conflicts** arise due to having uncommited changes in an existing branch and existing file 
-  * Let's walk through how it can be reproduced:
+  * **Walkthrough**:
     * Be on any branch (e.g., main).
     * Modify an existing file (a file that has already been committed).
     * Try to switch to another branch (e.g., bugfix).
