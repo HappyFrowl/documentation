@@ -8,8 +8,6 @@
 - [SSH](#SSH)
 
 
-
-
 ## Configuring network interfaces
 - `ifconfig` - interface configuration 
     - Display or configure network interfaces.
@@ -31,8 +29,8 @@
     - `route add default gw <ip>` - add a default gateway
 
 
-* **NetworkManager**
-- Entire suits of programs to manage networking
+###  **NetworkManager**
+- Entire suite of programs to manage networking
 - changes made are persistent
 - `nmcli` - CLI tool 
 - `nmtui` - Text user interface 
@@ -56,13 +54,10 @@
             - especially good in combination for scripting
         - `-p` - make it pretty - always good to use in combination with `show`
 
-
 * `netplan`
     * YAML network configuration abstraction for various backends
     * it is a way of declaratively ocnfigure interface devices 
     * `/etc/netplan/*` - location for the yaml files 
-
-
 
 * network bonds
     * same as NIC teaming
@@ -73,6 +68,7 @@
         * modify `/etc/netplan` file   
         * add section `bonds:` etc 
             * just look this up 
+
 
 
 
@@ -99,16 +95,27 @@
 
 * `ss` - socket statistics
   * prints similar information to `netstat`
-  * `-t | -u` - print tcp / udp connections
-  * `-l` - print listening connection
-  * `-s` - print statistics 
-  * `-4 | -6` - print ipv4 / ipv6 connection
-  * `sport == : <port> and dport == : <port>` - specify specific ports
+  * prints simpler output and syntax than `netstat`
+  * options:
+      * `-t | -u` - print tcp / udp connections
+      * `-l` - print listening connection
+      * `-s` - print statistics 
+      * `-4 | -6` - print ipv4 / ipv6 connection
+      * `sport == : <port> and dport == : <port>` - specify specific ports
 
+- `nmap` - network mapper
+    - Look for devices on the network and open ports on devices.
 
-- `nmap` - network map
-    - Look for open ports.
+* `iperf` 
+    * test the maximum throughput of an interface
 
+* `iftop` - interface top
+    * display bandwidth usage infoirmation for a system
+
+* `mtr` 
+    * Combination of `ping` and `traceroute`
+    * Enables testing the quality of a network connection
+    * Identify packet loss
 
 ## DNS
 
@@ -117,21 +124,21 @@
     - Essentially a simplified local DNS.
     - Add an IP with a name here, and you can ping that name.
 
-- `/etc/nsswitch`
-    - Name service switch.
-    - Specifies how name servers are looked up and in what order.
-    - The ‘hosts’ section is most important:
-    - First, it looks in its hosts file, then checks DNS.
 
 - `/etc/hosts`
     - Local hostnames and IPs.
 
 - `/etc/resolv.conf`
+    - File containing the IP address of one or more DNS servers
     - Set DNS name server to perform DNS queries.
     - This cannot be modified when using DHCP.
 
-- `/etc/dhcp/dhclient.conf`
-    - Add line `supersede domain-name-server [IP DNS servers]`.
+- `/etc/nsswitch`
+    - Name service switch
+    - File containing a couple different configurations
+    - Specifies which name servers are looked up and in what order.
+    - The ‘hosts’ section is most important:
+        - First, it looks in `/etc/hosts`, then DNS.
 
 - `getent hosts`
     - Get all known hosts.
@@ -154,9 +161,17 @@
         - `@<server_name>` - is used to query a custom DNS server 
     - verbose and detailed
     
+- `whois <domain>` 
+    - Print information about the owner of the domain name
+    - Prints also the domain nameservers and registrar
+
 
 ## DHCP
 
+* `/etc/dhcp/dhclient.conf`
+    * configuration file for DHCP
+    * Edited using `nmcli`
+    * Add line `supersede domain-name-server <IP DNS servers>`.
 
 
 
