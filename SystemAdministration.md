@@ -154,9 +154,8 @@
 
 ### Boot components 
 Before going into the actual boot process, first some notes on some important components of the boot process.
-The main components of the boot process are: BIOS/UEFI, which will be taken as general knowledge, the Linux kernel, discussed above,`initrd` and `grub2, which will be discussed here. 
+The main components of the boot process are: BIOS/UEFI, which will be taken as general knowledge, the Linux kernel, discussed above,`initrd` and `grub2`, which will be discussed here. 
 
-`initrd` which plays a crucial role in it: 
 * `initrd` - initial ram disk 
   * `initrd` is a root file system that is temporarily loaded into memory upon system boot 
     * It is a temporary file system 
@@ -185,28 +184,28 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 
 
 * **`GRUB2`** - GRand Unified Bootloader
-* A **boot loader** is a small program stored in ROM of which GRUB2 is an example
-* Among other things, the boot loader enables users to choose which OS and kernel version to boot
-* Moreover, it enables configuring boot laoder through scripts'
-* GRUB knows three important files/ directories:f
-  *  `grub.cfg`
-    * File containing the main config for GRUB 
-    * However, it is never edited itself; use scripts instead
-    * It is located at 
-      * `/boot/grub/grub.cfg`               - BIOS
-      * `/boot/efi/EFI/<distro>/grub.cfg`   - UEFI
+  * A **boot loader** is a small program stored in ROM of which GRUB2 is an example
+  * Among other things, the boot loader enables users to choose which OS and kernel version to boot
+  * Moreover, it enables configuring boot laoder through scripts'
+  * GRUB knows three important files/ directories:
+    *  `grub.cfg`
+      * File containing the main config for GRUB 
+      * However, it is never edited itself; use scripts instead
+      * It is located at 
+        * `/boot/grub/grub.cfg`               - BIOS
+        * `/boot/efi/EFI/<distro>/grub.cfg`   - UEFI
 
-  * `/etc/grub.d` 
-    * Directory containing scripts that are used to build the main `grub.cfg` file
-    * Add custom scripts as ##_fileName 
-    * Or add the script to the `40_custom` file
+    * `/etc/grub.d` 
+      * Directory containing scripts that are used to build the main `grub.cfg` file
+      * Add custom scripts as ##_fileName 
+      * Or add the script to the `40_custom` file
 
-  * `/etc/default/grub`
-    * Contains GRUB2 display menu settings that are read by the `/etc/grub.d`scripts
-    * This file must be saved to the boot folder `/boot/grub2`. 
-    * To generate a new or update an existing `grub.cfg`, run:  
-      * In RHEL: `sudo grub2-mkconfig -o <location>/grub.cfg`
-      * In Ubuntu: `sudo update-grub2` 
+    * `/etc/default/grub`
+      * Contains GRUB2 display menu settings that are read by the `/etc/grub.d` scripts
+      * This file must be saved to the boot folder `/boot/grub2`. 
+      * To generate a new or update an existing `grub.cfg`, run:  
+        * In RHEL: `sudo grub2-mkconfig -o <location>/grub.cfg`
+        * In Ubuntu: `sudo update-grub2` 
 
 
 ### **The Boot Process**
@@ -257,33 +256,33 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 * When using a `graphical.target` then the login screen is loaded and the user can log in
 
 
- #### **Run levels**
+### **Run levels**
 * Way of booting the system 
-* Only used in SysV systems, not in Systemd systems
+* Only used in **SysV** systems, not in Systemd systems
 * take particular note of run level 1 - single user mode
   * this boots the system into a single user mode, requiring no password
   * THIS is the way to reset the root's password 
 
 * For Debian based systems:
-  0. halt
-  1. single user mode 
-  2. full, multi user, GUI if installed
-  3. nothing
-  4. nothing
-  5. nothing
-  6. reboot (into system default)
+  * 0. halt
+  * 1. single user mode 
+  * 2. full, multi user, GUI if installed
+  * 3. nothing
+  * 4. nothing
+  * 5. nothing
+  * 6. reboot (into system default)
 
 * For CentOS/ RedHat:
-  0. Halt
-  1. single user mode
-  2. multi user, no net
-  3. mutli user, with net
-  4. nothing
-  5. multi user GUI
-  6. reboot 
+  * 0. Halt
+  * 1. single user mode
+  * 2. multi user, no net
+  * 3. mutli user, with net
+  * 4. nothing
+  * 5. multi user GUI
+  * 6. reboot 
 
 
-**Boot Targets**
+### **Boot Targets**
 * Boot targets are the modern equivalent of runlevels 
 * used in systemd
 * More flexible and descriptive way of managing system states
@@ -545,15 +544,24 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 * `uptime` 
   * print time since last boot
 
-
-
-* `vmstat` 
-
-* `iostat` 
-
 * `free`
+  * print free memory space 
+  * it uses the `/proc/meminfo` file
 
 
+* `lscpu` - list cpu 
+  * list cpu information
+
+* `lsmem` - list memory
+  * list memory card information
+
+* `vmstat` - virtual memory statistics
+  * Print various statistics about virtual memory, CPU, and I/O 
+  * It prints *averages* since the last bootup
+
+* `iostat` - input-output statistics
+  * Report statistics for devices and partitions.
+  * Display a report of CPU and disk statistics since system startup
 
 
 
