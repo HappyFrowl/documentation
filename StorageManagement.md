@@ -1,14 +1,14 @@
 # Storage
-- [File System introduction](#File-System-introduction)
 - [File system management](#file-system-management)
-- [The Linux File System](#the-linux-file-system)
-- [File localization](#File-localization)
-- 
-- [LVM](#LVM)
 - [RAID](#raid)
-- [NFS & samba file sharing](#nfs--samba-file-sharing)
-- [Archiving, Backup & Recovery](#archiving,-backup--recovery)
-
+- [LVM](#LVM)
+- [Swap management](#swap-management)
+- [File sharing](#file-sharing)
+- [Archiving, Backup & Recovery](#archiving-backup--recovery)
+- [The Linux File System](#the-linux-file-system)
+- [Hard and Symbolic Links](#hard-and-symbolic-links)
+- [File localization](#File-localization) 
+- [Storage Troubleshooting](#storage-troubleshooting)
 
 
 ## File System management
@@ -71,6 +71,7 @@
             * `e2label` - see or change ext-based file systems
             * `xfs_admin` - same but for XFS-based file systems 
 
+### Managing partitions and file systems 
 * `fdisk </dev/>`
     * Manage partition tables and partitions on a hard disk
     * bit of an old tool
@@ -157,8 +158,6 @@
 * `blkid` - block id
     * print the UUID of devices 
     * this is used to add the devices to `/etc/fstab` 
-
-
 
 * `mount [options] <dev> <mountpoint>`  
     * mount a file system
@@ -258,8 +257,6 @@
     * `-t (short|long)` - do a disk drive test 
     * `-all` - print all info, including test result
 
-
-
 ## RAID
 * RAID types
     * Striping
@@ -272,15 +269,18 @@
     * RAID 6 - 5+1, min. 4 drives
     * RAID 10 - 1+0, striped mirrors. min. 4 drives
 
-
 * `mdadm`
     * tool for managing software-based RAID arrays
-    * 
+    * options:
+        * `-F` - Activate monitor mode
+        * `-f` - Mark specified device
+        * `-r` - Remove specified device
+        * `-a` - Add device as hot-spare
 
 * `/proc/mdstat`
     * offers information on the current RAID configuration 
     * contains a snapshot of the kernel's RAID/ md state
-    * 
+ 
 
 ## LVM 
 * LVM - Logical Volume Manager
@@ -333,11 +333,6 @@
     * `lvresize`    - resizes logical volumes
     * `lvremove`    - removes a logical volume
 
-
-
-## NFS & samba file sharing
-
-
 ## Swap management
 * `mkswap`
     * Create swap space on a storage partition
@@ -352,6 +347,8 @@
 * `swapoff`
     * Deactivate a swap partition
 
+
+## File sharing
 
 
 ## Archiving, Backup & Recovery
@@ -453,6 +450,25 @@
 - Used to keep track of running processes.
 
 
+## Hard and Symbolic Links
+- **Hard Link**
+    - A link to another file’s inode.
+    - Can only occur within the same file system.
+    - `ls -la`: Displays hard link count (second column).
+    - Directories have a minimum of 2 links: one for itself and one for its parent.
+    - Files have a minimum of 1 link.
+    - Create hard links with `ln <sourcefile> <destfile>`.
+    - Check links with `ls -li`.
+    - **Note**: Hard links are not allowed for directories.
+
+  
+- **Symbolic (Soft) Link**
+    - A link to another file name.
+    - Can span across different file systems.
+    - Akin to shortcuts in Windows.
+    - Useful for linking files between file systems.
+    - Create soft links with `ln -s <sourcefile> <destfile>`.
+
 ## File localization
 
 * `type`
@@ -505,26 +521,6 @@
     -   Access, Modify, and Change timestamps 
 
 
-## Hard and Symbolic Links
-- Hard Link
-    - A link to another file’s inode.
-    - Can only occur within the same file system.
-    - `ls -la`: Displays hard link count (second column).
-    - Directories have a minimum of 2 links: one for itself and one for its parent.
-    - Files have a minimum of 1 link.
-    - Create hard links with `ln <sourcefile> <destfile>`.
-    - Check links with `ls -li`.
-    - **Note**: Hard links are not allowed for directories.
-
-  
-- Symbolic (Soft) Link
-    - A link to another file name.
-    - Can span across different file systems.
-    - Akin to shortcuts in Windows.
-    - Useful for linking files between file systems.
-    - Create soft links with `ln -s <sourcefile> <destfile>`.
-
-
 
 ## Storage Troubleshooting
 
@@ -533,8 +529,8 @@
     * `ulimit -n 512`   - limit for max open files is put for a particular user
     * `ulimit -a`       - see all limits configured
 
-- **`df`**: 
-    * Display filesystem usage.
+- **`df`**: - display filesystem
+    * Print filesystem usage.
     * `-h` - human-readable format (e.g., MiBs, GiBs).
     * `-i` - show inodes 
 
@@ -542,8 +538,8 @@
     * `-h` - human readable 
     * `-s` - show only total 
 
-* **quotas** 
-    * to start using disk quotes, the package `quotas` is required
+* **`quotas`** 
+    * Package for managing user quotas
     * `quotacheck`: Scan a file system for disk usage and create/repair quota files.
     * `edquota`: Edit the disk quota for a user.
         - Specifies disk usage, inode usage, and the specific file system to which it applies.
