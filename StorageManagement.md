@@ -339,9 +339,19 @@
 
 
 ## Swap management
-* `swapon`
-* `swapoff`
 * `mkswap`
+    * Create swap space on a storage partition
+    * options:
+        * `-c` - check for bad sectors before making the swap space
+        * `-p` - Set the page size to be used
+        * `-L` - Active swap space using labels applied to partition or file systems
+
+* `swapon`
+    * Activate a swap partition
+
+* `swapoff`
+    * Deactivate a swap partition
+
 
 
 ## Archiving, Backup & Recovery
