@@ -7,7 +7,7 @@
 - [Service management](#service-management)
 - [System monitoring](#system-monitoring)
 - [Log management](#log-management)
-
+- [Application management](#application-management)
 
 ## Kernel management
 
@@ -147,7 +147,7 @@
 - **Type**: Virtual Filesystem  
 - **Purpose**: Automatically populates the `/dev` directory with device nodes at boot, which are then managed by `udev`.  
 - **Example**:  
-  - Provides base device nodes for hardware detected during boot.
+  - Handles module loading for hardware devices
 
 
 ## Boot process and GRUB management
@@ -570,5 +570,102 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * sent system logs from all kinds of devices to a centralized server
 
 * `logrotate`
-* 
+  * 
 
+
+
+
+## Application management
+
+### RedHat-based systems
+* `rpm`
+  * low-level package management program using .rpm files 
+  * `-i` - install
+  * `-e` - erase, remove or uninstall
+  * `-v` - verbose
+  * `-h` - print hash marks to indicate a progress bar
+  * `-V` - verify software components
+  * `-q` - list information about package
+  * `-U` - upgrade and install
+  * `-F` - refreshen *installed* packages
+
+* `yum`
+  * Frontend package manager for `rpm`
+  * Benefit over `rpm` in that it automatically handles dependencies
+  * It uses repos
+  * `install`     - self-evident 
+  * `localinstall`- install package from *local* repo
+  * `remove`      - self-evident 
+  * `update`      - self-evident 
+  * `info`        - self-evident 
+  * `provides`    - report what package provides specified files/libraries
+
+* `dnf`
+  * improved version of `yum`
+  * same if not similar options as `yum`
+
+### Debian-based systems
+* `dpkg`
+  * low-level package management program using .deb files 
+    * analogous to `rpm`
+  * `-i` - install 
+  * `-r` - remove
+  * `-l` - list all packages/ info on one package
+  * `-s` - report whether package is installed
+
+* `apt`
+  * Frontend manager for `dpkg`
+  
+
+### Repos
+* Storage location for available software packages
+* Types
+  * **Local repos**
+    * Stored on the system's local storage drive  
+  * **Centralized internal repos**
+    * Stored on one or more systems withtin the internal LAN
+  * **Vendor repos**
+    * Maintained on the internet often by the distribution vendor
+
+* `createrepo`
+  * Updates the XML files used to reference the repository location
+  * `.repo` configuration file will be created in the `/etc/yum/repo.d` directory
+
+* `reposync`
+  * Manages the mirroring process
+  * This enables the syncronization of an online repo to a local storage location
+
+
+### Compiling software
+* **compling**
+  * Compiling is the process of translating the source code into binary, something the computer can actually understand
+  * `gcc` - GNU Compiler Collection. This is the built in Linux compiler
+* All dependencies of the software are in the `.h` or the `.a` file - the header or library file
+* **Program libraries**
+  * Chunks of compiled code that can be used in programs to accomplish common tasks
+  * **Shared libraries**
+    * Enabels more modular program builds and reduce time when compiling the software
+    * `/usr/lib` - general access
+    * `/lib`    - essential binary access
+  * `ldd {options} <program library>` - view shared library dependencies for a porgram
+  *
+
+### Software troubleshooting
+* **Package mananger config file**
+  * **`apt`**
+    * `/etc/apt/sources.list.d`
+    * `/etc/apt.conf`
+  * **`yum`**
+    * `/etc/yum.repo.d`
+    * `/etc/yum.conf`
+  * **`dnf`**
+    * `/etc/dnf/dnf.conf`
+  
+**Verification and dependencies**
+  * `rpm -V <package name>`
+    * Verify that all the package components and its dependencies were properly installed
+  * `rpm -qR <package name>`
+    * Identify what dependencies are required
+  * `apt-cache depends <package name>`
+    * 
+  * 
