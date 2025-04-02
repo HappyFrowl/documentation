@@ -1,10 +1,14 @@
 # Identity and Access Management
 
-
+- [user and group management](#user-and-group-management)
+- [PAM configuration](#pam-configuration)
+- [File permissions and ownership](#file-permissions-and-ownership)
 
 ## user and group management
 
-### **User types::**
+### **Users**
+
+**User types**
 * **Root:**
   - super user
   - admin 
@@ -20,28 +24,28 @@
 - Runs in the background
 
 
-* **Substituting/ switching users:**
-  - `su - <username>` - switch to another user account 
-    * using the `-` ensures full access to the target user environment
-    * it starts a new login shell giving access to the user environment variables
-  - `su -`, `su - root` or `sudo su` - switch to root
-  - `sudoedit` - gain elevated editing permissions to a specific file if, and only if, the user is member of `editors` group and the group has editing permissions to the file
-      - `%editors ALL = sudoedit /path/to/file`
-  - `visudo`
-      - edits `/etc/sudoers`
-      - Add users to `sudo` group 
-      - `visudo -c` checks the sudoers file for errors
-      - add user to sudoers
-          - `username ALL=(ALL) All:ALL`
-      - ensure all user can use `command`
-          - `ALL ALL=(ALL) /bin/last`
-      - give `user` access to `command` and to `updatedb`
-          - `user ALL=/path/to/command, /bin/updatedb`
-      - let `user` use `updatedb` without prompting for password
-          - `username ALL=NOPASSWD:/bin/updatedb`
+**Substituting/ switching users:**
+- `su - <username>` - switch to another user account 
+  * using the `-` ensures full access to the target user environment
+  * it starts a new login shell giving access to the user environment variables
+- `su -`, `su - root` or `sudo su` - switch to root
+- `sudoedit` - gain elevated editing permissions to a specific file if, and only if, the user is member of `editors` group and the group has editing permissions to the file
+    - `%editors ALL = sudoedit /path/to/file`
+- `visudo`
+    - edits `/etc/sudoers`
+    - Add users to `sudo` group 
+    - `visudo -c` checks the sudoers file for errors
+    - add user to sudoers
+        - `username ALL=(ALL) All:ALL`
+    - ensure all user can use `command`
+        - `ALL ALL=(ALL) /bin/last`
+    - give `user` access to `command` and to `updatedb`
+        - `user ALL=/path/to/command, /bin/updatedb`
+    - let `user` use `updatedb` without prompting for password
+        - `username ALL=NOPASSWD:/bin/updatedb`
 
 
-**Creating and managing users and groups:**
+### **Creating and managing users and groups:**
 - `useradd` - add a user
     - users are stored in `/etc/passwd`
         - it contains: `user:password:uid:gid:some_comment:homedir:defaultshell`
@@ -107,9 +111,7 @@
 - `w` - Print who is logged on and what they are doing.
   - Prints user login, TTY, remote host, login time, idle time, current proess
 
-
-
-* **sudo groups**
+**sudo groups**
 - `sudo`
     - Group for granting users `sudo` right
     - Used on Debian-based systems
@@ -120,19 +122,67 @@
     - e.g. CentOS, RedHat
 
 
-## PAM configuration
+## **Pluggable Authentication Modules (PAM)**
+* PAM is used to help apps make proper use of user accounts 
+  * Think programs like: Login, GDM, SSHD, FTPD
+* LDAP is one of the ways, such as W*ndws' Active Directory
 * `/etc/pam.d`
-  * 
+  * PAM config files
+  * Each PAM-aware service or app will have its own file inside this directory
+  * It is here where PAM is configured
+  * Each of these files will contain directives
+  * These directives are formatted as four different things
+    * `<module interface>`
+      * Defines the functions of the authentication and authorization proocess contained within a module
+    * `<control flag>`
+      * Inidcate what should be done upon a success or failure of the module
+    * `<module name>`
+      * Finds the module that the directive is going to apply to 
+    * `<module arguments>`
+      * Additional options that can pass into the module
+
+  * Module example: **password policy directive** 
+    * `password required pam_cracklib.so retry=5`
+
+Let's dive into the four mentioned components
+* **Module interfaces**
+  * **account module**
+    * Checks user accessibility
+  * **Auth**
+    * Verifies passwords and set credentials (Kerberos tickets)
+  * **Password**
+    * Used to change and verify password
+  * **Session**
+    * Configures and manages user sessions
+
+* **Control flags**
+  * This tell PAM what to do
+  * **Optional**
+    * Module result is ignored
+  * **Required**
+    * Module result must be successful for authentication to continue
+  * **Requisite**
+    * Same as Required, but is going to notify that user immediately
+  * **Sufficient** 
+    * Module result is ignored upon failure
+
+* **Module Names**
+  * **pam_pwquality.so**
+  * **pam_history.so**
+  * **pam_tally2**
+  * **pam_faillock**
+  * **pam_ldap**
+
 
 ## File permissions and ownership
 
-**File ownership** 
+### **File ownership** 
 -  `chown` / `chgrp`
   - `(chgrp|chown) user path/to/file_or_dir` change owner or group of a file or directory
   - `(chgrp|chown) -R path/to/file_or_dir` - change group recursively
   - `chown user:group path/to/file_or_dir` - change owner and group of the file or directory 
 
-**File permissions**
+### **File permissions**
 - `ls –la` results in something like this:
 
   - ```bash
@@ -189,7 +239,7 @@
   - `umask 777` - restrict `rwx` for everyone
   - `umask  a-e` - remove default execute permissions for everyone
 
-**Access Control Lists**
+### **Access Control Lists**
 - More granular file control than permissions
 - set access to one or multiple directories
 - `getfacl` - Get file ACL It outputs:
@@ -232,7 +282,7 @@
   - `-R` - same but recursively
 
 
-**Special permissions**
+### **Special permissions**
 Less privileged users are allowed to execute a file by assuming the privileges of the file's owner or group
 
 1. **SUID - Set User ID** (`s`/ `S` on user position)
@@ -261,7 +311,7 @@ Less privileged users are allowed to execute a file by assuming the privileges o
   - `T` appears if the directory lacks execute permissions `rwxr-xr-T`
 
 
-  ## **LDAP basics**
+## **LDAP**
 
 * `sssd`
 
