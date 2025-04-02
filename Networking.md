@@ -175,7 +175,6 @@
 
 
 
-
 ## File & data transfer
 
 * `scp` - secure copy
@@ -286,18 +285,30 @@
     - Configure outbound SSH connections.
     - Example: Turn off password-based authentication, allowing only certificate-based authentication.
 
-- `/etc/ssh/sshd.config`
-    - Configure the SSH server.
-    - Manages incoming SSH connections.
-    - Configure the port to which it listens for SSH connections.
+- `/etc/ssh/sshd_config`
+    - Configure the SSH **server**
+    - Manage the following:
+        - **Port** - set the port to which the server listens for SSH connections
+        - **PasswordAuthentication** - used to enable or disable password-based authentication 
+        - **PubKeyAuthentication** - used to enable or disable public key-based authentication
+        - **Hostkey** - used to reference the locations of the server's private keys
+        - **UsePAM** - enables or disables support for PAM (Puggable Authentication Modules, see IAM)
+        - **SyslogFacility**- Change the logging level of SSH event 
+        - **ChrootDirectory** - reference a chroot jail path for a user 
+        - **AllowUsers/AllowGroups** - Enable user-specific access by allowing the specified users or groups  access over SSH 
+        - **DenyUsers/DenyGroups** - Restrict the specified users or groups from accessing the server over SSH
+        - **PermitRootLogin** - enable or disbale the abiltiy for the root user to log in over SSH (best not to). 
 
--`ssh-keygen`
+- `ssh-keygen`
+    - generate a public / private key pair
     - `ssh-keygen -t <ed25519> -f <path/to/file>` - Create SSH key
 - `ssh-copy-id <IP>`
-    - Copy and add the public key to `~/.ssh/authorized_keys` on the remote machine.
+    - Copy and add the public key to a remote computer's `~/.ssh/authorized_keys` file
     - Enter the password of the account on the remote PC.
     - Once done, you can SSH without entering a password.
-- `ssh-add` - add the efault SSH keys in ~/.ssh to the ssh-agent
+- `ssh-add` 
+    - add the default SSH keys in `~/.ssh` to the ssh-agent
+    - Add private key identities to the SSH key agent
 - `ssh -X`
     - X11 forwarding.
 
