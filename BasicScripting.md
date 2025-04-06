@@ -60,12 +60,7 @@
 
 
 
-**File Operations:**
-- **`cut`**: Extract portions of a file.
-  - `-c`: Extract specific characters (e.g., `cut -c 3-5 file`).
-  - `-d`: Specify delimiter.
-  - `-f`: Specify field to extract (e.g., `cut -d, -f2 file`).
-
+**File Text Operations:**
 - **`expand / unexpand`**: Convert tabs to 8 spaces and vice versa.
   - Example: `expand file > file2`.
 
@@ -79,26 +74,45 @@
 
 - **`join`**: Join two files based on a common field.
 
-- **`nl`**: Similar to `cat` but adds line numbers.
+- **`nl`**
+  * Similar to `cat` but adds line numbers
 
-- **`od`**: Octal dump of a file.
+- **`od`** - Octal dump of a file
 
-- **`paste`**: Merge lines of files.
+- **`pr`** - Format files for printing.
 
-- **`pr`**: Format files for printing.
-
-- **`sed`**: Stream editor for substitutions.
-  - Example: `sed 's/old/new/' file`.
-
-- **`split`**: Split a file (default: 1000 lines per split).
+- **`split`**
+  * Split a file (default: 1000 lines per split).
   - Example: `split file newfile`.
 - **`split`**: Split a file (default: 1000 lines per split).
   - Example: `split file newfile`.
 
-- **`tr`**: Translate or delete characters.
+- **`tr`** - truncate / translate
+  *  Performs operations like removing repeated characters, converting uppercase to lowercase, and basic character replacement and removal
+  * `tr <char 1> <char 2>` - first char is the character to be replaced
 
 - **`uniq`**: Remove duplicate adjacent lines.
   - Use `sort` to make duplicates adjacent before using `uniq`.
+
+- **`sort`**
+  * Tool for sorting lines of text files
+  * Options:
+    * `-k <column numbers>` - Specify field values
+    * `-k2` - Indicate second field
+    * `-n`  - Compare and sort line based on the string numerical value
+    * `-r`  - Sort fields in descending order
+    * `-t`  - Separate one field from another
+
+- **`cut`**: Extract portions of a file.
+  - `-c` - Extract specific characters (e.g., `cut -c 3-5 file`).
+  - `-d` - Specify delimiter, e.g. `-d:`
+  - `-f` - Specify field to extract (e.g., `cut -d, -f2 file.txt`). 
+
+- **`paste`** - Merge lines of files.
+  * Merge lines from text files horizontally
+  * By default the delimeter is a tab
+  * Options:
+    * `-d` - Specify delimeter
 
 - **`expr`**: Perform mathematical operations.
   - Example: `expr 5 \* 3`.
@@ -145,12 +159,6 @@
     command > file 2>&1
     ```
 
-- **Piping**:
-  - Use `|` to chain commands.
-  - Example:
-    ```bash
-    ls | wc -l
-    ```
 
 - **`xargs`**: Process input line by line.
   - Example:
@@ -170,7 +178,8 @@
   - **`grep`**: Basic search.
   - **`egrep`**: Extended `grep`, allowing regular expression quantifiers without escaping.
   - **`fgrep`**: Literal search; no interpretation of special characters.
-
+  - **`pgrep`** - get PID for a running process
+  
   - `grep <pattern> *`: Search files in the current directory.
   - `grep -v 'e$' *`: Find strings that do not end with "e".
   - `egrep 'l+' *`: Match one or more occurrences of "l" without escaping.
@@ -252,18 +261,16 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
 
 
 ## vim 
+* `vim` is a powerful text editor in Linux with two primary modes: **Command Mode** and **Insert Mode**.
 
-`vim` is a powerful text editor in Linux with two primary modes: **Command Mode** and **Insert Mode**.
-
-Modes
-1. Command Mode
-- Used for navigating and manipulating text without typing.
-- Key bindings control movement and text actions.
-
-2. Insert Mode
-- Used for directly editing text.
-- Entered using specific keys (e.g., `i`, `a`, `o`) from Command Mode.
-
+* Modes
+  1. **Command Mode**
+    - Used for navigating and manipulating text without typing.
+    - Key bindings control movement and text actions.
+  2. **Insert Mode** 
+    - Used for directly editing text.
+    - Entered using specific keys (e.g., `i`, `a`, `o`) from Command Mode.
+    - Leave insert mode by pressing `esc`
 
 **Navigation in Command Mode:**
 - **`h`**: Move left.
@@ -287,7 +294,7 @@ Modes
   - **`p`**: Paste below the current line.
   - **`P`**: Paste above the current line.
 
-**Entering Insert Mode:**
+* **Entering Insert Mode:**
   - **`i`**: Insert before the cursor.
   - **`a`**: Insert after the cursor.
   - **`o`**: Insert a new line below the current line.

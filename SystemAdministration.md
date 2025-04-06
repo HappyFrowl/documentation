@@ -1,12 +1,12 @@
 # System Administration
 - [Kernel management](#kernel-management)
-- [Boot process and GRUB management](#boot-process-and-grub-management)
-- [Linux system Components](#linux-system-components)
-- [Localisation and time](#Localization-and-time)
-- [Process management](#Process-management)
-- [Service management](#service-management)
-- [System monitoring](#system-monitoring)
-- [Log management](#log-management)
+- [Boot Process and GRUB Management](#boot-process-and-grub-management)
+- [Linux System Components](#linux-system-components)
+- [Localization and Time](#Localization-and-time)
+- [Process Management](#Process-management)
+- [Service Management](#service-management)
+- [System Monitoring](#system-monitoring)
+- [Log Management](#log-management)
 - [Application management](#application-management)
 
 ## Kernel management
@@ -666,6 +666,9 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     * Verify that all the package components and its dependencies were properly installed
   * `rpm -qR <package name>`
     * Identify what dependencies are required
+  * `yum deplist <package name>`
+    * Identify what dependencies are required
   * `apt-cache depends <package name>`
-    * 
-  * 
+    * Identify what dependencies are required
+
+
