@@ -353,38 +353,60 @@
 
 ## Archiving, Backup & Recovery
 
-- **`tar`** - Archive files.
-  - Common options:
-    - `c`: Create an archive.
-    - `v`: Verbose (list files being processed).
-    - `f`: Specify the filename.
-    - `z`: Compress or decompress with gzip.
-    - `t`: List archive contents.
-  - Examples:
-    ```bash
-    tar cvf archive.tar file1 file2
-    tar zcvf archive.tar.gz file1 file2
-    tar tvf archive.tar
-    ```
+- **`tar`** - Tape Archiver
+    - Bundles together multiple files into a single tarball 
+    - Common options:
+        - `c` - Create an archive.
+        - `t` - List archive contents.
+        - `x` - Extract file
+        - `f` - Specify the filename.
+        - `v` - Verbose (list files being processed).
+        - `z` - Compress or decompress with gzip
+    - Examples:
+        * `tar -tvf <tar name>` - List files in tarball
+        * `tar -xvf <tar name>` - Extract **all** files in tarball
+        * `tar -xvf <tar name> <file name>` - Extract a some files from tarball
+        * `tar -cvf <tar name> <file names>` - Create a tarball from specified files  
 
-- **`gzip`**: Compress files using the DEFLATE algorithm.
-  - Use `gunzip` to decompress.
+- **`gzip`**
+    - Compression tool that produces files with `.gz` extension 
+    - Use `gunzip` to decompress
 
+* **`xz`**
+    * Another compression tool
+    * Has a higher compression ratio than `gzip` but is slower
+    * `-kv` 
+
+* **`bzip2`**
+    * Another compression tool
+    * Balanced performance between the two previous ones 
 
 - **`dd`** - data duplicator / disk destroyer
-    * commonly used for disk imaging, data recovery, and even wiping data securely
-        * `if` - input file 
-        * `of` - output file 
-    * disk cloning and imaging
+    * Commonly used for disk imaging, data recovery, and even wiping data securely
+    * Command components
+        * `if={file name}` - Specify input file 
+        * `of={file name}` - Specify output file
+        * `bs={bytes}`     - Specify total block size to read and write in bytes
+        * `count={count}`  - Specify the number of blocks to be written. Optional
+        * `status={level}` - Specify information to print to standard error
+    * Command examples
         * `dd if=/dev/sdX of=/path/to/backup.img bs=4M status=progress` 
-            * create a disk image
-    * converting files to lowercase
-    * secure wiping
+            * Create a disk image
         * `dd if=/dev/zero of=/dev/sd# bs=1M status=progress`
-    * Backup the MBR (Master Boot Record):
-        * `dd if=/dev/sda of=mbr.bak bs=446 count=1`
-    * disk performance tests
-        * measuring read / write speed
+            * Secure wipe a disk  
+        * `dd if=/dev/sda of=/backup.bak bs=446 count=1`
+            * Copy or backup a disk to a file
+        * `dd if=/dev/sda of=/dev/sdb`
+            * Copy or backup a disk to another disk   
+    * Other things you do with `dd`
+        * Converting files to lowercase
+        * Disk performance tests
+            * measuring read / write speed
+
+
+* `mirrorvg` - Mirror volume group
+    * 
+
 
 
 
