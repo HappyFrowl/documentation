@@ -1,6 +1,33 @@
-# System Logging
+# Monitoring
+- [System logging](#system-logging)
+- [Syslog](#syslog)
+- [Journal control](#journal-control)
 
-## Syslog
+## System logging
+* **File locations**
+  - Location of all system events, except for authentication messages
+    * `/var/log/syslog`
+    * `/var/log/messages` - for RHEL-based
+  * Authentication messages
+    * `/var/log/auth.log` - for Debian-based distros
+    * `/var/log/secure`   - for RHEL-based distros
+  - Config files
+    *  `/etc/rsyslog.d`
+  * Kernel messages
+    * `/var/log/kern.log`
+  * Misc apps (cron, firewalld, apt)
+    * `/var/log/[app]`
+
+
+* **Log rotation**
+  * Practice of creating new versions of a log file
+  * Allows you to add or modify the configuration for individual log rotations.
+  * Configuration files can be found in `/etc/logrotate.d`
+  * `logrotate`
+    * Program used to perform log rotation
+
+
+## Syslog 
 - Message logging standard.
 - Separates into different components:
   - **Message generator**: The software or process that generates the message.
@@ -16,39 +43,53 @@
     - General info.
     - Analysis.
     - Debugging messages.
+* Current Versions of syslog
+  - `rsyslogd` - older version
+  - `syslog-ng` - replacement for syslogd
 
-### Current Versions
-- `rsyslogd`
-- `syslog-ng`
+* **Syslog configuration**
+  * `/etc/rsyslog.conf`
+  * Here stuff can be configured such as:
+    * Send logging to a central server
+      * Add line at the bottom 
+      * something like: `*.* @@IP:514`
+    * Receive logging from servers
+      * Uncomment `#$ModLoad imtcp` and `#$InputTCPServerRun 514`
+    * Configure syslog rules
+      * The rule structure is in a two column format
+        * First column lists message facilities and/or severities
+          - `.info`, `.warn`, `.err`, `.none`
+          - `.*`: Log everything
+        * Second column defines actions for the messages 
+      * 
 
-### Configuration Files
-- Config files are located in `/etc/rsyslog.d`.
 
-### Meaning of the Config File
-- `.*`: Log everything.
-- Compare it to `.info`, `.warn`, `.err`, `.none`.
 
----
 
-## /var/log/syslog
-- Location of the logs.
+## Journal control
+* `journalctl`
+* Query and print logs 
+* Logs are collected by `systemd` 
+* `journald` is used in conjunction with `syslogd` or `rsyslogd`
+* Commonly used commands:
+  * `-n {number of lines}` - specify number of lines printed
+  * `-o <output format>` - specify output format
+  * `-f` - print nmost recent entries
+  * `-p` - filter log by severity
+  * `-u` - filter log output by name of the service
+  * `-b` - Displays messages since the last boot.
+  * `--since "2 days ago"` - Logs from 2 days ago.
+  * `-xeu [service name]` - {-x} Augment log lines with explanation texts from the message catalog. {-e} Immediately jump to the end of the journal inside the implied pager tool
+* Config File
+  - `/etc/journalctld.conf`
 
-## Logrotate
-- Program for rotating logs.
-- Allows you to add or modify the configuration for individual log rotations.
-- Configuration files can be found in `/etc/logrotate.d`.
 
-## Journalctl
-- Query and display logs from the `systemd` journal.
+* `last`
+  * Print the user's history of loging and logout events
+  * See reboots and who logged in and to which TTY  
+  * It shows time and date  
+  * 
 
-### Examples:
-- `journalctl -b`: Displays messages since the last boot.
-- `journalctl -1 / 2 / 3`: Displays messages from previous boots.
-- `journalctl --since "2 days ago"`: Logs from 2 days ago.
-- `journalctl -u cron`: Logs from the cron service.
-
-### Config File
-- `/etc/journalctld.conf`
 
 ---
 
@@ -68,11 +109,6 @@
 
 
 
-last 
-
-See reboots and who logged in  
-
-Shows time and date  
 
 
 
