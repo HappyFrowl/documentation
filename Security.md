@@ -1,6 +1,17 @@
 # Host Security
 
-## Securing the system
+- [Authentication](#authentication)
+
+
+## Hardening
+* **Chroot jail**
+    * Way to isolate a process and its children from the rest of the system
+    * Change the root directory for a process, creating an isolated environment
+    * This is particularly useful for system recovery, testing, and creating sandboxed environments.​
+    * `chroot [options] <new root dir> [command]`
+        * `chroot /home/me /usr/bin/bash`
+        * This creates a new bash shell in the home folder as the root folder 
+
 
 - `/etc/hosts.allow`
     - List hosts, domains, or IPs that are allowed services on the system
@@ -19,14 +30,73 @@
     - This is a file that locks down the entire system
     - If this file exists, only root can access.
 
-- `xinetd`
-    - X Internet Daemon.
+* Disabling ctrl+alt+delete
+    * 
+
+## Authentication
+* **Kerberos** 
+    * `kinit`
+        * Authenticate Kerberos ticekt if successful
+    * `kpassword`
+        * Change the user's Kerberos password
+    * `klist`
+        * List the user's ticekt cache
+    * `kdestroy`
+        * Clear the user's ticekt cache
+    * `klist -v`
+        * Verify ticekt 
+
+
+##  Encryption
+
+* **LUKS - Linux Unified Key Setup** 
+    * Tool to encrypt storage devices
+    * LUKS operations must be performed before creating a file system on it
+    * `cryptsetup`
+        * front-end to LUKS and dm-crypt
+        * `isLuks`      - Identify if a device is a LUKS device
+        * `luksFormat`  - Make a device formatted for the LUKS standard    
+        * `luksOpen`    - Open or map a storage device 
+        * `luksClose`   - Remove a LUKS storage device          
+        * `luksAddKey` - Associate new key with a LUKS device
+        * `luksDelKey`  - Remove key material from a LUKS device
+
+* **`shred`** 
+    * wipe a storage device
+    * better to use it to wipe files only
+    * Use `dd` for entire storage devices
+
+* `**gpg**`
+- Free implementation of PGP.
+- Used to get, create, and send encryption keys.
+- Encrypt files using `gpg`.
+
+
+* `**openssl**`
+    * Installing cert on an Apache server:
+        1. Generate OpenSSL
+        2. Download an install mod_ssl package
+        3. Point SSLCertificateFile
+        4. Point SSLCertificateKeyFile
+        5. Restart Apache
+        6. Verify
+
+
+## System auditing
+* `auditd` - audit daemon
+    * It enables records to be used to audit what is being written to storage and what actions are happening
+    * Best practise is to have it enabled
+
+* `ausearch`
+    * 
+
+- `xinetd` - X Internet Daemon.
     - Listens to incoming requests over the network.
     - Launches the appropriate program to handle the request.
     - Requests are often for specific ports.
     - Manages which services can be open at specific times.
 
-- `tcpd`
+- `tcpd` - tcp dump
     - Monitor incoming requests.
     - Program triggered by `xinetd`.
     - `xinetd` starts `tcpd` instead of the desired server.
@@ -36,25 +106,65 @@
 
 
 
-##  Encryption
+## **Mandatory Access Control (MAC)**
 
-* `**openssl**`
+* **MAC**
+    * System-enforced access control based on subject clearance and object labels
+    * Ways to restrict access to system processes into the files, directories, network, prots and other things like that
+    * **Context-based permissions**
+        * Permission scheme fthat defines various properties for a file or process
+        * Grant or deny access 
+    * **App-armor** and **SELinux** are the main examples
+    * MAC differs from the default scheme in Linux which is known as **Discretionary Access Control (DAC)**
+        * In DAC, each object has a list of entities that are allowed to access it
+        * The object owner administrates this, using `chown`, `chmod`, etc
 
-* `
+* **SELinux**
+    * Does not allow DAC, but enforces MAC to do its permissions and access control
+    * SELinux is the default context-based permissions scheme provided within RHEL
+    * **Three main context for each file and process**
+        * **User** - Defines what users can access the object
+                * `unconfined_u` - all users
+                * `user_u` - unprivileged users
+                * `sysadm_u` - system admins
+                * `root` - root user
+        * **Role** - permits or denies users access to domains
+            * Users can be in roles, and those roles are typically used to permit or deny access to the given domain, or objects
+            * `object_r` - role applies to files and directories
+        * **Type** - Groups objects together that have similar securtity requirements or characteristics
+            * Most important context
+            * It is a label
+        * **Level** - describes the szensitivity level called "multi-level security" 
+            * It is completely optional
+            * Further finegrained access control
+    * **Three modes** 
+        * **Disabled**     - SELinux is turned off and the DAC method will be prevalent
+        * **Enforcing**    - SELinux security policies are enforced
+        * **Permissive**   - SELinux is enabled but the security policies are not enforced. This means that processes can bypass the security policies. 
+    * **Policy types**
+        * **Targeted**  - Default SELinux policy used in RHEL. Targeted processes are run in a confined domain, those not targeted are not run in a confined domain
+        * **Strict**    - System subject and object is enforced to operate on MAC. MAC is always enforced
+    * Managing SELinux:
+        * `semanage`    - Configure SELinux policies
+        * `sestatus`    - Get SELinux status
+        * `getenforce`  - Display SELinux mode
+        * `setenforce`  - Change SELinux mode 
+        * `getsebool`   - Display the on or off status
+        * `ls-Z`        - List directory contents
+        * `ps-Z`        - list running processes
+        * `chcon`       - Change the security context of a file
+        * `restorecon`  - Restore the default security context
+    * Violation messages
+        * These occur when an attempt to access or modify an object goes against an existing policy
+        * `sealert` - alert message. Difficult to read.
+        * `audit2why` - translate the violation
+        * `audit2allow` - Used to gather information from the denied operations log        
 
-
-* `**gpg**`
-- Free implementation of PGP.
-- Used to get, create, and send encryption keys.
-- Encrypt files using `gpg`.
-
-
-## System auditing
-* `auditd`
-* `ausearch`
-
-
-## AppArmor & SELinux basics
+* **AppArmor**
+    * Alternative context-based pernissiosn scheme and MAC implementation for Linux
+    * Works with file system object, rather than referencing the inodes directly as SELinux does
+    * AppArmor is much easier to administrate
+    * 
 
 
 
