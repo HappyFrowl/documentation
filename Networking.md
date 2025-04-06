@@ -212,48 +212,35 @@
     * `-v` - view request headers and connection details, e.g. TLS handshake
 
 
-
-
 ## Firewall
 
-* `iptables` - 
-    * Configure tables, chains and rules 
+### iptables
+* `iptables`
+    * Applies to a certain context and consists of rule sets (aka chains) 
+    * `iptables [options] [-t table] [commands] {chain/rule spec}`
+    * Five default tables 
+        * **Filter table**
+            * Default table used to typical packet filtering functionality
+        * **NAT table**
+            * Implement NAT
+        * **Mangle table**
+            * Alter or rewrite packets' TCP/IP header
+        * **Raw table**
+            * Configure exeptions involved in connection tracking
+        * **Security table**
+            * Mark packets with SELinux security context 
+    * By default, rule sets are lost on reboot
+    * To get around this, install `iptables-services` or `iptables-persistent` on RHEL and Debian respectively
+    * **Logging:**
+        * Event for iptables are written to `/var/log/messages` or `/var/log/kern.log` files
 
-* `nftables`
-    * 
-
-
-* `firewalld`
-    * Red Hat firewall manager
-    * Used by
-        * RHEL
-        * CentOS
-        * Alma Linux
-        * Rocky Linux
-        * Oracle Enterprise Linux
-    * **Terminology**
-        * `netfilter`
-            * actual Linux firewall
-            * packet filtering code that is built-in the Linux Kernel
-            * to interact with it, a helper program is needed
-        * `iptables`
-            * default firewall manager for many distros
-        * `nftables`
-            * newer, better, easier than `iptables`
-        * `firewalld` 
-            * command line frontend for `iptables` or `nftables`
-            * this injects the rules into `iptables` or `nftables` 
-    * **zones**
-        * collection of open ports for that zone
-        * located `/etc/firewalld/zones/`
-        * by default, there always is a `public.xml` zone
-    * **basic commands:**
-        * `firewall-cmd --add-port=8080/tcp` - open up port 8080/tcp
-            * this configuration will be visible in `nft list ruleset`
-        * `--permenant` - make permanent changes 
+### Netfilter
+* `nftables` - net filter
+    *  
 
 
-* `ufw` - uncomplicated firewall
+### Uncomplicated firewall
+* `ufw` 
     * interface for IP tables and is desgiend to simplify the process of configuring firewalls 
     * Like any firewall, allow and block traffic by port number and IP address
     * `status` - active/ inactive
@@ -263,21 +250,51 @@
     * `enable` / `disable`
     * `reset` - resets firewall to its default configuration
     * `default (allow|deny) (incoming|outgoing)` - manage the default rules
-    * Managing incoming rules: 
+    * **Managing incoming rules:**
         * `ufw (allow|deny) (service|subnet|IP)`  
         * `allow ssh` - allow incoming ssh traffic
             * `allow 22` - same but with the port number
         * `deny http` - deny http
         * `deny proto (tcp|udp) from (any|IP) to any port <port numbers>` 
         * `(allow|deny) from (subnet|IP) to any port <port numbers>`
-    * Managing outgoing rules:
+    * **Managing outgoing rules:**
         * `ufw (allow|deny) out <to IP | on {interface}> <proto (tcp|udp)> <port {number}>`
         * `ufw deny out to 93.214.56.31 proto tcp port 443` - deny 443/tcp to 93.214.56.31
         * `ufw deny out on eth0 to 192.168.1.100 port 80 proto tcp` - deny based on interface
     * `delete <rule number>` - delete a firewall by specifying its number
 
-
-
+### RHEL Firewall
+* `firewalld`
+    * Red Hat firewall manager
+    * Used by
+        * RHEL
+        * CentOS
+        * Alma Linux
+        * Rocky Linux
+        * Oracle Enterprise Linux
+    * **Terminology**
+        * `netfilter `
+            * actual Linux firewall
+            * packet filtering code that is built-in the Linux Kernel
+            * to interact with it, a helper program is needed (e.g `iptables`, `nftables`, `firewalld`)
+        * `iptables`
+            * Default firewall manager for many distros
+        * `nftables`
+            * Newer, better, easier than `iptables`
+        * `firewalld` 
+            * command line frontend for `iptables` or `nftables`
+            * this injects the rules into `iptables` or `nftables` 
+    * **Zones**
+        * collection of open ports for that zone
+            * Public, DMZ, block
+        * located `/etc/firewalld/zones/`
+        * by default, there always is a `public.xml` zone
+    * **Basic commands:**
+        * `firewall-cmd --add-port=8080/tcp` - open up port 8080/tcp
+            * this configuration will be visible in `nft list ruleset`
+        * `firewall-cmd --list-all-zones`
+            * View all available firewall zones and rules in their runtime configuration state 
+        * `--permenant` - make permanent changes 
 
 
 ## SSH
