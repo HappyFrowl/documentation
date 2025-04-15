@@ -173,13 +173,13 @@
     ```
 
 
-* `grep` - Globally (search for a) Regular Expression and Print
+* **`grep`** - Globally Regular Expression and Print
   - Uses symbols and regular expressions to search plain text.
   - **`grep`**: Basic search.
   - **`egrep`**: Extended `grep`, allowing regular expression quantifiers without escaping.
   - **`fgrep`**: Literal search; no interpretation of special characters.
   - **`pgrep`** - get PID for a running process
-  
+
   - `grep <pattern> *`: Search files in the current directory.
   - `grep -v 'e$' *`: Find strings that do not end with "e".
   - `egrep 'l+' *`: Match one or more occurrences of "l" without escaping.
@@ -525,11 +525,11 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
     - `-e` - exit on fail 
     - `-o` - Set a option 
         - Noclobber 
-        - Do not permit overwriting when using > 
-        - Xtrace 
+        - Do not permit overwriting when using `>` 
+        - `xtrace` 
         - Shows full command 
-        - So for ls it shows ls --colour=auto 
-        - +o <option> 
+        - So for `ls` it shows `ls --colour=auto` 
+        - `+o <option>` 
          
 
  
