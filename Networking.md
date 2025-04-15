@@ -9,15 +9,81 @@
 
 
 ## Configuring network interfaces
+
+### Introduction
+* There are multiple ways to configure network adapters
+* It differs per distro and per init system
+* Mainly there are three:
+    1. Configuration scripts
+    2. Netplan
+    3. Network Manager 
+
+
+### **Configuration scripts*** 
+* This is the system used by SysV
+* Configuration scripts are just that, bash scripts that configure the network adapters
+* These run each time the system is booted 
+* The scripts can be found: `/etc/sysconfig/network-scripts/`
+    * Specifically, `ifcfg-<network-adapter>` is used for IP address configuration
+
+###  **NetworkManager**
+- Entire suite of programs to manage networking
+- Changes made are persistent
+- `nmcli` - CLI tool 
+- `nmtui` - Text user interface 
+* **network scripts**
+    - Network scripts are scripts in `/etc/init.d/network` or `/etc/network` and any other script NetworkManager calls
+    - When `ifdown` is executed, scripts in `/etc/network/if-down.d` are run
+    - Although NetworkManager provides the default networking service, scripts and NetworkManager can run in parallel and work together
+    - Running Network scripts should only be done using `systemctl` 
+        - `systemctl start|stop|restart|status network`
+
+* `nmcli`
+    - `nmcli device` - manage device interface settings 
+        - `status` - Print networking devices. Also see whether devices are managed by NetworkManger
+        - `show` - Print extensive network information on the devices, e.g. IP, MTU, Gateway, DNS, Routes
+    - `nmcli connection` - manage network connection settings
+        - `show <ConnectionName>` - Print conenction info, DNS, DHCP server, lease time, etc.
+        - `add type ethernet con-name <connection-name> ifname <interface-name>` - adding a dynamic connection
+        - `modify <connection name> +ipv4.routes "<dst IP> <nhop IP>"` - add a route
+    - **Options**
+        - `-t` - terse output: instead of a table format, seperate items with `:`
+        - `-f` - field: specific which fields you wanted printed
+            - especially good in combination for scripting
+        - `-p` - make it pretty - always good to use in combination with `show`
+
+### Netplan
+* `netplan`
+    * YAML network configuration abstraction for various backends
+    * It is a way of declaratively ocnfigure interface devices 
+* **Configuration**
+    * `/etc/netplan/*`
+    * `netplan try` 
+        * Command to run to test the changes
+    * `netplan apply`
+        * Apply changes
+* Network bonds
+    * Same as NIC teaming
+    * Several mode, but two are important:
+        1. Mode 4: 802.3ad - industry standard for network bonds. It does require switch support
+        2. Mode 5: balance-alb (all load balance). Incoming and outgoing traffic is distributed over all available NICs. This mode does not require switch support
+    * Configuring it:
+        * Modify `/etc/netplan` file   
+        * Add section `bonds:` etc 
+            * Just look this up 
+
+
+## Network troubleshooting
+
 - `ifconfig` - interface configuration 
     - Display or configure network interfaces.
     - `ifconfig interface_name ip_address` - assign an IP ddress to an interface
-        - changes are non-persistent between reboots
+        - Changes are non-persistent between reboots
 
 - `ip`
     - `ip a` - same as ifconfig
     - `ip link set <interface> (up|down)` - bring an interface up or down 
-    - Non persistent
+    - Changes are non-persistent
     
 * `ifdown / ifup` - interface down / up 
     - Bring an interface down.
@@ -28,51 +94,6 @@
     - `route add -net <ip> netmask <netmask> gw <gw_address>` - add a route rule
     - `route add default gw <ip>` - add a default gateway
 
-
-###  **NetworkManager**
-- Entire suite of programs to manage networking
-- changes made are persistent
-- `nmcli` - CLI tool 
-- `nmtui` - Text user interface 
-* **network scripts**
-    - `network scripts` are scripts in `/etc/init.d/network` or `/etc/network` and any other script NetworkManager calls
-    - When `ifdown` is executed, scripts in `/etc/network/if-down.d` are run
-    - Although NetworkManager provides the default networking service, scripts and NetworkManager can run in parallel and work together
-    - Running Network scripts should only be done using `systemctl` 
-        - `systemctl start|stop|restart|status network`
-* `nmcli`
-    - `nmcli device` - manage device interface settings 
-        - `status` - Print networking devices. Also see whether devices are managed by NetworkManger
-        - `show` - Print extensive network information on the devices, e.g. IP, MTU, Gateway, DNS, Routes
-    - `nmcli connection` - manage network connection settings
-        - `show <ConnectionName>` - Print conenction info, DNS, DHCP server, lease time, etc.
-        - `add type ethernet con-name <connection-name> ifname <interface-name>` - adding a dynamic connection
-        - `modify <connection name> +ipv4.routes "<dst IP> <nhop IP>"` - add a route
-    - options
-        - `-t` - terse output: instead of a table format, seperate items with `:`
-        - `-f` - field: specific which fields you wanted printed
-            - especially good in combination for scripting
-        - `-p` - make it pretty - always good to use in combination with `show`
-
-* `netplan`
-    * YAML network configuration abstraction for various backends
-    * it is a way of declaratively ocnfigure interface devices 
-    * `/etc/netplan/*` - location for the yaml files 
-
-* network bonds
-    * same as NIC teaming
-    * several mode, but two are important:
-        1. Mode 4: 802.3ad - industry standard for network bonds. It does require switch support
-        2. Mode 5: balance-alb (all load balance). Incoming and outgoing traffic is distributed over all available NICs. This mode does not require switch support
-    * configuring it:
-        * modify `/etc/netplan` file   
-        * add section `bonds:` etc 
-            * just look this up 
-
-
-
-
-## Network troubleshooting
 * `ping` 
 
 * `traceroute`
