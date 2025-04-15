@@ -263,7 +263,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * this boots the system into a single user mode, requiring no password
   * THIS is the way to reset the root's password 
 
-* For Debian based systems:
+* **For Debian-based distros:**
   * 0. halt
   * 1. single user mode 
   * 2. full, multi user, GUI if installed
@@ -272,7 +272,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * 5. nothing
   * 6. reboot (into system default)
 
-* For CentOS/ RedHat:
+* **For RHEL-based distros:**
   * 0. Halt
   * 1. single user mode
   * 2. multi user, no net
@@ -336,26 +336,32 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 
 
 ## Localization and time 
-* `locale`
-  - Region-specific settings, including language and country formats.
-  - View and configure locale settings
-
-- `iconv -f utf-8 -t iso_8653-1 < file.txt > output.txt`
+* **`iconv`** - convert
+  - Convert text from one encoding to another
+  - `iconv -f utf-8 -t iso_8653-1 < file.txt > output.txt`
   - Convert between encodings
-- `iconv -l`
-  -  List supported encodngs
-- `file <filename>`
+  - `iconv -l`
+    -  Print supported encodngs
+
+- **`file <filename>`**
   - Detect file encoding
 
-- `cat /etc/timezone`
+* **`locale`**
+  - Print and configure locale settings
+  - Region-specific settings, including language and country formats.
+
+- **`cat /etc/timezone`**
   - View current timezone
-- `/etc/localtime` 
+  
+- **`/etc/localtime`**
   - Current timezone configuration
-  - file is symlinked to the appropriate timezone file
-- `tzselect`
+  - File is symlinked to the appropriate timezone file
+  - File cannot be read since it is a binary 
+
+- **`tzselect`**
   - Select a timezone
 
-- `date` - print or set date and time
+- **`date`** - print or set date and time
   - options:
     - `+%A` - print full weekday
     - `+%B` - print full month
@@ -369,24 +375,31 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     - `+%S` - print time representation based on the locale
     - `+%Y` - print year 
 
-- `timedatectl` 
+- **`timedatectl`**
   - print or set local time, universal time, time zone, ntp info, etc. 
   - this command should three clocks
     - local time      - local current time
     - Universal time  - UTC/ GMT
     - RTC time        - Hardware clock as measured by the motherboard
 
-- `hwclock` 
-  - view and set the hardware clock
-  - best practice is to keep it in sync with universal time 
+- **`hwclock`** 
+  - View and set the hardware clock
+  - Best practice is to keep it in sync with universal time 
 
-- Synchronize with NTP servers:
-  - Install the client: `apt install ntpdate`
-  - Sync with NTP pool:
-    - `ntpdate pool.ntp.org`
-- Configure as an NTP server:
+### NTP
+* **Configure NTP *server*:**
   - Install the daemon: `apt install ntp`
   - Configuration file: `/etc/ntp.conf`
+
+* **Configure NTP *client*:**
+  - Install the client: `apt install ntpdate`
+  - `ntpdate`
+    - Sync and set the date and tiem via NTP
+  - Not necessary to use or configure, when using `systemd`
+  - 
+
+    
+
 
 
 ## Process management
