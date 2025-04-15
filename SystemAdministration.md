@@ -336,7 +336,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 
 
 ## Localization and time 
-* **`iconv`** - convert
+* **`iconv`** - convert 
   - Convert text from one encoding to another
   - `iconv -f utf-8 -t iso_8653-1 < file.txt > output.txt`
   - Convert between encodings
