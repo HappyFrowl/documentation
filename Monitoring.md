@@ -1,7 +1,7 @@
 # Monitoring
 - [System logging](#system-logging)
 - [Syslog](#syslog)
-- [Journal control](#journal-control)
+- [Systemd logging](#systemd-logging)
 
 ## System logging
 * **File locations**
@@ -29,49 +29,55 @@
 
 ## Syslog 
 - Message logging standard.
-- Separates into different components:
+- Completely separate and different from `systemd` 
+  * `systemd` logging is stuff like `journalctl`
+* **Syslog versions**
+  - `syslogd` - The original 
+  - `syslog-ng` - Improved syslogd 
+  - `rsyslogd` - Remote Syslog - latest and most used version of syslog. Allows for remote use of syslog
+* Syslog log files are stored in `/var/log`
+
+* **Reading syslog**
+  * A syslog message usually has two values attach to it. 
+  * Both are just numbers, but then represent different things and used to filter traffic
+    * **Facility**
+      * Tied to a service
+      * They range from 1 to 23 
+      * Some are pre-programmed, e.g. 15 for cron, others are local 
+    * **Severity** 
+      - 8 severity numbers, 0 to 7
+      - emerg, alert, crit, err, warning, notice, info, debug
+ 
+  - Syslog separates into different components:
   - **Message generator**: The software or process that generates the message.
   - **Message storage**: The storage location of the log message.
   - **Message reporter**: The system that reports the message.
   - **Message analysis**: Analyzing the logs for relevant information.
-- Each message has a facility code indicating:
-  - Software type.
-  - Severity label.
-  - Used for:
-    - System management.
-    - Security auditing.
-    - General info.
-    - Analysis.
-    - Debugging messages.
-* Current Versions of syslog
-  - `rsyslogd` - older version
-  - `syslog-ng` - replacement for syslogd
 
 * **Syslog configuration**
   * `/etc/rsyslog.conf`
-  * Here stuff can be configured such as:
-    * Send logging to a central server
+  * Config file for rsyslog, where the following can be configured:
+    * ***Send* logging to a central server**
       * Add line at the bottom 
-      * something like: `*.* @@IP:514`
-    * Receive logging from servers
+      * Something like: `*.* @@<IP>:514`
+    * ***Receive* logging from servers**
       * Uncomment `#$ModLoad imtcp` and `#$InputTCPServerRun 514`
-    * Configure syslog rules
+    * **Configure syslog rules**
       * The rule structure is in a two column format
         * First column lists message facilities and/or severities
           - `.info`, `.warn`, `.err`, `.none`
           - `.*`: Log everything
         * Second column defines actions for the messages 
-      * 
 
 
 
-
-## Journal control
-* `journalctl`
-* Query and print logs 
-* Logs are collected by `systemd` 
-* `journald` is used in conjunction with `syslogd` or `rsyslogd`
-* Commonly used commands:
+## Systemd logging
+* `journald` - journal daemon
+  * `journalctl` - command line utility to control journald
+  * Query and print logs 
+  * Logs are collected by `systemd` 
+  * `journald` can be used in conjunction with `syslogd` or `rsyslogd`
+* **Commonly used commands:**
   * `-n {number of lines}` - specify number of lines printed
   * `-o <output format>` - specify output format
   * `-f` - print nmost recent entries
@@ -80,8 +86,11 @@
   * `-b` - Displays messages since the last boot.
   * `--since "2 days ago"` - Logs from 2 days ago.
   * `-xeu [service name]` - {-x} Augment log lines with explanation texts from the message catalog. {-e} Immediately jump to the end of the journal inside the implied pager tool
-* Config File
-  - `/etc/journalctld.conf`
+  * `PID=<#number>` - look for a specific process ID
+* Configuration
+  * `/etc/systemd/journald.conf`
+  * `storage=auto` means it is writing logs persistently to the default journald log folder `/var/log/journal/`
+  * If this folder exists, journald is writing logs to disk to this folder, if the folder is not there, journald writes to RAM
 
 
 * `last`
