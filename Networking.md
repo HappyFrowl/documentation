@@ -79,14 +79,14 @@
     - Display or configure network interfaces.
     - `ifconfig interface_name ip_address` - assign an IP ddress to an interface
         - Changes are non-persistent between reboots
-
-- `ip`
-    - `ip a` - same as ifconfig
-    - `ip link set <interface> (up|down)` - bring an interface up or down 
-    - Changes are non-persistent
     
 * `ifdown / ifup` - interface down / up 
-    - Bring an interface down.
+    - Bring an interface down or up 
+
+- `ip` - IP address
+    - `ip a` - same as ifconfig
+    - `ip link set <interface> (up|down)` - bring an interface up or down. Same as `ifdown`/ `ifup`
+    - Changes are non-persistent
 
 * `route` - Show route tables.
     - Like `ip` changes made with `route` are not persistent
@@ -106,7 +106,7 @@
     - Used to test connectivity.
     - Afges from a remote computer on the network using netcat.
 
-* `netstat` - network interface stats.
+* `netstat` - network statistics
     - Active internet connections.
     - What remote machines are you connected to.
     - Active UNIX domain sockets.
@@ -115,23 +115,25 @@
             - Shows all active internet connections.
 
 * `ss` - socket statistics
-  * prints similar information to `netstat`
-  * prints simpler output and syntax than `netstat`
-  * options:
-      * `-t | -u` - print tcp / udp connections
-      * `-l` - print listening connection
-      * `-s` - print statistics 
-      * `-4 | -6` - print ipv4 / ipv6 connection
-      * `sport == : <port> and dport == : <port>` - specify specific ports
+    * Newer version of `netstat`
+    * Prints similar information to `netstat`, but prints more simple output and syntax than `netstat`
+    * Options (these are actually the same for `netstat`)
+        * `-t | -u` - print tcp / udp connections
+        * `-l` - print listening connection
+        * `-s` - print statistics 
+        * `-p` - print the process using the 
+        * `-4 | -6` - print ipv4 / ipv6 connection
+        * `sport == : <port> and dport == : <port>` - specify specific ports
 
 - `nmap` - network mapper
     - Look for devices on the network and open ports on devices.
+    - 
 
 * `iperf` 
-    * test the maximum throughput of an interface
+    * Test the maximum throughput of an interface
 
 * `iftop` - interface top
-    * display bandwidth usage infoirmation for a system
+    * Display bandwidth usage infoirmation for a system
 
 * `mtr` 
     * Combination of `ping` and `traceroute`
@@ -144,7 +146,6 @@
     - Hosts file.
     - Essentially a simplified local DNS.
     - Add an IP with a name here, and you can ping that name.
-
 
 - `/etc/hosts`
     - Local hostnames and IPs.
@@ -319,36 +320,48 @@
 
 
 ## SSH
+
+### Configuring SSH Server
+- It starts with installing the openSSH server and client
+- `/etc/ssh/sshd_config`
+    - Config file for the SSH **server**
+    - Manage the following:
+        - **Port** - Set the port to which the server listens for SSH connections
+        - **PasswordAuthentication** - Enable or disable password-based authentication 
+        - **PubKeyAuthentication** - Enable or disable public key-based authentication
+        - **Hostkey** - Reference the locations of the server's private keys
+        - **UsePAM** - Enable or disable support for PAM (Puggable Authentication Modules, see IAM)
+        - **SyslogFacility**- Change the logging level of SSH event 
+        - **ChrootDirectory** - Reference a chroot jail path for a user 
+        - **AllowUsers/AllowGroups** - Enable user-specific access by allowing the specified users or groups access over SSH 
+        - **DenyUsers/DenyGroups** - Restrict the specified users or groups from accessing the server over SSH
+        - **PermitRootLogin** - Enable or disable the abiltiy for the root user to log in over SSH (best not to). 
+
+### Configuring SSH client
 - `/etc/ssh/ssh.config`
     - Configure outbound SSH connections.
     - Example: Turn off password-based authentication, allowing only certificate-based authentication.
-
-- `/etc/ssh/sshd_config`
-    - Configure the SSH **server**
-    - Manage the following:
-        - **Port** - set the port to which the server listens for SSH connections
-        - **PasswordAuthentication** - used to enable or disable password-based authentication 
-        - **PubKeyAuthentication** - used to enable or disable public key-based authentication
-        - **Hostkey** - used to reference the locations of the server's private keys
-        - **UsePAM** - enables or disables support for PAM (Puggable Authentication Modules, see IAM)
-        - **SyslogFacility**- Change the logging level of SSH event 
-        - **ChrootDirectory** - reference a chroot jail path for a user 
-        - **AllowUsers/AllowGroups** - Enable user-specific access by allowing the specified users or groups  access over SSH 
-        - **DenyUsers/DenyGroups** - Restrict the specified users or groups from accessing the server over SSH
-        - **PermitRootLogin** - enable or disbale the abiltiy for the root user to log in over SSH (best not to). 
-
+- `~/.ssh/` 
+    - Location where SSH client configurations are stored
+    -  `known_hosts` - list of all known hosts to which the client has connected. It stores all the other hosts' fingerprints
+    -  
 - `ssh-keygen`
-    - generate a public / private key pair
-    - `ssh-keygen -t <ed25519> -f <path/to/file>` - Create SSH key
+    - Generate a public / private key pair
+    - `ssh-keygen -t <ed25519> -f <path/to/file>`
 - `ssh-copy-id <IP>`
     - Copy and add the public key to a remote computer's `~/.ssh/authorized_keys` file
     - Enter the password of the account on the remote PC.
     - Once done, you can SSH without entering a password.
 - `ssh-add` 
-    - add the default SSH keys in `~/.ssh` to the ssh-agent
+    - Add the default SSH keys in `~/.ssh` to the ssh-agent
     - Add private key identities to the SSH key agent
 - `ssh -X`
     - X11 forwarding.
+
+
+
+
+
 
 
 SSH: 
