@@ -3,6 +3,8 @@
 - [Authentication](#authentication)
 
 - [Mandatory Access Control (MAC)](#mandatory-access-control-mac)
+- [SSH](#SSH)
+
 
 ## Hardening
 * **Chroot jail**
@@ -180,6 +182,44 @@
 
 
 
+
+## SSH
+
+### Configuring SSH Server
+- It starts with installing the openSSH server and client
+- `/etc/ssh/sshd_config`
+    - Config file for the SSH **server**
+    - Manage the following:
+        - **Port** - Set the port to which the server listens for SSH connections
+        - **PasswordAuthentication** - Enable or disable password-based authentication 
+        - **PubKeyAuthentication** - Enable or disable public key-based authentication
+        - **Hostkey** - Reference the locations of the server's private keys
+        - **UsePAM** - Enable or disable support for PAM (Puggable Authentication Modules, see IAM)
+        - **SyslogFacility**- Change the logging level of SSH event 
+        - **ChrootDirectory** - Reference a chroot jail path for a user 
+        - **AllowUsers/AllowGroups** - Enable user-specific access by allowing the specified users or groups access over SSH 
+        - **DenyUsers/DenyGroups** - Restrict the specified users or groups from accessing the server over SSH
+        - **PermitRootLogin** - Enable or disable the abiltiy for the root user to log in over SSH (best not to). 
+
+### Configuring SSH client
+- `/etc/ssh/ssh.config`
+    - Configure outbound SSH connections.
+    - Example: Turn off password-based authentication, allowing only certificate-based authentication.
+- `~/.ssh/` 
+    - Location where SSH client configurations are stored
+    -  `known_hosts` - list of all known hosts to which the client has connected. It stores all the other hosts' fingerprints
+- `ssh-keygen`
+    - Generate a public / private key pair
+    - `ssh-keygen -t <ed25519> -f <path/to/file>`
+- `ssh-copy-id <IP>`
+    - Copy and add the public key to a remote computer's `~/.ssh/authorized_keys` file
+    - Enter the password of the account on the remote PC.
+    - Once done, you can SSH without entering a password.
+- `ssh-add` 
+    - Add the default SSH keys in `~/.ssh` to the ssh-agent
+    - Add private key identities to the SSH key agent
+- `ssh -X`
+    - X11 forwarding.
 
 
 
