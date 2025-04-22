@@ -178,7 +178,7 @@ Let's dive into the four mentioned components
 
 ### **File ownership** 
 -  `chown` / `chgrp`
-  - `(chgrp|chown) user path/to/file_or_dir` change owner or group of a file or directory
+  - `(chgrp|chown) testuser path/to/file_or_dir` - change owner or group of a file or directory
   - `(chgrp|chown) -R path/to/file_or_dir` - change group recursively
   - `chown user:group path/to/file_or_dir` - change owner and group of the file or directory 
 
@@ -189,30 +189,30 @@ Let's dive into the four mentioned components
     drwxrwxr-x 2 ismet ismet    4096  Nov 20 20:19 .
     drwxrwxr-x 3 ismet ismet    4096  Nov 13 09:46 ..
     -rw-rw-r-- 1 ismet learners 11324 Nov 20 20:25 NOTES.md
-    -rw-rw-r-- 1 root  hackers  1135  Nov 21 17:25 important.blah
+    -rw-rw-r-- 1 root  hackers  1135  Nov 21 17:25 important.txt
     ```
--
-  - the first bit is the file type - `-` for file, and `d` for directory
-  - the rest of the bits are grouped in pairs of three 
-  - the first three being user permissons, second three group permissions, last three other
 
-  - the last bit is the access method. 
+- **How to read:** 
+  - The first bit is the file type - `-` for file, and `d` for directory
+  - The rest of the bits are grouped in pairs of three 
+    - The first three being user permissons, second three group permissions, last three other 
+  - The last bit is the access method. 
     - `.` - SELinux 
-    - `+` - other 
+    - `+` - Other 
 
 **Changing permissions**
-- chmod applies to 
+- `chmod` applies to 
   - `u` - users
   - `g` - group
   - `o` - other
   - `a` - all
 
-- permissions operators 
+- **Permissions operators**
   - `+` - add permissions
   - `-` - remove permissions
   - `=` - set exact permissions
 
-- permissions attributes
+- **Permissions attributes**
   - `r` - read
   - `w` - write
   - `e` - execute
@@ -224,7 +224,7 @@ Let's dive into the four mentioned components
   - `-f` - hide errors
   - `-c` - display output of changes
 
-- `chmod` absolute mode
+- `chmod` absolute mode:
   - `4` - read
   - `2` - write 
   - `1` - execute
@@ -283,17 +283,37 @@ Let's dive into the four mentioned components
 
 
 ### **Special permissions**
-Less privileged users are allowed to execute a file by assuming the privileges of the file's owner or group
+* Less privileged users are allowed to execute a file by assuming the privileges of the file's owner or group
+* Three types: **SUID**, **SGID**, **Sticky Bit**
+* They are represented by the characters `s` and `t`  in place of the execute (x) permission for the user, group, and others in the permission string.
+  * They can be upper or lower case
+* Files with Set UID or Set GID can be read by using `ls`. The files will pop out with a red background
+  * `-rwsr-xr-x 1 root root 59704 Nov 21 21:01 mount`
+* Red background + white letters = set UID
+* Yellow background + black letters = set GID
+* Red background + yellow letters = set UID and set GID
 
-1. **SUID - Set User ID** (`s`/ `S` on user position)
+
+
+1. **SUID - Set User ID** 
+- `s`/ `S` on user position
 - **Purpose**: Allows a file to execute with the permissions of its owner, regardless of who runs it.
 - **Applicable to**: Executable files.
-- **Usage**: Commonly used for programs that require elevated privileges (e.g., passwd).
+- **Usage**: Commonly used for programs that require elevated privileges (e.g., `passwd`).
 - **Symbol**:
   - `s` replaces `x` in the user execute field if executable `rws------`
   - `S` appears if the file lacks execute permissions `rwS------`
-
-2. **SGID - Set Group ID** Set User ID (`s`/ `S` on group position)
+    * This basically means it is inactive
+- **Implementation**:
+  ```bash
+  # Symbolic
+  chmod u+s file   
+  # Numeric (4xxx)
+  chmod 4755 file  # Sets rwsr-xr-x
+  ```
+---
+2. **SGID - Set Group ID** 
+- `s`/ `S` on group position
 - **Purpose:**
   - For files: Ensures the file executes with the permissions of its group.
   - For directories: Files created inside inherit the group ownership of the directory, not the creator’s primary group.
@@ -301,14 +321,30 @@ Less privileged users are allowed to execute a file by assuming the privileges o
 - **Symbol:**
 -   `s` replaces `x` in the group execute field if executable `rwxr-sr-x`
 -   `S` appears if the file lacks execute permissions `rwxr-Sr-x`
-
-
-3. **Sticky Bit** (`t` / `T` on others execute position)
+  * The permissions do shit 
+- **Implementation**:
+  ```bash
+  # Symbolic
+  chmod g+s file   
+  # Numeric (2xxx)
+  chmod 2755 file  # Sets rwxr-sr-x
+  ```
+---
+3. **Sticky Bit** 
+- `t` / `T` on others execute position
 - **Purpose:** Restricts deletion of files within a directory. Only the owner of a file, the owner of the directory, or the root user can delete files in that directory.
 - **Applicable to:** Directories (rarely used on files).
 - **Symbol:**
   - `t` replaces `x` in the others execute field if executable `rwxr-xr-t`
   - `T` appears if the directory lacks execute permissions `rwxr-xr-T`
+- **Implementation**:
+  ```bash
+  # Symbolic
+  chmod o+t file   
+  # Numeric (1xxx)
+  chmod 1755 file  # Sets rwxr-xr-t
+  ```
+
 
 
 ## **LDAP**
