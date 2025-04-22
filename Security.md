@@ -2,6 +2,7 @@
 
 - [Authentication](#authentication)
 
+- [Mandatory Access Control (MAC)](#mandatory-access-control-mac)
 
 ## Hardening
 * **Chroot jail**
@@ -11,7 +12,6 @@
     * `chroot [options] <new root dir> [command]`
         * `chroot /home/me /usr/bin/bash`
         * This creates a new bash shell in the home folder as the root folder 
-
 
 - `/etc/hosts.allow`
     - List hosts, domains, or IPs that are allowed services on the system
@@ -117,7 +117,7 @@
     * **App-armor** and **SELinux** are the main examples
     * MAC differs from the default scheme in Linux which is known as **Discretionary Access Control (DAC)**
         * In DAC, each object has a list of entities that are allowed to access it
-        * The object owner administrates this, using `chown`, `chmod`, etc
+        * The object owner administrates this, using `chown`, `chmod`, etc.
 
 * **SELinux**
     * Does not allow DAC, but enforces MAC to do its permissions and access control
@@ -161,10 +161,24 @@
         * `audit2allow` - Used to gather information from the denied operations log        
 
 * **AppArmor**
-    * Alternative context-based pernissiosn scheme and MAC implementation for Linux
+    * High-level overview:
+        * Normally, a user account can write to its home directory... Makes sense
+        * Often, that user can also write to other place on the hard drive. 
+        * But some user accounts are not tied to a user, but to a service, e.g. Apache
+        * Does that need to write to the whole directory
+        * AppArmor locks down what applications can do
+    * Alternative context-based permissions scheme and MAC implementation for Linux
     * Works with file system object, rather than referencing the inodes directly as SELinux does
     * AppArmor is much easier to administrate
-    * 
+    * Profiles are locted in the `/etc/apparmor.d/` directory
+    * Managing AppArmor:
+        * `apparmor_status`    - Display the current status    
+        * `aa-complain`        - Place a profile in complain mode
+        * `aa-enforce`         - place a profile in enforce mode
+        * `aa-disable`         - disable profile
+        * `aa-unconfined`      - list processes with open network sockets
+
+
 
 
 
