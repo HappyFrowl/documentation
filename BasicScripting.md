@@ -11,32 +11,33 @@
 
 ## Basic commands
 
-
 * `man` - manual
   * find info on commands
-  - Man pages may have multiple sources, indicated by the `(x)` in the corner.
+  - Man pages may have multiple sources, indicated by the `(#)` in the corner.
   - Sections are identified by their number:
-    1. General commands  
+    1. General commands, end-user commands  
     2. System calls  
     3. C library functions  
     4. Special files  
-    5. File formats and conventions  
+    5. Config files
     6. Games and screensavers  
     7. Misc  
-    8. System admin commands/daemons 
+    8. System commands, root commands
   - **Search**: Press `/` and type your query to search within a man page.
-
-**Searching the Man Pages:**
-* There are tools to help find the command when you do not know which one to use, or forgot the same
-* they use `mandb` which indexes the man through a daily cron job. 
-  * `mandb` - updates the manual database
-* tools finding commands:
-  - **`man -k`** - Search the name section of all man pages (great for finding commands).
-    * this is exactly the same as `apropos`
-  - **`whatis`**: Display a brief description of a command.
-  - **`info`**: Display the info page of a command.
-
-
+* **Reading the man pages**
+  * `[ ]` = optional 
+  * `...` = multiple arguments can be passed
+  * `|` = exclusive or. It is either or 
+  * `{ | }` = same as `|`
+* **Searching the Man Pages:**
+  * There are tools to help find the command when you do not know which one to use, or forgot the same
+  * They use the man database which indexes the man through a daily cron job 
+    * **`mandb`** - updates the database manually 
+  * Tools finding commands:
+    - **`man -k`** - Search the name section of all man pages (great for finding commands).
+      * This is exactly the same as **`apropos`**
+    - **`whatis`**: Display a brief description of a command.
+    - **`info`**: Display the info page of a command.
 
 - **`cp`**
   - `*` the wildcard of wildcards, it's used to represent all single characters or any string.
@@ -61,7 +62,11 @@
 
 
 **File Text Operations:**
-- **`expand / unexpand`**: Convert tabs to 8 spaces and vice versa.
+- **`ls`**
+  - `ls -lrt` - list files in long format, sorted by time, oldest first
+
+- **`expand / unexpand`**
+  - Convert tabs to 8 spaces and vice versa
   - Example: `expand file > file2`.
 
 - **`wc`** - word count
@@ -116,6 +121,22 @@
 
 - **`expr`**: Perform mathematical operations.
   - Example: `expr 5 \* 3`.
+
+
+* **`find`**
+  * Some interesting options:
+    * `-name` - find files based on the file name
+    * `-user` - find files owned by a user
+    * `-size <-|+ # G|M|k|c>` - find files smaller or larger than # gib, mib,kib, bytes 
+    * `-exec {} <command> \;` - use the results of the `find` command as the input `{}` for another command. Piping does not work here, although you can use `| xargs`... 
+    * `-perm <e.g. \<e.g. 4000>` - find files based on their permissions. 
+    * `-type` - find files based on their file type. Some of the options: [b]lock, [d]irectory, regular [f]ile, sym [l]ink
+    * `-ls` - equivalent of `ls -l`. List all the files that were specified by the other options, but list hte in the long format 
+    * `-printf` - specify the output format     
+      * This option is quite extensive. You need to completely make up the entire output.
+      * tip: end with a newline, `\n`, so the output is not one ginormous string
+    * 
+
 
 * **Environment and Basics**
   - **`env`**: Display user environment variables (temporary, only for the session).
@@ -263,7 +284,7 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
 ## vim 
 * `vim` is a powerful text editor in Linux with two primary modes: **Command Mode** and **Insert Mode**.
 
-* Modes
+* Vim has two **modes**
   1. **Command Mode**
     - Used for navigating and manipulating text without typing.
     - Key bindings control movement and text actions.
@@ -272,51 +293,60 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
     - Entered using specific keys (e.g., `i`, `a`, `o`) from Command Mode.
     - Leave insert mode by pressing `esc`
 
-**Navigation in Command Mode:**
-- **`h`**: Move left.
-- **`l`**: Move right.
-- **`j`**: Move down.
-- **`k`**: Move up.
-- **`/`**: Search forward.
-  - Use **`n`** for the next occurrence.
-- **`?`**: Search backward.
-  - Use **`n`** for the next occurrence.
-- **`Shift+g`**: Move to the end of the file.
-
+* **Navigation in Command Mode:**
+  - **`h`** - Move left.
+  - **`l`** - Move right.
+  - **`j`** - Move down.
+  - **`k`** - Move up.
+  - **`/`** - Search forward.
+    - Use **`n`** for the next occurrence.
+  - **`?`** - Search backward.
+    - Use **`n`** for the next occurrence.
+  - **`Shift+g`** - Move to the end of the file.
+  - **`w`** - Go to next word
+  - **`b`** - Go to previous word
+  - **`^`** - Move to start of current line 
+  - **`$`** - Move to end of current line 
 
 **Editing in Command Mode:**
+  * **Deleting Text:**
+    - **`x`** - Delete the character under the cursor.
+    - **`dd`** - Delete the current line
+      - **`3dd`** - Delete 3 lines
+    - **`dw`** - Delete the current word
+  * **Pasting Text**
+    - **`p`** - Paste below the current line
+    - **`P`** - Paste above the current line
+  * **Entering Insert Mode:**
+    - **`i`** - Insert before the cursor.
+    - **`a`** - Insert after the cursor.
+    - **`o`** - Insert a new line below the cursor position.
+    - **`O`** - Insert a new line above the cursor position.
+  * **Saving and Exiting:**
+    - **`:q`** - Exit without saving.
+    - **`:q!`** - Force exit without saving.
+    - **`:w`** - Save the file.
+    - **`:wq!`** - Save and exit, no complaining!
+    - **`Shift+ZZ`** - Save and exit.
 
-* **Deleting Text:**
-  - **`x`**: Delete the character under the cursor.
-  - **`dd`**: Delete the current line.
+* **Simple text manipulation**
+  * **`y`** - copy
+  * **`p`** - paste
+  * **`u`** - undo 
+  * **`ctrl+r`** - Redo
+ 
 
-* **Pasting Text**
-  - **`p`**: Paste below the current line.
-  - **`P`**: Paste above the current line.
+* **Additional Commands:**
+  * **`/`** - Search forward for a term.
+  * **`?`** - Search backward for a term.
+  * **`n`** - Jump to the next search result.
+  * **`N`** - Jump to the previous search result.
+  * **`v`** - enter visual mode, use arrow keys to select a block 
+  * **`:%s/old/new/g`** - replace all occurrences of `old` with `new`
+  * **`/<text>`** - search for text 
+  * **`:se number`** - show line numbers
 
-* **Entering Insert Mode:**
-  - **`i`**: Insert before the cursor.
-  - **`a`**: Insert after the cursor.
-  - **`o`**: Insert a new line below the current line.
-  - **`O`**: Insert a new line above the current line.
-
-**Saving and Exiting:**
-* Without Saving
-  - **`:q`**: Exit without saving.
-  - **`:q!`**: Force exit without saving.
-
-* Saving
-  - **`:w`**: Save the file.
-  - **`:wq`**: Save and exit.
-  - **`Shift+ZZ`**: Save and exit.
-
-**Additional Commands:**
-  - **`/`**: Search forward for a term.
-  - **`?`**: Search backward for a term.
-  - **`n`**: Jump to the next search result.
-  - **`N`**: Jump to the previous search result.
-
-
+  * `vimtutor` - command for opening the vim learning module 
 
 ## Task Automation 
 
