@@ -3,14 +3,13 @@
 - [Basic commands](#Basic-commands)
 - [Streams and Redirection](Streams-and-Redirection)
 - [if Statements](if-Statements)
-- [Regular Expressions](Regular-Expressions)
 - [Vim](#vim)
 - [Task Autoanmtion](#task-automation)
 - [Git](#git)
 
 
 ## Basic commands
-
+### Man pages
 * `man` - manual
   * find info on commands
   - Man pages may have multiple sources, indicated by the `(#)` in the corner.
@@ -39,6 +38,7 @@
     - **`whatis`**: Display a brief description of a command.
     - **`info`**: Display the info page of a command.
 
+### **File Text Operations:**
 - **`cp`**
   - `*` the wildcard of wildcards, it's used to represent all single characters or any string.
   - `?` used to represent one character
@@ -52,18 +52,21 @@
   - `-p` - include the parent directories if not existing
 
 
-
-
-
-
-
-
-
-
-
-**File Text Operations:**
 - **`ls`**
   - `ls -lrt` - list files in long format, sorted by time, oldest first
+
+- **`head`** / **`tail`** - Display the first or last lines of a file
+  - `-n` - Specify the number of lines (default: 5).
+  - `-f` - follow, using as an option for `tail`. Follow the end of a file as it receives more text, e.g. logs
+
+- **`cat`** / **`tac`** - concatenate
+  * Print the contents of a file
+  * `tac` does so in reverse
+  * options:
+    * `-A` - show all non-printable characters
+    * `-b` - number the lines
+    * `-n` - number lines, but not empty lines
+    * `-s` - suppress repeated empty lines
 
 - **`expand / unexpand`**
   - Convert tabs to 8 spaces and vice versa
@@ -71,57 +74,6 @@
 
 - **`wc`** - word count
   * Count lines, words, and bytes in a file.
-
-- **`fmt`**: Format text.
-
-- **`head / tail`**: Display the first or last lines of a file.
-  - `-n`: Specify the number of lines (default: 5).
-
-- **`join`**: Join two files based on a common field.
-
-- **`nl`**
-  * Similar to `cat` but adds line numbers
-
-- **`od`** - Octal dump of a file
-
-- **`pr`** - Format files for printing.
-
-- **`split`**
-  * Split a file (default: 1000 lines per split).
-  - Example: `split file newfile`.
-- **`split`**: Split a file (default: 1000 lines per split).
-  - Example: `split file newfile`.
-
-- **`tr`** - truncate / translate
-  *  Performs operations like removing repeated characters, converting uppercase to lowercase, and basic character replacement and removal
-  * `tr <char 1> <char 2>` - first char is the character to be replaced
-
-- **`uniq`**: Remove duplicate adjacent lines.
-  - Use `sort` to make duplicates adjacent before using `uniq`.
-
-- **`sort`**
-  * Tool for sorting lines of text files
-  * Options:
-    * `-k <column numbers>` - Specify field values
-    * `-k2` - Indicate second field
-    * `-n`  - Compare and sort line based on the string numerical value
-    * `-r`  - Sort fields in descending order
-    * `-t`  - Separate one field from another
-
-- **`cut`**: Extract portions of a file.
-  - `-c` - Extract specific characters (e.g., `cut -c 3-5 file`).
-  - `-d` - Specify delimiter, e.g. `-d:`
-  - `-f` - Specify field to extract (e.g., `cut -d, -f2 file.txt`). 
-
-- **`paste`** - Merge lines of files.
-  * Merge lines from text files horizontally
-  * By default the delimeter is a tab
-  * Options:
-    * `-d` - Specify delimeter
-
-- **`expr`**: Perform mathematical operations.
-  - Example: `expr 5 \* 3`.
-
 
 * **`find`**
   * Some interesting options:
@@ -137,6 +89,104 @@
       * tip: end with a newline, `\n`, so the output is not one ginormous string
     * 
 
+* **`grep`** - Globally Regular Expression and Print
+  - Uses symbols and regular expressions to search plain text.
+  - **`grep`** - Basic search.
+  - **`egrep`** - Extended `grep`, allowing regular expression quantifiers without escaping.
+  - **`fgrep`** - Literal search; no interpretation of special characters.
+  - **`pgrep`** - get PID for a running process
+
+* **options:**
+  * `-i` - ignore case
+  * `-v` - show lines that **do not** match pattern
+  * `-l` - list file names that contain pattern, without showing matching lines
+  * `-A5` - show line that matches pattern as well as 5 lines after 
+  * `-B5` - show line that matches pattern as well as 5 lines before
+  * `-C5` - combination of `-A5` and `-B5`
+  * 
+  
+* **`sed`** - Stream Editor
+  - Replace characters in a regular expression.
+  - Syntax:
+    ```bash
+    sed 's/<pattern>/<replacement>/' <file>
+
+* **`awk`** - pattern scanning and text processing language
+
+- **`tr`** - translate
+  *  Performs operations like removing repeated characters, converting uppercase to lowercase, and basic character replacement and removal
+  * `tr <char 1> <char 2>` - first char is the character to be replaced
+  * `tr [:lower] [:upper]`
+
+- **`cut`**: Extract portions of a file.
+  - `-c` - Extract specific characters (e.g., `cut -c 3-5 file`).
+  - `-d` - Specify delimiter, e.g. `-d:`
+  - `-f` - Specify field to extract (e.g., `cut -d, -f2 file.txt`). 
+
+- **`split`**
+  * Split a file (default: 1000 lines per split).
+  - Example: `split file newfile`.
+- **`split`**: Split a file (default: 1000 lines per split).
+  - Example: `split file newfile`.
+
+- **`paste`** - Merge lines of files.
+  * Merge lines from text files horizontally
+  * By default the delimeter is a tab
+  * Options:
+    * `-d` - Specify delimeter
+
+- **`uniq`**: Remove duplicate adjacent lines.
+  - Use `sort` to make duplicates adjacent before using `uniq`.
+
+- **`sort`**
+  * Utility for sorting lines of text files
+  * Options:
+    * `-k <column numbers>` - Specify field values
+    * `-k2`- Indicate second field
+    * `-n` - Compare and sort line based on the string numerical value
+    * `-r` - Sort fields in descending order
+    * `-t` - Separate one field from another
+
+- **`fmt`** - Format text.
+
+- **`join`**
+  - Join two files based on a common field.
+
+- **`nl`**
+  * Similar to `cat` but adds line numbers
+
+- **`od`** - Octal dump of a file
+
+- **`pr`** - Format files for printing.
+
+- **`expr`** - Express
+  - Perform mathematical operations
+  - Example: `expr 5 \* 3`
+
+### Regular Expressions
+Regular expressions (regex) are sequences of symbols and characters used to express patterns for searching text.
+
+**Symbols:**
+- `|`: OR  
+  Example: `( grey|gray )` matches either "grey" and/or "gray".
+- `()`: Grouping  
+  Example: `gr(e|a)y` matches "grey" and/or "gray".
+- `$`: End of line  
+  Example: `e$` matches any line ending with "e".
+- `^`: Start of line  
+  Example: `^Hello` matches lines starting with "Hello".
+- `.`: Matches any single character.
+
+**Quantifiers:**
+- `?`: 0 or 1 occurrence of the preceding element.
+- `*`: 0 or more occurrences of the preceding element.
+- `+`: 1 or more occurrences of the preceding element.
+- `{n}`: Matches the preceding element exactly `n` times.
+- `{min,}`: Matches the preceding element at least `min` times.
+- `{min,max}`: Matches the preceding element between `min` and `max` times.
+
+---
+
 
 * **Environment and Basics**
   - **`env`**: Display user environment variables (temporary, only for the session).
@@ -150,7 +200,6 @@
     - Defaults back after logout.
 
 
----
 
 ## Stream manipulation
 - **Streams**:
@@ -194,26 +243,6 @@
     ```
 
 
-* **`grep`** - Globally Regular Expression and Print
-  - Uses symbols and regular expressions to search plain text.
-  - **`grep`**: Basic search.
-  - **`egrep`**: Extended `grep`, allowing regular expression quantifiers without escaping.
-  - **`fgrep`**: Literal search; no interpretation of special characters.
-  - **`pgrep`** - get PID for a running process
-
-  - `grep <pattern> *`: Search files in the current directory.
-  - `grep -v 'e$' *`: Find strings that do not end with "e".
-  - `egrep 'l+' *`: Match one or more occurrences of "l" without escaping.
-  - `fgrep 'l\+' *`: Search for a literal `\` and `+`.
-
-
-* `sed` - Stream Editor
-  - Replace characters in a regular expression.
-  - Syntax:
-    ```bash
-    sed 's/<pattern>/<replacement>/' <file>
-
-* `awk` - pattern scanning and text processing language
 
 
 
@@ -224,7 +253,6 @@
 ## `if` Statements
 
 Conditional expressions in shell scripting allow you to evaluate strings, files, and directories. Below are some commonly used conditions.
-
 
 **String Conditions:**
 - **`-z <string>`**:  
@@ -255,27 +283,7 @@ Conditional expressions in shell scripting allow you to evaluate strings, files,
 
 ---
 
-## Regular Expressions
-Regular expressions (regex) are sequences of symbols and characters used to express patterns for searching text.
 
-**Symbols:**
-- `|`: OR  
-  Example: `grey|gray` matches either "grey" or "gray".
-- `()`: Grouping  
-  Example: `gr(e|a)y` matches "grey" or "gray".
-- `$`: End of line  
-  Example: `e$` matches any line ending with "e".
-- `^`: Start of line  
-  Example: `^Hello` matches lines starting with "Hello".
-- `.`: Matches any single character.
-
-**Quantifiers:**
-- `?`: 0 or 1 occurrence of the preceding element.
-- `*`: 0 or more occurrences of the preceding element.
-- `+`: 1 or more occurrences of the preceding element.
-- `{n}`: Matches the preceding element exactly `n` times.
-- `{min,}`: Matches the preceding element at least `min` times.
-- `{min,max}`: Matches the preceding element between `min` and `max` times.
 
 ---
 
