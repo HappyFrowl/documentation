@@ -185,7 +185,7 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
 - `{min,}`: Matches the preceding element at least `min` times.
 - `{min,max}`: Matches the preceding element between `min` and `max` times.
 
----
+
 
 
 * **Environment and Basics**
@@ -198,6 +198,20 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
       export HISTFILE=<path>
       ```
     - Defaults back after logout.
+
+
+
+- `set` - set shell options     
+    - `-e` - exit on fail 
+    - `-o` - Set a option 
+        - Noclobber 
+        - Do not permit overwriting when using `>` 
+        - `xtrace` 
+        - Shows full command 
+        - So for `ls` it shows `ls --colour=auto` 
+        - `+o <option>`  
+         
+
 
 
 
@@ -282,11 +296,6 @@ Conditional expressions in shell scripting allow you to evaluate strings, files,
 
 
 ---
-
-
-
----
-
 
 
 ## vim 
@@ -529,7 +538,7 @@ Conditional expressions in shell scripting allow you to evaluate strings, files,
   * `git remote add origin https://github.com<username>/<repo-name>.git` - Add a remote named <name> for the repo at <URL>
     * this is done during the initial push after initializing the repo
     * 'origin' is the remote branch
-  * `git remote rename <oldname> <newname> - change the remote branch name. By default it is 'origin' and this can be changed
+  * `git remote rename <oldname> <newname>` - change the remote branch name. By default it is 'origin' and this can be changed
 
 * `git push` - push code to the remote repo
   * `git push --set-upstream origin <name>` - link the remote to the current branch. This is done as the initial push, after which it is remembered
@@ -559,18 +568,8 @@ Conditional expressions in shell scripting allow you to evaluate strings, files,
 
 
 
-- `set` - set shell options     
-    - `-e` - exit on fail 
-    - `-o` - Set a option 
-        - Noclobber 
-        - Do not permit overwriting when using `>` 
-        - `xtrace` 
-        - Shows full command 
-        - So for `ls` it shows `ls --colour=auto` 
-        - `+o <option>` 
-         
-
  
+
 
 
 

@@ -140,6 +140,9 @@
 * `/etc/crypttab` 
     * file storing information about encrypted devices and partitions that must be unlocked and mounted on system boot
 
+* `findmnt` - find mount
+    * Show all mounts on the system
+
 * `lsblk` - list block
     - Lists information about storage devices, such as
         - device and partition name
@@ -356,31 +359,38 @@
 - **`tar`** - Tape Archiver
     - Bundles together multiple files into a single tarball 
     - Common options:
-        - `c` - Create an archive.
-        - `t` - List archive contents.
-        - `x` - Extract file
-        - `f` - Specify the filename.
-        - `v` - Verbose (list files being processed).
-        - `z` - Compress or decompress with gzip
-    - Examples:
-        * `tar -tvf <tar name>` - List files in tarball
-        * `tar -xvf <tar name>` - Extract **all** files in tarball
-        * `tar -xvf <tar name> <file name>` - Extract a some files from tarball
-        * `tar -cvf <tar name> <file names>` - Create a tarball from specified files  
+        - `-c` - Create an archive.
+        - `-x` - Extract file
+        - `-t` - List archive contents.
+        - `-f` - Specify the filename.
+        - `-v` - Verbose (list files being processed).
+        - `-z` - Compress or decompress with gzip
+        - `-C` - Specify the output file
+    - **Examples:**
+        * `tar -cvf <file>.tar <files>` - Create a tarball from specified files  
+        * `tar -xvf <file>.tar` - Extract **all** files in tarball
+            * `tar -xvf <file>.tar <files>` - Extract only the mentioned files from tarball
+            * `tar -xvf <file>.tar -C <directory>` - Extract the tarball into the specified directory 
+        * `tar -tvf <file>.tar` - List files in tarball
 
-- **`gzip`**
-    - Compression tool that produces files with `.gz` extension 
-    - Use `gunzip` to decompress
-
-* **`xz`**
-    * Another compression tool
-    * Has a higher compression ratio than `gzip` but is slower
-    * `-kv` 
-
-* **`bzip2`**
-    * Another compression tool
-    * Balanced performance between the two previous ones 
-
+* **Compression tools**:
+    - **`gzip`**
+        - Most common utility
+        - Nice balance between compression ratio and take to compress
+        - Compression tool that produces files with `.gz` extension 
+        - Use with `tar` with `-z` option
+            - `tar -czvf <file>.tar <files>` - archive and compress
+        
+    * **`bzip2`**
+        * Better compression, but takes longer 
+        * `-j` - when used as a option for `tar`
+            * `tar -cjvf <file>.tar <files>` - archive and compress
+             
+    * **`xz`**
+        * Best compression, but slow, like 10x slower than `gzip` for a +-20% better compression
+        * `-J` - when used as a option for `tar`
+            * `tar -cJvf <file>.tar <files>` - archive and compress
+            
 - **`dd`** - data duplicator / disk destroyer
     * Commonly used for disk imaging, data recovery, and even wiping data securely
     * Command components
@@ -403,6 +413,7 @@
         * Disk performance tests
             * measuring read / write speed
 
+
 * `mirrorvg` - Mirror volume group
     * 
 
@@ -410,6 +421,9 @@
 
 
 ## The Linux File System
+
+* To read up on the file system:
+    * `man hier`
 
 `/` - Root
 - The root directory is the top-level directory in the Linux filesystem hierarchy.
