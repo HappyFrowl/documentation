@@ -38,7 +38,7 @@
 ## Authentication
 * **Kerberos** 
     * `kinit`
-        * Authenticate Kerberos ticekt if successful
+        * Authenticate Kerberos ticket if successful
     * `kpassword`
         * Change the user's Kerberos password
     * `klist`
@@ -68,13 +68,12 @@
     * better to use it to wipe files only
     * Use `dd` for entire storage devices
 
-* `**gpg**`
-- Free implementation of PGP.
-- Used to get, create, and send encryption keys.
-- Encrypt files using `gpg`.
+* **`gpg`**
+    - Free and open source implementation of PGP
+    - Used to get, create, and send encryption keys, e.g. public keys, "use it to send shit to me" 
+    - Encrypt files using `gpg`
 
-
-* `**openssl**`
+* **`openssl`**
     * Installing cert on an Apache server:
         1. Generate OpenSSL
         2. Download an install mod_ssl package
@@ -82,7 +81,6 @@
         4. Point SSLCertificateKeyFile
         5. Restart Apache
         6. Verify
-
 
 ## System auditing
 * `auditd` - audit daemon
@@ -93,6 +91,7 @@
     * 
 
 - `xinetd` - X Internet Daemon.
+    - Old shit, unsecure
     - Listens to incoming requests over the network.
     - Launches the appropriate program to handle the request.
     - Requests are often for specific ports.
