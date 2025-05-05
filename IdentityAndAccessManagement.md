@@ -49,14 +49,18 @@
 - `useradd` - add a user
     - users are stored in `/etc/passwd`
         - it contains: `user:password:uid:gid:some_comment:homedir:defaultshell`
-    - if a home directory is created, folders stated in `/etc/skel` are created in it by default
-    - `-D` - show default settigns for cerating a user
+    - if a home directory is created, folders stated in `/etc/skel/` are created in it by default
+    - `-D` - show default settings for creating a user
     - `-u` - choose a specific uid
     - `-s` - choose a specific shell
     - `-m` - explicitely create a home directory
+    - `-M` - explicitely DO NOT create a home directory
     - `-r` - create system user
     - `-e` - set expiration date for the user
     - `-c` - add comment to the user, e.g. full name
+  * `/etc/login.defs` 
+    * Config file that contains all parameters that are used when creating a user
+      * Such as password settings
 - `userdel` - delete a user
     - `-r` - delete the home directory also
 - `usermod` - modify a user
@@ -84,15 +88,15 @@
     - `-l` - list expiration date for user
     - `-w` - set a warning for a user
 - `passwd` - change password for a user
-    - passwords are stored in `/etc/shadow`
-        - it contains:
-            - user name
-            - password
+    - Passwords are stored in `/etc/shadow`
+        - It contains:
+            - Username
+            - Password
                 - if the password is `!` and more nothing, the password is invalid
                 - if it contains something like `!$y$j9T$TW4`, **then the user is disabled**
-            - total number of days since 1 jan 1970 since the password was changed
-            - min days of days required between password changes 
-            - max days of days a password is valid 
+            - Total number of days since 1 jan 1970 since the password was changed
+            - Min days of days required between password changes 
+            - Max days of days a password is valid 
             - Number of days after password is expired that the account will be disabled 
             - Days after jan 1 1970 that the account will be disabled 
     - `-l | -u` - lock or unlock a user 
@@ -102,16 +106,19 @@
 - `groups <$USER>` - print groups of which someone is member 
 - `id`- get user id and group membership
 - `getent` - read entry from `/etc/` files
-    - `getent group <group>` -  get the group's entry from `/etc/group`
-- `lastlog` - print when users last logged in 
-- `who` - Print who is logged in and related data (processes, boot time)
-  - Prints name of the system from which they are connecting 
-  - `-u` - print who is idle and for how long. 
-    - `old` means in active for over 24h
-- `w` - Print who is logged on and what they are doing.
-  - Prints user login, TTY, remote host, login time, idle time, current proess
+    - Options:
+      * `getent group`
+      * `getent passwd`
+      * `getent hosts`
+    * It is also possible to specify a group, user or host
 
-**sudo groups**
+* `vigr`
+  * Manage groups by editing the `/etc/group`
+
+* `vipw`
+  * Manage users by editing the `/etc/passwd`
+
+### **sudo groups**
 - `sudo`
     - Group for granting users `sudo` right
     - Used on Debian-based systems
@@ -121,6 +128,19 @@
     - Used on distros that do not by default have the `sudo` group
     - e.g. CentOS, RedHat
 
+### Managing user sessions
+- `who` - Print who is logged in and the related data (processes, boot time)
+  - Prints name of the system from which they are connecting 
+  - `-u` - print who is idle and for how long. 
+    - `old` means in active for over 24h
+- `w` - Print who is logged on and what they are doing.
+  - Prints user login, TTY, remote host, login time, idle time, current process
+* `loginctl` - login control
+  * `list-sessions`
+  * `show-session <id>`
+  * `show-user <username>`
+  * `terminate-session <session-id>`
+- `lastlog` - print when users last logged in 
 
 ## **Pluggable Authentication Modules (PAM)**
 * PAM is used to help apps make proper use of user accounts 
