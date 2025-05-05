@@ -23,10 +23,10 @@
       - Contains entries for itself, its parents, and its children.
     - A disk can run out of inodes before running out of disk space, which prevents new file creation.
     - Inodes can be used to delete strangely named files that won’t tab-complete.
-
-    - `ls -i` - See the inode number.
-    - `find . -inum <inode number>`: Find file by inode number.
-    - `df -ih` - see inode usage on a partition level
+    - **inode related commands**
+        - `ls -i` - See the inode number.
+        - `find . -inum <inode number>`: Find file by inode number.
+        - `df -ih` - see inode usage on a partition level
 
 ### The storage structure is governed by **three** main layers:
 * **Partition table** (GPT/MBT)
@@ -72,9 +72,10 @@
             * `xfs_admin` - same but for XFS-based file systems 
 
 ### Managing partitions and file systems 
-* `fdisk </dev/>`
+* `fdisk </dev/>` / `gdisk </dev>`
     * Manage partition tables and partitions on a hard disk
-    * bit of an old tool
+    * Bit of an old tool
+    * `fdisk` is for MBR, `gdisk` for GPT
     * **options:**
         * `-l` - list partitions 
         * `-b` - Specify number of drive sectors
@@ -297,7 +298,7 @@
         * Volume Group comprising of multiple of these physical volumes
         * Virtual Volumes carved from the Volume Group
         * File Systems created from these Virtual Volumes
-    * `/dev/mapper` contains alls the logical volumes on a given system managed by LVM
+    * `/dev/mapper` contains all the logical volumes on a given system managed by LVM
 
 * Physical volume tools
     * `pvscan`      - scan for all physical devices being used as physical volumes
