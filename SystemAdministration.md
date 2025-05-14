@@ -283,24 +283,36 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 
 
 ### **Boot Targets**
-* Boot targets are the modern equivalent of runlevels 
-* used in systemd
-* More flexible and descriptive way of managing system states
-* Boot targets are particularly useful when troubleshooting the system, especially when it does not want to boot properly.
-* available modes and its equivalent runlevel
-  * poweroff    ~ runlevel 0 
-  * rescue      ~ runlevel 1
-  * multi-user  ~ runlevel 3
-  * graphical   ~ runlevel 5
-  * reboot      ~ runlevel 6
-* like the associated runlevel, `rescue mode` is used to change root's password 
-* `systemctl get-default`
-    - Get default mode
-* `systemctl set-default <mode_name>` - set default boot target
-  * this only takes effect after rebooting
-- `sudo systemctl isolate <target>`
-    - Temporarily change the boot target
-    - this takes effect immedadiately
+* Boot targets are the modern equivalent of runlevels used in systemd
+  * More flexible and descriptive way of managing system states
+  * Boot targets are particularly useful when troubleshooting the system, especially when it does not want to boot properly.
+  * Some targets are isolatable which ameans that you can use them to defined the state your system should be started in 
+* There's **four** of them:
+  * emergency.target  - minimal environment, no services, only a root shell   
+  * rescue.target     - single-user mode with basic services, **used to change root password**
+  * multiuser.target  - multi-user mode with no GUI
+  * graphical.target  - multi-user mode with GUI
+* Besides these, there are **two** targets that are not **boot targets**
+  * These are: 
+    * poweroff.target
+    * reboot.target
+  * Like the name suggests, you do not **boot into** them. 
+* **Boot target vs runtime equivalence**
+  * poweroff.target    - runlevel 0 
+  * rescue.target      - runlevel 1
+  * multi-user.target  - runlevel 3
+  * graphical.target   - runlevel 5
+  * reboot.target      - runlevel 6
+
+* **systemctl command to manage boot targets**
+  * `systemctl get-default`
+      - Get default mode
+  * `systemctl list-dependencies <target>` - see contents and dependencies of a systemd target
+  * `systemctl set-default <mode_name>` - set default boot target
+    * this only takes effect after rebooting
+  - `sudo systemctl isolate <name.target>`
+      - Temporarily change the boot target
+      - this takes effect immediately
 
 
 ## Linux system Components
@@ -524,16 +536,46 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 ## Service management
 **Service**
   * Running programs or processes that provide support for requests and monitoring from other processes or external clients
-  * e.g., postfix, apache, and initd, like systemd
+  * e.g., postfix, apache, and systemd
 
 * `systemctl` - system control
-  * enables the control of the systemd init daemon
-  * subcommands:
-    * `status`, `start`, `stop`, `restart`, `enable`, `disable` - speak for themselves 
-    * `set-default`   - set the default target for the system to use on boot
-    * `isolate`       - force the system to immedaitely change tot he provided target 
-    * `mask`          - prevent the provided unit file from being enabled or activated
-    * `daemon-reload` - reload the systemd init daemon, including all unit files
+  * Utility for controlling the systemd init daemon
+  * **Options**:
+    * `status`, `start`, `stop`, `restart`, `enable`, `disable` - speak for themselves. All used in conjunction with a service or unit 
+    * `set-default`         - set the default boot target for the system to use on boot, e.g. when you want to change the root password
+    * `isolate`             - force the system to immediately change to the provided target 
+    * `mask`/ `unmask`      - prevent/ enable the provided unit file from being enabled or activated
+    * `list-unit-files`     - Showing all the unit files used on the system and their status
+    * `cat <unit>`          - Read current unit configuration. Show the contents & absolute path of a unit file
+    * `show`                - Show all available configuration parameters
+    * `edit <name.service>` - edit service configuration
+    * `daemon-reload`       - reload the systemd init daemon, including all unit files. Best for when your need to reapply the configuration after editing 
+
+### **Targets**
+* A target is group of services
+  * Besides the four boot targets mentioned previously, there's a bunch more
+  * But you cannot put your system into that target
+  * e.g. Bluetooth.target
+* `systemctl` options for managing targets:
+  * `start name.target`         
+  * `isolate name.target`           
+  * `list-dependencies`         
+  * `get-default`         
+  * `set-default`         
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 * `sysv` specific management: 
   * `/etc/init.d`
@@ -658,10 +700,9 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * Chunks of compiled code that can be used in programs to accomplish common tasks
   * **Shared libraries**
     * Enabels more modular program builds and reduce time when compiling the software
-    * `/usr/lib` - general access
-    * `/lib`    - essential binary access
-  * `ldd {options} <program library>` - view shared library dependencies for a porgram
-  *
+    * `/usr/lib`  - general access
+    * `/lib`      - essential binary access
+  * `ldd <binary>` - view shared library dependencies for a porgram
 
 ### Software troubleshooting
 * **Package mananger config file**
