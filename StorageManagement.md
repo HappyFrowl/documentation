@@ -108,7 +108,7 @@
 
 * `mkfs.<type> /dev/sd#` - make file system
     - Build a filesystem on a hard disk partition
-        - e.g. `mkfs.ext2/3/4` & `mkfs.xfs` and `mkfs.btrfs`
+        - e.g. `mkfs.ext2/3/4` / `mkfs.xfs` / `mkfs.btrfs`
     - Some options:
         - `-v` - verbose
         - `-c` - check for bad blocks before building the file system
@@ -117,7 +117,6 @@
     * inform the OS of partition table changes
     * This updates the kernels with changes that now exist within the partition table
     * It eliminates the necessity to reboot the system
-
 
 * `/etc/fstab` - file system table
     - Dictates how mounting happens at startup.
