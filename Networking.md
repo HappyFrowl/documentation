@@ -123,6 +123,7 @@
         * `-p` - print the process using the 
         * `-4 | -6` - print ipv4 / ipv6 connection
         * `sport == : <port> and dport == : <port>` - specify specific ports
+        * `-tunap` - Shows everything that is being offered by services
 
 - `nmap` - network mapper
     - Look for devices on the network and open ports on devices.
@@ -143,22 +144,19 @@
 
 - `/etc/hosts`
     - Hosts file.
+    - Local hostnames and IPs.
     - Essentially a simplified local DNS.
     - Add an IP with a name here, and you can ping that name.
 
-- `/etc/hosts`
-    - Local hostnames and IPs.
-
 - `/etc/resolv.conf`
-    - File containing the IP address of one or more DNS servers
-    - Set DNS name server to perform DNS queries.
+    - This file contains the IP of the DNS server(s).
     - This cannot be modified when using DHCP.
 
 - `/etc/nsswitch`
     - Name service switch
-    - File containing a couple different configurations
-    - Specifies which name servers are looked up and in what order.
-    - The ‘hosts’ section is most important:
+    - This file specifies the order of host name resolution mechanisms
+        - Specifies which name servers are looked up and in what order.
+    - The `hosts` section is most important:
         - First, it looks in `/etc/hosts`, then DNS.
 
 - `getent hosts`
