@@ -542,7 +542,7 @@ Conditional expressions in shell scripting allow you to evaluate strings, files,
 
 * `git push` - push code to the remote repo
   * `git push --set-upstream origin <name>` - link the remote to the current branch. This is done as the initial push, after which it is remembered
-    * `git push -u <remote-repo> <local-repo>` - `-u` is synonym for `--set-upstream` 
+  * `git push -u <remote-repo> <local-repo>` - `-u` is synonym for `--set-upstream` 
 
 * `git pull` - fetch branch from a remote repo
 
