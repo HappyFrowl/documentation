@@ -8,6 +8,8 @@
 - [System Monitoring](#system-monitoring)
 - [Log Management](#log-management)
 - [Application management](#application-management)
+- [Task Automation](#task-automation)
+
 
 ## Kernel management
 
@@ -348,6 +350,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 
 
 ## Localization and time 
+
 * **`iconv`** - convert 
   - Convert text from one encoding to another
   - `iconv -f utf-8 -t iso_8653-1 < file.txt > output.txt`
@@ -362,16 +365,19 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   - Print and configure locale settings
   - Region-specific settings, including language and country formats.
 
-- **`cat /etc/timezone`**
-  - View current timezone
-  
-- **`/etc/localtime`**
-  - Current timezone configuration
-  - File is symlinked to the appropriate timezone file
-  - File cannot be read since it is a binary 
 
-- **`tzselect`**
-  - Select a timezone
+### Time
+- **`hwclock`** - hardware clock
+  - View and set the hardware clock
+  - Hardware time is measured on the motherboard using a battery
+  - Best practice is to keep it in sync with universal time 
+
+- **`timedatectl`**
+  - print or set local time, universal time, time zone, ntp info, etc. 
+  - this command should three clocks
+    - local time      - local current time
+    - Universal time  - UTC/ GMT
+    - RTC time        - Hardware clock as measured by the motherboard
 
 - **`date`** - print or set date and time
   - options:
@@ -386,17 +392,19 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     - `+%x` - print date representation based on the locale
     - `+%S` - print time representation based on the locale
     - `+%Y` - print year 
+  - Mainly good for printing time, not for setting it, use `timedatectl` for that 
 
-- **`timedatectl`**
-  - print or set local time, universal time, time zone, ntp info, etc. 
-  - this command should three clocks
-    - local time      - local current time
-    - Universal time  - UTC/ GMT
-    - RTC time        - Hardware clock as measured by the motherboard
+- **`tzselect`**
+  - Select a timezone
 
-- **`hwclock`** 
-  - View and set the hardware clock
-  - Best practice is to keep it in sync with universal time 
+- **`cat /etc/timezone`**
+  - View current timezone
+  
+- **`/etc/localtime`**
+  - Current timezone configuration
+  - File is symlinked to the appropriate timezone file
+  - File cannot be read since it is a binary 
+
 
 ### NTP
 * **Configure NTP *server*:**
@@ -411,9 +419,6 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   - 
 
     
-
-
-
 ## Process management
 
 - `ps` - Lists running processes.
@@ -422,6 +427,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     - `a` - displays all user-triggered processes
     - `u` - list proceses along with the username and start time
     - `x` - include processes without a terminal
+    - `fax` - shows parent child relationship 
   - Processes in **square brackets** are system or kernel processes.
 
 - `pgrep <process name>` - process grep
@@ -726,3 +732,45 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     * Identify what dependencies are required
 
 
+## Task Automation 
+
+* `at`
+  - Execute commands at a specified time by reading them from `STDIN` or a file.
+  - All jobs scheduled to run at the same time are executed simultaneously.
+  - Great tool for **one-time** tasks
+  - `at <options> <time>`
+    - `-m` - send mail to user
+    - `-M` - prevent sending mail to user
+    - `-f <file name>` - Execute a file 
+    - `-t <time>` - Run the job at the specified time
+  - Time can be given in words and text
+    - `Noon`
+    - `Teatime` - 4 PM
+    - `Midnight`
+    - `3 minutes from now`
+    - `1 hr from now`
+  - `echo "command" | at -m 1000`: Schedule a command to execute at 10 AM.
+    - The result will be mailed to the user. If no mail server is available, check logs in `/var/log/syslog`.
+  - `atq`: Check the list of scheduled jobs
+  - `atrm <job_id>`: Remove a scheduled job
+  - **Access Control**:
+    - `/etc/at.deny`: Users listed here cannot use `at`
+    - `/etc/at.allow`: Users listed here can use `at`. Overrides `at.deny` if present.
+
+* `batch`
+  - Similar to `at`, but jobs are executed only if the system load drops below 1.5 or a specified threshold set in `atd`.
+  - Jobs are executed sequentially, not simultaneously.
+
+* **Cron**
+  - Schedules recurring jobs at specified times and intervals.
+  - Best for repetitive tasks
+  - Works by command `crontab <options> <file / user>`
+    - `-e` - Edit or create scheduled jobs.
+    - `-l` - List current cron jobs.
+    - `-r` - Delete current crontab file
+    - `-u` - Create crontab file for the specified user
+  - **Access Control**:
+    - `/etc/cron.allow`: List of users who can use cron. Overrides `/etc/cron.deny`.
+    - `/etc/cron.deny`: List of users who cannot use cron.
+  - **Configuration**:
+    - Similar access rules as `at`.
