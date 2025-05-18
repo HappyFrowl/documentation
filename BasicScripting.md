@@ -1,10 +1,7 @@
-# Linux Commands and Features
-
+# Basic Linux command and Scripting
 - [Basic commands](#Basic-commands)
 - [Streams and Redirection](Streams-and-Redirection)
-- [if Statements](if-Statements)
 - [Vim](#vim)
-- [Task Automation](#task-automation)
 - [Git](#git)
 - [Basic shell scripting](#basic-shell-scripting)
 
@@ -267,40 +264,6 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
 
 
 
-
-
----
-
-## `if` Statements
-
-Conditional expressions in shell scripting allow you to evaluate strings, files, and directories. Below are some commonly used conditions.
-
-**String Conditions:**
-- **`-z <string>`**:  
-  True if the length of `<string>` is zero.
-- **`-n <string>`**:  
-  True if the length of `<string>` is non-zero.
-- **`<string1> = <string2>`**:  
-  True if `<string1>` is equal to `<string2>`.
-- **`<string1> != <string2>`**:  
-  True if `<string1>` is not equal to `<string2>`.
-- **`<string>`**:  
-  True if `<string>` is not empty.
-
-
-**File and Directory Conditions:**
-- **`-e <file>`**:  
-  True if `<file>` exists.
-- **`-f <file>`**:  
-  True if `<file>` exists and is a regular file.
-- **`-d <directory>`**:  
-  True if `<directory>` exists and is a directory.
-- **`-x <file>`**:  
-  True if `<file>` exists and is executable.
-- **`-s <file>`**:  
-  True if `<file>` exists and has a size greater than zero.
-
-
 ---
 
 
@@ -371,48 +334,6 @@ Conditional expressions in shell scripting allow you to evaluate strings, files,
 
   * `vimtutor` - command for opening the vim learning module 
 
-## Task Automation 
-
-* `at`
-  - Execute commands at a specified time by reading them from `STDIN` or a file.
-  - All jobs scheduled to run at the same time are executed simultaneously.
-  - Great tool for **one-time** tasks
-  - `at <options> <time>`
-    - `-m` - send mail to user
-    - `-M` - prevent sending mail to user
-    - `-f <file name>` - Execute a file 
-    - `-t <time>` - Run the job at the specified time
-  - Time can be given in words and text
-    - `Noon`
-    - `Teatime` - 4 PM
-    - `Midnight`
-    - `3 minutes from now`
-    - `1 hr from now`
-  - `echo "command" | at -m 1000`: Schedule a command to execute at 10 AM.
-    - The result will be mailed to the user. If no mail server is available, check logs in `/var/log/syslog`.
-  - `atq`: Check the list of scheduled jobs
-  - `atrm <job_id>`: Remove a scheduled job
-  - **Access Control**:
-    - `/etc/at.deny`: Users listed here cannot use `at`
-    - `/etc/at.allow`: Users listed here can use `at`. Overrides `at.deny` if present.
-
-* `batch`
-  - Similar to `at`, but jobs are executed only if the system load drops below 1.5 or a specified threshold set in `atd`.
-  - Jobs are executed sequentially, not simultaneously.
-
-* **Cron**
-  - Schedules recurring jobs at specified times and intervals.
-  - Best for repetitive tasks
-  - Works by command `crontab <options> <file / user>`
-    - `-e` - Edit or create scheduled jobs.
-    - `-l` - List current cron jobs.
-    - `-r` - Delete current crontab file
-    - `-u` - Create crontab file for the specified user
-  - **Access Control**:
-    - `/etc/cron.allow`: List of users who can use cron. Overrides `/etc/cron.deny`.
-    - `/etc/cron.deny`: List of users who cannot use cron.
-  - **Configuration**:
-    - Similar access rules as `at`.
 
 
 ## git
@@ -600,10 +521,38 @@ filepath="/home/user/projects/myproject/file.txt"
 
 ```
 
+### Conditional Statements
+* Conditional expressions in shell scripting allow you to evaluate strings, files, and directories. Below are some commonly used conditions.
+  * if ... then ... fi
+  * while ... do ... done
+  * until ... do ... done
+  * case ... in ... esac
+  * for ... in ... do ... done
 
+**if statements**
+  * **String Conditions:**
+    - **`-z <string>`**:  
+      True if the length of `<string>` is zero.
+    - **`-n <string>`**:  
+      True if the length of `<string>` is non-zero.
+    - **`<string1> = <string2>`**:  
+      True if `<string1>` is equal to `<string2>`.
+    - **`<string1> != <string2>`**:  
+      True if `<string1>` is not equal to `<string2>`.
+    - **`<string>`**:  
+      True if `<string>` is not empty.
 
-
-
+* **File and Directory Conditions:**
+  - **`-e <file>`**:  
+    * True if `<file>` exists.
+  - **`-f <file>`**:  
+    * True if `<file>` exists and is a regular file.
+  - **`-d <directory>`**:  
+    * True if `<directory>` exists and is a directory.
+  - **`-x <file>`**:  
+    * True if `<file>` exists and is executable.
+  - **`-s <file>`**:  
+    * True if `<file>` exists and has a size greater than zero.
 
 
  
