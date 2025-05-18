@@ -198,7 +198,10 @@
         - **ChrootDirectory** - Reference a chroot jail path for a user 
         - **AllowUsers/AllowGroups** - Enable user-specific access by allowing the specified users or groups access over SSH 
         - **DenyUsers/DenyGroups** - Restrict the specified users or groups from accessing the server over SSH
-        - **PermitRootLogin** - Enable or disable the abiltiy for the root user to log in over SSH (best not to). 
+        - **PermitRootLogin** - Enable or disable the abiltiy for the root user to log in over SSH (best not to).
+    - Remember to open the port on the firewall when changing the default port 
+        - `ufw` for Ubuntu
+        - `firewall` for RHEL 
 
 ### Configuring SSH client
 - `/etc/ssh/ssh.config`
@@ -210,15 +213,22 @@
 - `ssh-keygen`
     - Generate a public / private key pair
     - `ssh-keygen -t <ed25519> -f <path/to/file>`
-- `ssh-copy-id <IP>`
+- `ssh-copy-id <server IP>`
     - Copy and add the public key to a remote computer's `~/.ssh/authorized_keys` file
     - Enter the password of the account on the remote PC.
     - Once done, you can SSH without entering a password.
 - `ssh-add` 
     - Add the default SSH keys in `~/.ssh` to the ssh-agent
-    - Add private key identities to the SSH key agent
+    - Add private key identities to the SSH key agent on the ssh key client
+- `ssh-agent`
+    - Having a passphrase on the ssh key is secure, but it requires to be entered each time when you connect to a server
+    - That is inconvenient
+    - Using `ssh-agent` the passphrase can be cached for the duration of the bash session
+    - Workflow
+       - `ssh-agent /bin/bash`
+       - `ssh-add` 
 - `ssh -X`
-    - X11 forwarding.
+    - X11 forwarding
 
 
 
