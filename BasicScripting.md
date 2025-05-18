@@ -4,8 +4,9 @@
 - [Streams and Redirection](Streams-and-Redirection)
 - [if Statements](if-Statements)
 - [Vim](#vim)
-- [Task Autoanmtion](#task-automation)
+- [Task Automation](#task-automation)
 - [Git](#git)
+- [Basic shell scripting](#basic-shell-scripting)
 
 
 ## Basic commands
@@ -243,6 +244,12 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
     command > file 2>&1
     ```
 
+  - `<<` 
+    - Used in conjunction with `cat << EOF`
+    - It allows for printing multiple lines
+    - Can be used as well to print multiple lines into a file
+    - `cat << EOF > file.txt`
+
 
 - **`xargs`**: Process input line by line.
   - Example:
@@ -292,7 +299,6 @@ Conditional expressions in shell scripting allow you to evaluate strings, files,
   True if `<file>` exists and is executable.
 - **`-s <file>`**:  
   True if `<file>` exists and has a size greater than zero.
-
 
 
 ---
@@ -409,14 +415,6 @@ Conditional expressions in shell scripting allow you to evaluate strings, files,
     - Similar access rules as `at`.
 
 
-
-
-
-
-
-
-
-
 ## git
 
 ### **git basics**
@@ -514,7 +512,6 @@ Conditional expressions in shell scripting allow you to evaluate strings, files,
   * 
     * 
 
-
 ### git history and rewrites
 * `git rebase` 
   * Commonly used to "move" an entire branch to another base, creating copies of the commits in the new location
@@ -551,7 +548,6 @@ Conditional expressions in shell scripting allow you to evaluate strings, files,
   * not into the working area, like `git pull`
   * `git pull` = `git fetch` + `git merge`
 
-
 ### Github specific
 
 * `gh repo` - github specific commands
@@ -568,6 +564,41 @@ Conditional expressions in shell scripting allow you to evaluate strings, files,
   * `git remote set-url origin git@github.com:<username>/<repo>.git`
 
 
+## Basic shell scripting
+
+### Pattern-matching operator
+* All about cleaning up strings
+* This occur when the string provided contains too much information 
+* So, the purpose of a pattern mathcing operator is to clean up a string
+* It is performed against a variable
+* `${1#}` prints the string length of `$1`
+* `${1#string}` removes the **shortest match** of string from the **front end** of `$1`
+* `${1##string}` removes the **longest match** of string from the **front end** of `$1`
+* `${1%string}` removes the **shortest match** of string from the **back end** of `$1`
+* `${1%%string}` removes the **longest match** of string from the **back end** of `$1`
+```
+filename="backup_2025-05-18.tar.gz"
+
+| Expression         | Matches                  | Removes                  | Result                     |
+|--------------------|---------------------------|---------------------------|----------------------------|
+| `${filename#*.}`   | Shortest from front       | `backup_2025-05-18.`      | `tar.gz`                   |
+| `${filename##*.}`  | Longest from front        | `backup_2025-05-18.tar.`  | `gz`                       |
+| `${filename%.*}`   | Shortest from back        | `.gz`                     | `backup_2025-05-18.tar`    |
+| `${filename%%.*}`  | Longest from back         | `.tar.gz`                 | `backup_2025-05-18`        |
+
+
+# another example 
+
+filepath="/home/user/projects/myproject/file.txt"
+
+| Expression           | Matches                    | Removes                                | Result                               |
+|----------------------|-----------------------------|-----------------------------------------|--------------------------------------|
+| `${filepath#*/}`     | Shortest `*/` from front     | `/`                                     | `home/user/projects/myproject/file.txt` |
+| `${filepath##*/}`    | Longest `*/` from front      | `/home/user/projects/myproject/`        | `file.txt`                           |
+| `${filepath%/*}`     | Shortest `/*` from back      | `/file.txt`                             | `/home/user/projects/myproject`      |
+| `${filepath%%/*}`    | Longest `/*` from back       | everything after first `/`              | *(empty)*                            |
+
+```
 
 
 
