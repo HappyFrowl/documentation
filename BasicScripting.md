@@ -528,7 +528,7 @@ filepath="/home/user/projects/myproject/file.txt"
   * until ... do ... done
   * case ... in ... esac
   * for ... in ... do ... done
-
+ 
 **if statements**
   * **String Conditions:**
     - **`-z <string>`**:  
