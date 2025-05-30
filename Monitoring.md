@@ -1,7 +1,7 @@
 # Monitoring
 - [System logging](#system-logging)
 - [Syslog](#syslog)
-- [Systemd logging](#systemd-logging)
+- [Systemd-journald](#systemd-journald)
 
 ## System logging
 * **File locations**
@@ -23,17 +23,17 @@
   * Practice of creating new versions of a log file
   * Allows you to add or modify the configuration for individual log rotations.
   * Configuration files can be found in `/etc/logrotate.d`
+    * Define execeptions
   * `logrotate`
     * Program used to perform log rotation
 
 
 ## Syslog 
 - Message logging standard.
-- Completely separate and different from `systemd` 
-  * `systemd` logging is stuff like `journalctl`
+- Completely separate and different from `systemd journald` 
 * **Syslog versions**
   - `syslogd` - The original 
-  - `syslog-ng` - Improved syslogd 
+  - `syslog-ng` - Improved syslogd, compatible with the `syslogd` service
   - `rsyslogd` - Remote Syslog - latest and most used version of syslog. Allows for remote use of syslog
 * Syslog log files are stored in `/var/log`
 
@@ -41,18 +41,21 @@
   * A syslog message usually has two values attach to it. 
   * Both are just numbers, but then represent different things and used to filter traffic
     * **Facility**
+      * Define the item for which logging is happening
       * Tied to a service
       * They range from 1 to 23 
-      * Some are pre-programmed, e.g. 15 for cron, others are local 
+      * Some are pre-programmed, e.g. `15` for `cron`, others are local 
     * **Severity** 
+      - Define the severity levels in which case messages should be logged
       - 8 severity numbers, 0 to 7
       - emerg, alert, crit, err, warning, notice, info, debug
- 
+    * **Modules**
+      * Can be used to handle log input and log output
   - Syslog separates into different components:
-  - **Message generator**: The software or process that generates the message.
-  - **Message storage**: The storage location of the log message.
-  - **Message reporter**: The system that reports the message.
-  - **Message analysis**: Analyzing the logs for relevant information.
+    - **Message generator**: The software or process that generates the message.
+    - **Message storage**: The storage location of the log message.
+    - **Message reporter**: The system that reports the message.
+    - **Message analysis**: Analyzing the logs for relevant information.
 
 * **Syslog configuration**
   * `/etc/rsyslog.conf`
@@ -61,7 +64,9 @@
       * Add line at the bottom 
       * Something like: `*.* @@<IP>:514`
     * ***Receive* logging from servers**
-      * Uncomment `#$ModLoad imtcp` and `#$InputTCPServerRun 514`
+      * Uncomment the lines with `UDP or TCP syslog reception`
+      * Do not forget to allow the ports on the firewall
+      * Check whether it  work using `sudo ss -tulnp | grep 514` 
     * **Configure syslog rules**
       * The rule structure is in a two column format
         * First column lists message facilities and/or severities
@@ -71,27 +76,36 @@
 
 
 
-## Systemd logging
-* `journald` - journal daemon
+## Systemd-journald
+* The logging option offered by systemd
+  * `journald` can be used in conjunction with `rsyslogd`
+* **journald configuration**
+  * `/etc/systemd/journald.conf` is the config file for systemd journal
+  * systemd journal is not always set to be persistent
+  * To make sure it is, ensure `Storage=auto` is entried in the above mentioned config file
+  * Then, a persistent journal will be created after creating a directory in `/var/log/journal`
+    * If this folder exists, journald is writing logs to disk to this folder, if the folder is not there, journald writes to RAM
+  * Make sure to trigger systemd to reload its configuration with `systemctl restart systemd-journal-flush.service`
+  * Or just reboot
+* **journald commands**
+  * Logs can be queried using `systemctl status <unit>`
+    * Or in their entirety with `journalctl`
   * `journalctl` - command line utility to control journald
-  * Query and print logs 
-  * Logs are collected by `systemd` 
-  * `journald` can be used in conjunction with `syslogd` or `rsyslogd`
-* **Commonly used commands:**
-  * `-n {number of lines}` - specify number of lines printed
-  * `-o <output format>` - specify output format
-  * `-f` - print nmost recent entries
-  * `-p` - filter log by severity
-  * `-u` - filter log output by name of the service
-  * `-b` - Displays messages since the last boot.
-  * `--since "2 days ago"` - Logs from 2 days ago.
-  * `-xeu [service name]` - {-x} Augment log lines with explanation texts from the message catalog. {-e} Immediately jump to the end of the journal inside the implied pager tool
-  * `PID=<#number>` - look for a specific process ID
-* Configuration
-  * `/etc/systemd/journald.conf`
-  * `storage=auto` means it is writing logs persistently to the default journald log folder `/var/log/journal/`
-  * If this folder exists, journald is writing logs to disk to this folder, if the folder is not there, journald writes to RAM
+    * Query and print logs 
+  * **Commonly used commands:**
+    * `-n {number of lines}` - specify number of lines printed
+    * `-o <output format>` - specify output format
+    * `-f` - print nmost recent entries
+    * `-p` - filter log by severity
+    * `-u` - filter log output by name of the service
+    * `-b` - Displays messages since the last boot.
+    * `--since "2 days ago"` - Logs from 2 days ago.
+    * `-xeu [service name]` - {-x} Augment log lines with explanation texts from the message catalog. {-e} Immediately jump to the end of the journal inside the implied pager tool
+    * `PID=<#number>` - look for a specific process ID
 
+
+
+---
 
 * `last`
   * Print the user's history of loging and logout events
