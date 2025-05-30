@@ -76,22 +76,47 @@
 
 - `ifconfig` - interface configuration 
     - Display or configure network interfaces.
-    - `ifconfig interface_name ip_address` - assign an IP ddress to an interface
-        - Changes are non-persistent between reboots
+    - Changes are non-persistent between reboots
+    - Old, obsolete
     
 * `ifdown / ifup` - interface down / up 
-    - Bring an interface down or up 
+    - Bring an interface down or up
 
 - `ip` - IP address
-    - `ip a` - same as ifconfig
-    - `ip link set <interface> (up|down)` - bring an interface up or down. Same as `ifdown`/ `ifup`
-    - Changes are non-persistent
+    - Changes made with `ip` are non-persistent
+    - **Options**:
+        - `ip a` - same as ifconfig
+        - `ip link show` - show available interfaces. This does not show the IP address etc as `ip a` does
+        - `ip link set <interface> (up|down)` - bring an interface up or down. Same as `ifdown`/ `ifup`
+        - `ip a add` - add interface configuration      
+        - `ip r` - show configured routes. This also shows the default gateway
+
+* `ethtool` - 
+    * Query or control network driver and hardware settings
+    * Display and modify Network Interface Controller (NIC) parameters
+    * legacy tool
+
+* `lshw` - list hardware
+    * `lshw -class network`
 
 * `route` - Show route tables.
     - Like `ip` changes made with `route` are not persistent
     - `route -n` - Show the IP addresses, rather than `default`
     - `route add -net <ip> netmask <netmask> gw <gw_address>` - add a route rule
     - `route add default gw <ip>` - add a default gateway
+
+* **Adding persistent routes**
+    * **On Ubuntu**: 
+        * Add persistent static routes to the `/etc/netplan/*.yaml` file
+        * add a section
+        ```bash
+        routes:
+        - to: 10.8.0.0/16
+            via: 192.168.1.1
+        ```
+    * **On RedHat**
+        * Use `nmcli connection modify <connection-name> +ipv4.routes "<dest> <router>"`
+        * e.g.: `nmcli connection modify wlp4s0 +ipv4.routes 10.8.0.0/16 192.168.1.1` 
 
 * `ping` 
 
