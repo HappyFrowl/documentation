@@ -1,10 +1,9 @@
 # System Administration
 - [Kernel management](#kernel-management)
 - [Boot Process and GRUB Management](#boot-process-and-grub-management)
-- [Linux System Components](#linux-system-components)
 - [Localization and Time](#Localization-and-time)
 - [Process Management](#Process-management)
-- [Service Management](#service-management)
+- [systemd Management](#systemd-management)
 - [System Monitoring](#system-monitoring)
 - [Log Management](#log-management)
 - [Application management](#application-management)
@@ -51,7 +50,7 @@
   * Manages devices by controlling device access and in interfacing between user apps and hardware devices on the computer
 
 
-**Kernel modules**
+### **Kernel modules**
 * `/usr/lib/modules` contains the modules of different kernel versions
 * the parent directory is specific to a specific kernel version
 * The kernel modules are stored in `./kernel`, e.g.
@@ -63,8 +62,24 @@
 * `lsmod` - list modules
   * List all currently loaded kernel modules
 
+* `modprobe` - module probe
+  * Add or remove modules from the Linux Kernel
+  * options:
+    * `-a` - add a module. This is the default use of `modprobe`, so even running it without `-a` adds a module
+    * `-r` - remove or unload a module
+    * `-f` - force adding or removing
+    * `-s` - print errors to syslog
+    * `-n` - dry run
+  * To add modules by default into the kernel each time the system boot add the module name to 
+    * `/etc/modules`
+  * To prevent modules from being loaded into the kernel, add them to a `blacklist` file in 
+    * `/etc/modprobe.d`
+
 * `modinfo` - module information
   * display information about a specific module 
+
+* `depmod` - dependency modules
+  * Generate the modules.dep kernel module depenencies file
 
 * `insmod` - insert module
   * install a module into the kernel
@@ -74,28 +89,41 @@
 * `rmmod` - remove module
   * removes a module from the kernel
 
-* `modprobe` - module probe
-  * Add or remove modules from the Linux Kernel
-  * options:
-    * `-a` - add a module. This is the default use of `modprobe`, so even running it without `-a` adds a module
-    * `-r` - remove a module
-    * `-f` - force adding or removing
-    * `-s` - print errors to syslog
-    * `-n` - dry run
-  * To add modules by default into the kernel each time the system boot add the module name to 
-    * `/etc/modules`
-  * To prevent modules from being loaded into the kernel, add them to a `blacklist` file in 
-    * `/etc/modprobe.d`
 
-* `sysctl` - system control
-  * Interface to dynamically change kernel paramters
+### Tuning the kernel
+* The `/proc` pseudo filesystem is used for kernel tuning and optimization
+* This can be done by modifying specific kernel parameters directly
+* This is not persistent however
+* **`procfs`**
+  * The `/proc` directory is a directory that is backed up by the **virtual file system** `procfs`
+  * `/proc` is the mount point for procfs, meaning that all files and directories inside `/proc` come from `procfs`
+  * `procfs` is a pseudo-filesystem, meaning it doesn’t store real files on disk but instead dynamically presents system and process-related information.
+  - **Purpose**: 
+    * Provides an interface to kernel data structures.  
+    - Mounted at `/proc` and allows user space to query or control the kernel.  
+    - Presents information about:  
+      - Processes  
+      - System information  
+  - **Examples**:  
+    - `/proc/cpuinfo`     - CPU details 
+    - `/proc/meminfo`     - memory usage
+    - `/proc/cmdline`     - contains options passed by GRUB during boot
+    - `/proc/devices`     - contains a list of character and block device drivers loaded into the currently running kernel
+    - `/proc/filesystems` - contains a list of file systems types that are supported by the kernel
+    - `/proc/modules`     - contains informatiokns about modules currently installed on the system
+    - `/proc/stat`        - contains various statistics about hte system's last reboot
+    - `/proc/version`     - specifies several points of informations about the Linux Kernel. Similar to `uname`
+  * All the numbers shown in the directory are process IDs. Inside them you will find process info that can be shown by `ps` as well
+
+* `sysctl` - sys control
+  * Not be confused with `systemctl`
+  * Interface to dynamically change kernel parameters **persistently** 
   * Kernel parameters are stored in `/proc/sys`
   * Kernel parameters can be configured to:
     * Improve performance
     * Harden security
     * Configure networking limitations
     * Change virtual memory settings 
-    * etc
   * options: 
     * `-a`                    - print all parameters and the current values
     * `-w <parameters=value>` - set a parameter value 
@@ -103,41 +131,45 @@
     * `-e`                    - ignore errors
   * `/etc/sysctl.conf` enables configuration changes to a running Linux kernel
 
-* **`procfs`**
-  * The `/proc` directory is a directory that is backed up by the **virtual file system** `procfs`
-    * `/proc` is the mount point for procfs, meaning that all files and directories inside `/proc` come from `procfs`
-    * `procfs` is a pseudo-filesystem, meaning it doesn’t store real files on disk but instead dynamically presents system and process-related information.
-    - **Purpose**: 
-      * Provides an interface to kernel data structures.  
-      - Mounted at `/proc` and allows user space to query or control the kernel.  
-      - Presents information about:  
-        - Processes  
-        - System information  
-    - **Examples**:  
-      - `/proc/cpuinfo`     - CPU details 
-      - `/proc/meminfo`     - memory usage
-      - `/proc/cmdline`     - contains options passed by GRUB during boot
-      - `/proc/devices`     - contains a list of character and block device drivers loaded into the currently running kernel
-      - `/proc/filesystems` - contains a list of file systems types that are supported by the kernel
-      - `/proc/modules`     - contains informatiokns about modules currently installed on the system
-      - `/proc/stat`        - contains various statistics about hte system's last reboot
-      - `/proc/version`     - specifies several points of informations about the Linux Kernel. Similar to `uname`
 
-* `dmesg` - display / driver messages
-  * Prints messages that have been sent to the kernel's mesasge during andd after system boot
-  * Drivers can also send diagnostics messages to the kernel when they encounter errors
-  * Great for troubleshooting and driver validation
-
+### Managing Devices 
 * **`sysfs`**
   - **Type**: Virtual Filesystem  
   - **Purpose**: Exposes kernel device and subsystem information to user space.  
-    - Mounted at `/sys` and provides a structured way to view and manipulate kernel objects.  
+    - Mounted at `/sys` and provides information about devices and their attributes
     - Presents information about:  
       - Various kernel subsystems  
       - Hardware devices  
       - Drivers  
   - **Example**:  
     - Check `/sys/class/net` for network interface details.
+  - **Commands**
+    - `udevadm` is the command that provides an interface to query device information from `/sys`
+
+
+* **`udev`**
+  - **Type**: Device Manager  
+  - **Purpose**: Responsible for dynamically managing device nodes in the `/dev/` directory.  
+    - Device nodes represent hardware devices like disks, USB drives, network interfaces, and more.  
+  - **Capabilities**:  
+    - Low-level access to the Linux device tree  
+    - Handles user-space events (e.g., loading firmware, adding hardware)  
+  - **Example**:  
+    - Access is provided by a temporary filesystem (`tmpfs`) mounted to `/dev/`
+
+
+
+
+
+* **`devtmpfs`**
+  - **Type**: Virtual Filesystem  
+  - **Purpose**: Automatically populates the `/dev` directory with device nodes at boot, which are then managed by `udev`.  
+  - **Example**:  
+    - Handles module loading for hardware devices
+
+
+
+
 
 * **`tmpfs`**
 - **Type**: Temporary Filesystem  
@@ -145,11 +177,10 @@
 - **Example**:  
   - The `/tmp` directory is often mounted as `tmpfs`.
 
-* **`devtmpfs`**
-- **Type**: Virtual Filesystem  
-- **Purpose**: Automatically populates the `/dev` directory with device nodes at boot, which are then managed by `udev`.  
-- **Example**:  
-  - Handles module loading for hardware devices
+* `dmesg` - display / driver messages
+  * Prints messages that have been sent to the kernel's mesasge during andd after system boot
+  * Drivers can also send diagnostics messages to the kernel when they encounter errors
+  * Great for troubleshooting and driver validation
 
 
 ## Boot process and GRUB management
@@ -158,8 +189,7 @@
 Before going into the actual boot process, first some notes on some important components of the boot process.
 The main components of the boot process are: BIOS/UEFI, which will be taken as general knowledge, the Linux kernel, discussed above,`initrd` and `grub2`, which will be discussed here. 
 
-* `initrd` - initial ram disk 
-  * `initrd` is a root file system that is temporarily loaded into memory upon system boot 
+* `initrd` - initial ram disk boot 
     * It is a temporary file system 
   * The bootloader starts the OS by using `initrd` - see below
   * `initfs` - initial file system - is the successor of `initrd`  
@@ -192,7 +222,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * GRUB knows three important files/ directories:
     *  `grub.cfg`
       * File containing the main config for GRUB 
-      * However, it is never edited itself; use scripts instead
+      * However, it is never edited itself; edit `/etc/default/grub` instead - see below
       * It is located at 
         * `/boot/grub/grub.cfg`               - BIOS
         * `/boot/efi/EFI/<distro>/grub.cfg`   - UEFI
@@ -206,43 +236,49 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
       * Contains GRUB2 display menu settings that are read by the `/etc/grub.d` scripts
       * This file must be saved to the boot folder `/boot/grub2`. 
       * To generate a new or update an existing `grub.cfg`, run:  
-        * In RHEL: `sudo grub2-mkconfig -o <location>/grub.cfg`
-        * In Ubuntu: `sudo update-grub2` 
+        * In RHEL-based systems: `sudo grub2-mkconfig -o /boot/path/to/grub.cfg`
+        * In Debian-based systems: `sudo update-grub2` 
 
 
 ### **The Boot Process**
 
 **1. BIOS/ UEFI**
+* When a machine is powered on, the CPU is hardwired to execute boot code stored in ROM.
 * CPU checks the BIOS/UEFI firmware
-* BIOS/UEFI runs POST 
-    * Power On Self Test 
-    * Tests whether all hardware pieces are working properly 
-    * If there is an error it is shown on the screen 
-* BIOS/UEFI checks for bootable media
+* BIOS/UEFI is loaded from NVRAM
+* BIOS/UEFI probes for hardware
+  * BIOS/UEFI runs POST 
+      * Power On Self Test 
+      * Tests whether all hardware pieces are working properly 
+      * If there is an error it is shown on the screen 
+* BIOS/UEFI checks for bootable media and the user must select one
     * Hard drive 
     * USB 
     * CD 
     * PXE 
     * NFS
-  * BIOS/UEFI loads the primary boot loader from the MBR or GPT, and loads the partition table with it
+  * EFI system partition is identified
+  * BIOS/UEFI loads the primary boot loader from the MBR or GPT, and loads the partition table with 
 
 
 **2. GRUB2** 
 * GRUB2 selects the OS 
-* GRUB2 determines the kernel and locate the kernel binary on the disk  
+* GRUB2 determines the kernel and locates the kernel binary on the disk  
 * GRUB2 loads the kernel into memory and runs the kernel code 
 
-
 **3. Linux Kernel** 
-* Once the kernel is loaded into memory, the kernel takes to finish the startup process 
-* The kernel checks the hardware and decompresses the `initrd` image to load the hardware drivers and other device drivers into memory 
+* Kernel is loaded
+* Kernel data structures get instantiated
+* Kernel checks the hardware and decompresses the `initrd` image to load the hardware drivers and other device drivers into memory 
 * Virtual devices such as RAID and LVM are initialized here
-* The kernel mounts the main root partition and releases unused memory back into the system
+* Kernel mounts the main root partition and releases unused memory back into the system
 * This starts `init` as the first process 
 
 
 **4. init** - Initialization system 
-* Background on `init`
+* init executes startup scripts
+
+* **Background on `init`**
   * `init` brings up and maintains user space services 
   * Init is the first process run by Linux, so it always has process ID 1
   * For many distros, `**systemd**` is the used init system 
@@ -319,28 +355,12 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 
 ## Linux system Components
 
-**udev**
-- **Type**: Device Manager  
-- **Purpose**: Responsible for dynamically managing device nodes in the `/dev/` directory.  
-  - Device nodes represent hardware devices like disks, USB drives, network interfaces, and more.  
-- **Capabilities**:  
-  - Low-level access to the Linux device tree  
-  - Handles user-space events (e.g., loading firmware, adding hardware)  
-- **Example**:  
-  - Access is provided by a temporary filesystem (`tmpfs`) mounted to `/dev/`
-
 **dbus**
 - **Type**: Inter-Process Communication System  
 - **Purpose**: Facilitates communication between applications and system services.  
   - Allows processes to send messages to each other.  
 - **Example**:  
   - Applications like `NetworkManager` use D-Bus to communicate with the system's networking stack.
-
-**cgroups**
-- **Type**: Resource Management Subsystem  
-- **Purpose**: Limits, prioritizes, and accounts for resources (CPU, memory, I/O) used by groups of processes.  
-- **Example**:  
-  - Docker and Kubernetes use `cgroups` to manage container resource allocation.
 
 **FUSE** - Filesystem in User Space 
 - **Type**: Virtual Filesystem Framework  
@@ -539,23 +559,18 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * `nohup.script.sh` 
 
 
-## Service management
-**Service**
+## systemd management
+### **Managing Services**
+* Services:
   * Running programs or processes that provide support for requests and monitoring from other processes or external clients
   * e.g., postfix, apache, and systemd
-
 * `systemctl` - system control
   * Utility for controlling the systemd init daemon
   * **Options**:
     * `status`, `start`, `stop`, `restart`, `enable`, `disable` - speak for themselves. All used in conjunction with a service or unit 
     * `set-default`         - set the default boot target for the system to use on boot, e.g. when you want to change the root password
-    * `isolate`             - force the system to immediately change to the provided target 
     * `mask`/ `unmask`      - prevent/ enable the provided unit file from being enabled or activated
     * `list-unit-files`     - Showing all the unit files used on the system and their status
-    * `cat <unit>`          - Read current unit configuration. Show the contents & absolute path of a unit file
-    * `show`                - Show all available configuration parameters
-    * `edit <name.service>` - edit service configuration
-    * `daemon-reload`       - reload the systemd init daemon, including all unit files. Best for when your need to reapply the configuration after editing 
 
 ### **Targets**
 * A target is group of services
@@ -563,13 +578,81 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * But you cannot put your system into that target
   * e.g. Bluetooth.target
 * `systemctl` options for managing targets:
-  * `start name.target`         
-  * `isolate name.target`           
+  * `start <target.type>`         
+  * `isolate <target.type>`           
   * `list-dependencies`         
   * `get-default`         
   * `set-default`         
 
+### * **Editing systemd units**
+* `systemctl show <unit.type>`
+  * Print all editable parameters
+* **`man systemd.directives`**
+  * Look up information on the parameters
+* `systemctl cat <unit.type>`
+  * Show the currently configured parameters
+* `systemctl edit <unit.type>`
+  * edit the unit 
+* `daemon-reload`
+  * Reload the systemd init daemon, including all unit files. 
+  * Required when needing to reapply theconfiguration after using `systemctl edit`
 
+### systemd sockets
+* A socker is used witha service to start the service when traffic comes in on a specific socket
+* In other words: sockets are listeners that trigger service startup on incoming traffic
+  * e.g.: sshd.socket / sshd.service
+* The service and socket files need to have the same name 
+* `systemctl list-unit-files  -t socket`
+  * This just print all units with `-[t]ype` socket
+* Custom sockets can be created easily. 
+  * Just tell them what to monitor and what to start when they detect incoming traffic
+  * Note: the socket and service must have the same name
+  * Create a `servicename.socket` under `/lib/systemd/system`
+
+### systemd timers
+* `systemctl cat logrotate.timer`
+  * When logrotate triggers 
+* `systemctl cat fstrim.timer`
+  * When fstrim triggers
+* It basically replaces cron jobs
+* To create it, create a file in `/lib/systemd/systemd`
+
+### Control groups
+* cgroups place resources in controllers that represent the type of resource
+* Common default controllers are: cpu, memory, blkio
+* These controlelrs are dubdivided ina  tree structure where differenw eights or limits are applied to each branch
+  * Each of thewse branches is a cgroup
+  * One or more processes are assigned to a cgroup
+* Cgroups can be applied from the commnad line or from systemd
+  * Manual creation happened through the **`cgconifg`** service and the **`cgred`** process
+* Docker and Kubernetes use `cgroups` to manage container resource allocation
+* 
+ 
+ ### Depdendency management
+ * Different statements can be used in hte unit sectiopn to define unit file dependencies:
+  * **before**: This unit starts before the specified unit 
+  * **after**: This unit starts when the specified unit is started
+  * **requires**: when this unit starts, the unit listed here is also started. If the specified unit fails, this one also fails
+  * **wanted**:  when this unit starts, the unit listed here is also started
+* To create such a dependency:
+  * `systemctl edit <name.service>`
+  * add lines
+  ```bash
+  [Unit]
+  Requires=other.service
+  ```
+* Targets  are better for a more consistent dependency management
+
+### systemd self-healing
+* Get service to restart when they get into a failed state
+* To configure:
+  * `systemctl edit <service>`
+  * add lines
+  ```bash
+  [Service]
+  Restart=always
+  RestartSec=<TimeInSeconds>
+  ```
 
 
 

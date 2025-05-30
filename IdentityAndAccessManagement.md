@@ -3,6 +3,7 @@
 - [user and group management](#user-and-group-management)
 - [PAM configuration](#pam-configuration)
 - [File permissions and ownership](#file-permissions-and-ownership)
+- [LDAP](#ldap)
 
 ## user and group management
 

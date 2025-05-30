@@ -1,9 +1,9 @@
 # Basic Linux command and Scripting
 - [Basic commands](#Basic-commands)
 - [Streams and Redirection](Streams-and-Redirection)
+- [Basic shell scripting](#basic-shell-scripting)
 - [Vim](#vim)
 - [Git](#git)
-- [Basic shell scripting](#basic-shell-scripting)
 
 
 ## Basic commands
@@ -95,7 +95,7 @@
   - **`pgrep`** - get PID for a running process
 
 * **options:**
-  * `-i` - ignore case
+  * `-i` - ignore case. Otherwise `grep` is **case sensitive**
   * `-v` - show lines that **do not** match pattern
   * `-l` - list file names that contain pattern, without showing matching lines
   * `-A5` - show line that matches pattern as well as 5 lines after 
@@ -106,8 +106,7 @@
 * **`sed`** - Stream Editor
   - Replace characters in a regular expression.
   - Syntax:
-    ```bash
-    sed 's/<pattern>/<replacement>/' <file>
+    `sed 's/<pattern>/<replacement>/' <file>`
 
 * **`awk`** - pattern scanning and text processing language
 
@@ -184,8 +183,6 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
 - `{min,max}`: Matches the preceding element between `min` and `max` times.
 
 
-
-
 * **Environment and Basics**
   - **`env`**: Display user environment variables (temporary, only for the session).
   - **`pwd`**: Print working (current) directory.
@@ -197,8 +194,6 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
       ```
     - Defaults back after logout.
 
-
-
 - `set` - set shell options     
     - `-e` - exit on fail 
     - `-o` - Set a option 
@@ -209,9 +204,6 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
         - So for `ls` it shows `ls --colour=auto` 
         - `+o <option>`  
          
-
-
-
 
 ## Stream manipulation
 - **Streams**:
@@ -266,6 +258,75 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
 
 ---
 
+## Basic shell scripting
+
+### Pattern-matching operator
+* All about cleaning up strings
+* This occur when the string provided contains too much information 
+* So, the purpose of a pattern mathcing operator is to clean up a string
+* It is performed against a variable
+* `${1#}` prints the string length of `$1`
+* `${1#string}` removes the **shortest match** of string from the **front end** of `$1`
+* `${1##string}` removes the **longest match** of string from the **front end** of `$1`
+* `${1%string}` removes the **shortest match** of string from the **back end** of `$1`
+* `${1%%string}` removes the **longest match** of string from the **back end** of `$1`
+```
+filename="backup_2025-05-18.tar.gz"
+
+| Expression         | Matches                  | Removes                  | Result                     |
+|--------------------|---------------------------|---------------------------|----------------------------|
+| `${filename#*.}`   | Shortest from front       | `backup_2025-05-18.`      | `tar.gz`                   |
+| `${filename##*.}`  | Longest from front        | `backup_2025-05-18.tar.`  | `gz`                       |
+| `${filename%.*}`   | Shortest from back        | `.gz`                     | `backup_2025-05-18.tar`    |
+| `${filename%%.*}`  | Longest from back         | `.tar.gz`                 | `backup_2025-05-18`        |
+
+
+# another example 
+
+filepath="/home/user/projects/myproject/file.txt"
+
+| Expression           | Matches                    | Removes                                | Result                               |
+|----------------------|-----------------------------|-----------------------------------------|--------------------------------------|
+| `${filepath#*/}`     | Shortest `*/` from front     | `/`                                     | `home/user/projects/myproject/file.txt` |
+| `${filepath##*/}`    | Longest `*/` from front      | `/home/user/projects/myproject/`        | `file.txt`                           |
+| `${filepath%/*}`     | Shortest `/*` from back      | `/file.txt`                             | `/home/user/projects/myproject`      |
+| `${filepath%%/*}`    | Longest `/*` from back       | everything after first `/`              | *(empty)*                            |
+
+```
+
+### Conditional Statements
+* Conditional expressions in shell scripting allow you to evaluate strings, files, and directories. Below are some commonly used conditions.
+  * if ... then ... fi
+  * while ... do ... done
+  * until ... do ... done
+  * case ... in ... esac
+  * for ... in ... do ... done
+ 
+**if statements**
+  * **String Conditions:**
+    - **`-z <string>`**:  
+      True if the length of `<string>` is zero.
+    - **`-n <string>`**:  
+      True if the length of `<string>` is non-zero.
+    - **`<string1> = <string2>`**:  
+      True if `<string1>` is equal to `<string2>`.
+    - **`<string1> != <string2>`**:  
+      True if `<string1>` is not equal to `<string2>`.
+    - **`<string>`**:  
+      True if `<string>` is not empty.
+
+* **File and Directory Conditions:**
+  - **`-e <file>`**:  
+    * True if `<file>` exists.
+  - **`-f <file>`**:  
+    * True if `<file>` exists and is a regular file.
+  - **`-d <directory>`**:  
+    * True if `<directory>` exists and is a directory.
+  - **`-x <file>`**:  
+    * True if `<file>` exists and is executable.
+  - **`-s <file>`**:  
+    * True if `<file>` exists and has a size greater than zero.
+
 
 ## vim 
 * `vim` is a powerful text editor in Linux with two primary modes: **Command Mode** and **Insert Mode**.
@@ -284,6 +345,7 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
   - **`l`** - Move right.
   - **`j`** - Move down.
   - **`k`** - Move up.
+  
   - **`/`** - Search forward.
     - Use **`n`** for the next occurrence.
   - **`?`** - Search backward.
@@ -333,6 +395,10 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
   * **`:se number`** - show line numbers
 
   * `vimtutor` - command for opening the vim learning module 
+
+### Good shit
+* `:%s/<oldstring>/<newstring>/g`
+  * replace **all** occurrences of `oldstring` by `newstring`
 
 
 
@@ -483,81 +549,5 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
 
 * For re-authentication, e.g. for another project
   * `git remote set-url origin git@github.com:<username>/<repo>.git`
-
-
-## Basic shell scripting
-
-### Pattern-matching operator
-* All about cleaning up strings
-* This occur when the string provided contains too much information 
-* So, the purpose of a pattern mathcing operator is to clean up a string
-* It is performed against a variable
-* `${1#}` prints the string length of `$1`
-* `${1#string}` removes the **shortest match** of string from the **front end** of `$1`
-* `${1##string}` removes the **longest match** of string from the **front end** of `$1`
-* `${1%string}` removes the **shortest match** of string from the **back end** of `$1`
-* `${1%%string}` removes the **longest match** of string from the **back end** of `$1`
-```
-filename="backup_2025-05-18.tar.gz"
-
-| Expression         | Matches                  | Removes                  | Result                     |
-|--------------------|---------------------------|---------------------------|----------------------------|
-| `${filename#*.}`   | Shortest from front       | `backup_2025-05-18.`      | `tar.gz`                   |
-| `${filename##*.}`  | Longest from front        | `backup_2025-05-18.tar.`  | `gz`                       |
-| `${filename%.*}`   | Shortest from back        | `.gz`                     | `backup_2025-05-18.tar`    |
-| `${filename%%.*}`  | Longest from back         | `.tar.gz`                 | `backup_2025-05-18`        |
-
-
-# another example 
-
-filepath="/home/user/projects/myproject/file.txt"
-
-| Expression           | Matches                    | Removes                                | Result                               |
-|----------------------|-----------------------------|-----------------------------------------|--------------------------------------|
-| `${filepath#*/}`     | Shortest `*/` from front     | `/`                                     | `home/user/projects/myproject/file.txt` |
-| `${filepath##*/}`    | Longest `*/` from front      | `/home/user/projects/myproject/`        | `file.txt`                           |
-| `${filepath%/*}`     | Shortest `/*` from back      | `/file.txt`                             | `/home/user/projects/myproject`      |
-| `${filepath%%/*}`    | Longest `/*` from back       | everything after first `/`              | *(empty)*                            |
-
-```
-
-### Conditional Statements
-* Conditional expressions in shell scripting allow you to evaluate strings, files, and directories. Below are some commonly used conditions.
-  * if ... then ... fi
-  * while ... do ... done
-  * until ... do ... done
-  * case ... in ... esac
-  * for ... in ... do ... done
- 
-**if statements**
-  * **String Conditions:**
-    - **`-z <string>`**:  
-      True if the length of `<string>` is zero.
-    - **`-n <string>`**:  
-      True if the length of `<string>` is non-zero.
-    - **`<string1> = <string2>`**:  
-      True if `<string1>` is equal to `<string2>`.
-    - **`<string1> != <string2>`**:  
-      True if `<string1>` is not equal to `<string2>`.
-    - **`<string>`**:  
-      True if `<string>` is not empty.
-
-* **File and Directory Conditions:**
-  - **`-e <file>`**:  
-    * True if `<file>` exists.
-  - **`-f <file>`**:  
-    * True if `<file>` exists and is a regular file.
-  - **`-d <directory>`**:  
-    * True if `<directory>` exists and is a directory.
-  - **`-x <file>`**:  
-    * True if `<file>` exists and is executable.
-  - **`-s <file>`**:  
-    * True if `<file>` exists and has a size greater than zero.
-
-
- 
-
-
-
 
 
