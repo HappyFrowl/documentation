@@ -167,10 +167,6 @@
   - **Example**:  
     - Handles module loading for hardware devices
 
-
-
-
-
 * **`tmpfs`**
 - **Type**: Temporary Filesystem  
 - **Purpose**: A memory-based filesystem used for temporary data storage that does not persist after reboot.  
@@ -355,12 +351,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 
 ## Linux system Components
 
-**dbus**
-- **Type**: Inter-Process Communication System  
-- **Purpose**: Facilitates communication between applications and system services.  
-  - Allows processes to send messages to each other.  
-- **Example**:  
-  - Applications like `NetworkManager` use D-Bus to communicate with the system's networking stack.
+
 
 **FUSE** - Filesystem in User Space 
 - **Type**: Virtual Filesystem Framework  
@@ -559,6 +550,83 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * `nohup.script.sh` 
 
 
+### Resource Limits
+* POSIX resource limits
+  * `ulimit` - user limit 
+    * limits the system resources for a user in a Linux-based server
+    * It applies persistent `ulimit` settings to `/etc/security/limits.conf`    
+      * Soft limits can be modified by the users
+      * Hard limits implement an absolute ceiling
+    * **Commands**
+      * `ulimit -n 512`   - limit for max open files is put for a particular user
+      * `ulimit -a`       - see all currently  limits configured
+
+* PAM resource limits
+  * `pam_limits` 
+  * Applied from PAM session to configure **persistent** limits
+  * It works with `/etc/security/limits.conf` and `/etc/security/limits.d/*.conf`
+  * For the how to, see `man 5 limits.conf`
+    * For example: limit the amount of concurrent logins (`maxlogins`) for a certain group or user
+
+
+* Cgroup resource limits
+  * Cgroups place resource in controllers that represent the type of resource, like cpu, memory, blkio
+    * By default, processes get an equal amount of resources
+    * Cgroups are used to limit the availability of resources using limits and weights
+    * Integrated with systemd
+    * systemd uses 3 slices to identity resource types:
+      * System for system services and daemons
+      * VMachine for VMs and containers
+      * User for user sessions
+  * See below on its own section
+
+### Inter-Process Communication
+* This is about how different processes communicate with each other in user space
+* Current options are:
+  * **Remote Procedure Calls (RPC)**
+  * **D-Bus**
+* IPC mechanisms:
+  * **Shared files:** two programs read/write to a shared file
+  * **Shared memory with semaphores:** values in memory that can be tested and set by mutliple programs
+  * **Named and unnamed pipes:** output of one program is used as input by another
+  * **Message queues:** One process writes to the queue, multiple processes can access
+  * **Sockets:** Local or network port used for communication
+  * **Signals:** Signals that are generated to alert processes
+* Commands:
+  * `ipcs` - show information on IPC facilities
+  * `ipcs -p` - see names of processes using these system v IPCs
+  * `ipcsc` - Print summary of usage of all IPC resource types
+
+
+* **D-Bus**  
+  * Modern way of managing IPC
+  * Applications like `NetworkManager` use D-Bus to communicate with the system's networking stack.
+
+
+### Managing Out-of-Memory
+* **OOM**
+  * When a Linux system runs out of memory, the OOM killer activates and kills the process with the highest OOM score
+  * What process this is, can be manipulated
+  * `/proc/sysrq-trigger` provides commands that can be used for testing specific functionality
+  * In some distro's it is disabled
+  * Commands:
+    * `echo 1 > /proc/kernel/sys/rq` - enable full functionality 
+    * `echo h > /proc/sysrq-trigger` - print sysrq-trigger help
+    * `dmesg` - see the help output
+    * `echo f > /proc/sysrq-trigger` - trigger the OOM killer
+    * `journalctl | grep -A 10 "Out-of-Memory"` - Monitor what has happened
+
+
+### I/O Monitoring
+* `top` 
+  * Check the `weight` parameter
+* `iotop`
+  * top like interface for I/O
+* `vmstat` 
+  * Print various statistics about virtual memory, CPU, and I/O 
+  * See section of system monitoring
+
+
 ## systemd management
 ### **Managing Services**
 * Services:
@@ -618,15 +686,14 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 * To create it, create a file in `/lib/systemd/systemd`
 
 ### Control groups
-* cgroups place resources in controllers that represent the type of resource
+* Cgroups place resources in controllers that represent the type of resource
 * Common default controllers are: cpu, memory, blkio
 * These controlelrs are dubdivided ina  tree structure where differenw eights or limits are applied to each branch
-  * Each of thewse branches is a cgroup
-  * One or more processes are assigned to a cgroup
+  * Each of thewse branches is a Cgroup
+  * One or more processes are assigned to a Cgroup
 * Cgroups can be applied from the commnad line or from systemd
   * Manual creation happened through the **`cgconifg`** service and the **`cgred`** process
-* Docker and Kubernetes use `cgroups` to manage container resource allocation
-* 
+* Docker and Kubernetes use `cgroups` to manage container resource allocation 
  
  ### Depdendency management
  * Different statements can be used in hte unit sectiopn to define unit file dependencies:
@@ -692,7 +759,6 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * print free memory space 
   * it uses the `/proc/meminfo` file
 
-
 * `lscpu` - list cpu 
   * list cpu information
 
@@ -706,8 +772,6 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 * `iostat` - input-output statistics
   * Report statistics for devices and partitions.
   * Display a report of CPU and disk statistics since system startup
-
-
 
 ## Log management
 * `rsyslog`
