@@ -157,10 +157,6 @@
   - **Example**:  
     - Access is provided by a temporary filesystem (`tmpfs`) mounted to `/dev/`
 
-
-
-
-
 * **`devtmpfs`**
   - **Type**: Virtual Filesystem  
   - **Purpose**: Automatically populates the `/dev` directory with device nodes at boot, which are then managed by `udev`.  
@@ -265,20 +261,20 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 **3. Linux Kernel** 
 * Kernel is loaded
 * Kernel data structures get instantiated
-* Kernel checks the hardware and decompresses the `initrd` image to load the hardware drivers and other device drivers into memory 
+* Kernel checks the hardware, and decompresses the `initrd` or `initramfs` image to load the hardware drivers and other device drivers into memory \
+  * `initramfs` contains all the drivers
 * Virtual devices such as RAID and LVM are initialized here
 * Kernel mounts the main root partition and releases unused memory back into the system
 * This starts `init` as the first process 
 
-
 **4. init** - Initialization system 
-* init executes startup scripts
+* init/ systemd executes startup scripts
 
 * **Background on `init`**
   * `init` brings up and maintains user space services 
   * Init is the first process run by Linux, so it always has process ID 1
   * For many distros, `**systemd**` is the used init system 
-      * Another is `sysv` or `upstart`
+      * Others are `sysv` and `upstart`
       * `systemd` was spearheaded by RedHat 
   * `systemd` is a collection of units (e.g. services, mounts, etc) 
       * Systemctl, journalctl, loginct, notify, analyze, cgls, cgtop, nspawn 
@@ -292,7 +288,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 
 ### **Run levels**
 * Way of booting the system 
-* Only used in **SysV** systems, not in Systemd systems
+* Only used in **SysV** systems, not in systemd systems
 * take particular note of run level 1 - single user mode
   * this boots the system into a single user mode, requiring no password
   * THIS is the way to reset the root's password 
@@ -322,10 +318,10 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * Boot targets are particularly useful when troubleshooting the system, especially when it does not want to boot properly.
   * Some targets are isolatable which ameans that you can use them to defined the state your system should be started in 
 * There's **four** of them:
-  * emergency.target  - minimal environment, no services, only a root shell   
-  * rescue.target     - single-user mode with basic services, **used to change root password**
-  * multiuser.target  - multi-user mode with no GUI
-  * graphical.target  - multi-user mode with GUI
+  * **emergency.target** - minimal environment, no services, only a root shell   
+  * **rescue.target**    - single-user mode with basic services, **used to change root password**
+  * **multiuser.target** - multi-user mode with no GUI
+  * **graphical.target** - multi-user mode with GUI
 * Besides these, there are **two** targets that are not **boot targets**
   * These are: 
     * poweroff.target
@@ -348,17 +344,17 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
       - Temporarily change the boot target
       - this takes effect immediately
 
-
-## Linux system Components
-
-
-
-**FUSE** - Filesystem in User Space 
-- **Type**: Virtual Filesystem Framework  
-- **Purpose**: Allows non-privileged users to create and manage filesystems in user space.  
-- **Example**:  
-  - Filesystems like `SSHFS` or `NTFS-3G` use FUSE.
-
+### Troubleshooting the boot process
+* If the **bootloader** does not show or load
+  * Then you need a rescue disk
+  * This is new copy of installation disk of the Linux distro
+  * From there you can access a prompt through which you can access the hard drive and troubleshoot or reinstall grub2
+* If grub2 is shown, but the **kernel** is not
+  * Make changes to the **grub2 menu** so that it loads the OS properly
+* If **systemd** is not loading
+  * Use `init=/bin/bash` if systemd is not loading at all
+  * Use `emergency.target` or even `rescue.target` if systemd is loading but there are still issues
+  * Both can be added as kernel parameters in the **grub2 menu**
 
 ## Localization and time 
 
@@ -781,8 +777,6 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * 
 
 
-
-
 ## Application management
 
 ### RedHat-based systems
@@ -793,7 +787,8 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * `-v` - verbose
   * `-h` - print hash marks to indicate a progress bar
   * `-V` - verify software components
-  * `-q` - list information about package
+  * `-q` - query whether package is installed
+  * `-f` - file, often used together, `-qf` querying a file. Identify owner of a file and show version of the package
   * `-U` - upgrade and install
   * `-F` - refreshen *installed* packages
 
