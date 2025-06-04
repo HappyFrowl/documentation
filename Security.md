@@ -1,9 +1,9 @@
 # Host Security
 
 - [Authentication](#authentication)
-
 - [Mandatory Access Control (MAC)](#mandatory-access-control-mac)
 - [SSH](#SSH)
+- [Pluggable Authentication Modules (PAM)](#pluggable-authentication-modules-pam)
 
 
 ## Hardening
@@ -231,6 +231,64 @@
     - X11 forwarding
 
 
+## **Pluggable Authentication Modules (PAM)**
+* PAM is used to help apps make proper use of user accounts 
+  * Think programs like: Login, GDM, SSHD, FTPD
+* LDAP is one of the ways, such as W*ndws' Active Directory
+* `/etc/pam.d`
+  * PAM config files
+  * Each PAM-aware service or app will have its own file inside this directory
+  * It is here where PAM is configured
+  * Each of these files will contain directives
+  * These directives are formatted as four different things
+    * `<module interface>`
+      * Defines the functions of the authentication and authorization proocess contained within a module
+    * `<control flag>`
+      * Inidcate what should be done upon a success or failure of the module
+    * `<module name>`
+      * Finds the module that the directive is going to apply to 
+    * `<module arguments>`
+      * Additional options that can pass into the module
+
+  * Module example: **password policy directive** 
+    * `password required pam_cracklib.so retry=5`
+
+Let's dive into the three mentioned components
+1. **Module interfaces**
+  * **Account**
+    * Verifies passwords and set credentials (Kerberos tickets)
+    * May also set credentials (e.g., Kerberos tickets, tokens).
+  * **Auth**
+    * Verifies user identity, typically by prompting for and checking passwords.
+    * May also set credentials (e.g., Kerberos tickets, tokens).
+  * **Password**
+    * Handles password changes and password verification
+    * Verifies old passwords and enforces password strength policies.
+  * **Session**
+    * Manages actions that occur at the beginning and end of a user session.
+    * Examples: mounting directories, logging, setting limits, starting user-specific services.
+
+2. **Control flags**
+* This tell PAM what to do
+  * **Optional**
+    * Result is ignored unless it's the only module for the service
+  * **Required**
+    * Result must be successful for authentication to continue
+  * **Requisite**
+    * Same as Required, but is going to notify that user immediately
+  * **Sufficient** 
+    * Result is ignored upon failure
+  * **Include**
+    * Include the rules from another PAM configuration file.
+
+3. **Module Names or pam libraries**
+  * **pam_pwquality.so**
+  * **pam_history.so**
+  * **pam_tally2**
+  * **pam_faillock**
+  * **pam_ldap**
+
+  * These are located in `/lib64/security`
 
 
 
