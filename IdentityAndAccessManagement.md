@@ -1,7 +1,5 @@
 # Identity and Access Management
-
 - [user and group management](#user-and-group-management)
-- [PAM configuration](#pam-configuration)
 - [File permissions and ownership](#file-permissions-and-ownership)
 - [LDAP](#ldap)
 
@@ -143,56 +141,6 @@
   * `terminate-session <session-id>`
 - `lastlog` - print when users last logged in 
 
-## **Pluggable Authentication Modules (PAM)**
-* PAM is used to help apps make proper use of user accounts 
-  * Think programs like: Login, GDM, SSHD, FTPD
-* LDAP is one of the ways, such as W*ndws' Active Directory
-* `/etc/pam.d`
-  * PAM config files
-  * Each PAM-aware service or app will have its own file inside this directory
-  * It is here where PAM is configured
-  * Each of these files will contain directives
-  * These directives are formatted as four different things
-    * `<module interface>`
-      * Defines the functions of the authentication and authorization proocess contained within a module
-    * `<control flag>`
-      * Inidcate what should be done upon a success or failure of the module
-    * `<module name>`
-      * Finds the module that the directive is going to apply to 
-    * `<module arguments>`
-      * Additional options that can pass into the module
-
-  * Module example: **password policy directive** 
-    * `password required pam_cracklib.so retry=5`
-
-Let's dive into the four mentioned components
-* **Module interfaces**
-  * **account module**
-    * Checks user accessibility
-  * **Auth**
-    * Verifies passwords and set credentials (Kerberos tickets)
-  * **Password**
-    * Used to change and verify password
-  * **Session**
-    * Configures and manages user sessions
-
-* **Control flags**
-  * This tell PAM what to do
-  * **Optional**
-    * Module result is ignored
-  * **Required**
-    * Module result must be successful for authentication to continue
-  * **Requisite**
-    * Same as Required, but is going to notify that user immediately
-  * **Sufficient** 
-    * Module result is ignored upon failure
-
-* **Module Names**
-  * **pam_pwquality.so**
-  * **pam_history.so**
-  * **pam_tally2**
-  * **pam_faillock**
-  * **pam_ldap**
 
 
 ## File permissions and ownership
@@ -262,8 +210,9 @@ Let's dive into the four mentioned components
 
 ### **Access Control Lists**
 - More granular file control than permissions
-- set access to one or multiple directories
-- `getfacl` - Get file ACL It outputs:
+  - Set access to one or multiple directories
+  - Grant permission to more than one user and/or group 
+- `getfacl` - Get current file ACL. It outputs:
   - file, owner, group, and user/group/other permissions
 - `setfacl` - set file ACL for a user or group specifically
   - `setfacl -m u:username:rwx /path/to/file_or_directory` - give `username` read, write, and execute permissions to `file`
@@ -272,9 +221,11 @@ Let's dive into the four mentioned components
 
 
 **Attributes**
-
+* Attributes are a POSIX style of adding security to files
 - `lsattr`
   - list attibutes of files and directories
+  - Of the ones mentioned below, the `immutable` attribute is one of the most used
+  - Many other ones are not supported or used any more
 
 | Position | Attribute | Meaning                                                                |
 |----------|-----------|------------------------------------------------------------------------|
@@ -295,7 +246,7 @@ Let's dive into the four mentioned components
 | 15       | E         | Encrypted: File is encrypted (ext4 encryption).                      |
 
 
-- `chattr`
+- `chattr` 
   - Change attributes of files or directories
   - `chattr +i path/to/file_or_directory` - make a file or directory imutable to changes and deletion, even by superuser
   - `chattr -i path/to/file_or_directory` - make it mutuable again

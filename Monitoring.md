@@ -130,11 +130,6 @@
 
 
 
-
-
-
-
-
 ### `top`
 - Provides a live feed of running processes and their resource usage.
 - Useful for real-time process monitoring.
@@ -154,13 +149,13 @@
   - Higher priority (lower nice value) processes get more CPU time.
   - Long-running processes are deprioritized over time.
 
-### `nice` Command
+### `nice` command
 - Starts a new process with a specified nice value.
 - **Usage**:
   - `nice -<value> <command>`
   - Example: `nice --15 ping google.com` (sets a nice value of `-15`).
 
-### `renice` Command
+### `renice` command
 - Changes the nice value of a running process.
 - **Usage**:
   - `sudo renice -<value> -p <PID>`

@@ -285,6 +285,7 @@
 
 ### Uncomplicated firewall
 * `ufw` 
+    * The standard in Ubuntu-like distro's
     * interface for IP tables and is desgiend to simplify the process of configuring firewalls 
     * Like any firewall, allow and block traffic by port number and IP address
     * `status` - active/ inactive
@@ -309,8 +310,7 @@
 
 ### RHEL Firewall
 * `firewalld`
-    * Red Hat firewall manager
-    * Used by
+    * The standard in RHEL, and used by
         * RHEL
         * CentOS
         * Alma Linux
@@ -318,9 +318,9 @@
         * Oracle Enterprise Linux
     * **Terminology**
         * `netfilter `
-            * actual Linux firewall
-            * packet filtering code that is built-in the Linux Kernel
-            * to interact with it, a helper program is needed (e.g `iptables`, `nftables`, `firewalld`)
+            * Actual Linux firewall
+            * Packet filtering code that is built-in the Linux Kernel
+            * To interact with it, a helper program is needed (e.g `iptables`, `nftables`, `firewalld`)
         * `iptables`
             * Default firewall manager for many distros
         * `nftables`
@@ -328,11 +328,27 @@
         * `firewalld` 
             * command line frontend for `iptables` or `nftables`
             * this injects the rules into `iptables` or `nftables` 
-    * **Zones**
-        * collection of open ports for that zone
-            * Public, DMZ, block
-        * located `/etc/firewalld/zones/`
-        * by default, there always is a `public.xml` zone
+    * **`firewalld` components:**
+        * **Zones**
+            * Collection of network cards that is facing a specific direction and to which rules can be assigned
+                * For example: Public, DMZ, block
+            * Located `/etc/firewalld/zones/`
+            * By default, there always is a `public.xml` zone
+        * **Interfaces**
+            * Individual network cards
+            * Always assigned to zones
+        * **Services**
+            * An XML-based configuration that specifies ports to be opeened and modules that should be used
+        * **Forward ports**
+            * Used to forward traffic on a specific port to another port, maybe on a different machine 
+        * **Masquerading**
+            * Provides NAT
+        * **Rich rules**
+            * Extension to the `firewalld` syntax to make more complex configuration possible
+            * Create custom rules that cannot be created with the basic syntax
+            * For example: configure logging, port forwarding, masquerading, rate limiting
+            * `firewall-cmd --add-rich-rule='<rule>'` 
+            * Check `man 5 firewalld.richlanguage` for the syntax
     * **Basic commands:**
         * `firewall-cmd --add-port=8080/tcp` - open up port 8080/tcp
             * this configuration will be visible in `nft list ruleset`
