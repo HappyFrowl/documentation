@@ -347,6 +347,8 @@
             * Extension to the `firewalld` syntax to make more complex configuration possible
             * Create custom rules that cannot be created with the basic syntax
             * For example: configure logging, port forwarding, masquerading, rate limiting
+                * `sudo firewall-cmd --add-rich-rule="rule family="ipv4" source address="192.168.1.1/32" service name="ftp" accept"`
+                * This allow incoming ftp traffic from 192.168.1.1/32
             * `firewall-cmd --add-rich-rule='<rule>'` 
             * Check `man 5 firewalld.richlanguage` for the syntax
     * **Basic commands:**
