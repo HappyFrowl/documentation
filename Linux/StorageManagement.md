@@ -411,6 +411,13 @@
 * `/proc/mounts`
     * Same but more accurate and includes more up-to-date info on file systems
 
+* `smartctl` - SMART control
+    * Self-Monitoring, Analysis, and Reporting Technology
+    * Tool for tracking disk drive health, predict failures, and log error and self-tests
+    * `--health` - print overall health 
+    * `-t (short|long)` - do a disk drive test 
+    * `-all` - print all info, including test result
+
 * **ext-specific file system management tools**
     * `e2fsck`
         * file system check
@@ -467,13 +474,6 @@
 * `xfs_repair`      -  repair and recover a corrupt XFS file system
 * `xfs_db`          -  Debug the XFS file system
 
-
-* `smartctl` - SMART control
-    * Self-Monitoring, Analysis, and Reporting Technology
-    * tool for tracking disk drive health, predict failures, and log error and self-tests
-    * `--health` - print overall health 
-    * `-t (short|long)` - do a disk drive test 
-    * `-all` - print all info, including test result
 
 
 ## Logical Volume Manager
