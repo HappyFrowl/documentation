@@ -9,4 +9,5 @@ Even though the sections can be studies in any order, the suggestion is as follo
 - System Administration
 - Storage Management
 - Networking
-- Monitoring 
+- Monitoring
+- Security
