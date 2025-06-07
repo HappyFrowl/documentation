@@ -4,11 +4,12 @@
 - [File Localization](#File-localization) 
 - [File System Management](#file-system-management)
 - [RAID](#raid)
-- [Logical Volume Manager](#logical-volume-manager)
 - [Swap management](#swap-management)
+- [Logical Volume Manager](#logical-volume-manager)
 - [File sharing](#file-sharing)
 - [Archiving, Backup & Recovery](#archiving-backup--recovery)
 - [Storage Troubleshooting](#storage-troubleshooting)
+- [Remote File System Access](#remote-file-system-access)
 
 
 ## The Linux File System
@@ -422,6 +423,21 @@
     * contains a snapshot of the kernel's RAID/ md state
  
 
+## Swap management
+* `mkswap`
+    * Create swap space on a storage partition
+    * options:
+        * `-c` - check for bad sectors before making the swap space
+        * `-p` - Set the page size to be used
+        * `-L` - Active swap space using labels applied to partition or file systems
+
+* `swapon`
+    * Activate a swap partition
+
+* `swapoff`
+    * Deactivate a swap partition
+
+
 ## Logical Volume Manager
 * LVM - Logical Volume Manager
     * Tool for mapping whole physical devices and partitions into one or more virtual containers called **volume groups**
@@ -472,20 +488,6 @@
     * `lvextend`    - extends the size of logical volumes 
     * `lvresize`    - resizes logical volumes
     * `lvremove`    - removes a logical volume
-
-## Swap management
-* `mkswap`
-    * Create swap space on a storage partition
-    * options:
-        * `-c` - check for bad sectors before making the swap space
-        * `-p` - Set the page size to be used
-        * `-L` - Active swap space using labels applied to partition or file systems
-
-* `swapon`
-    * Activate a swap partition
-
-* `swapoff`
-    * Deactivate a swap partition
 
 
 ## File sharing
@@ -557,14 +559,8 @@
 
 
 
-
-
 ## Storage Troubleshooting
 
-* `ulimit` - user limit 
-    * limits teh system resources for a user in a Linux-based server
-    * `ulimit -n 512`   - limit for max open files is put for a particular user
-    * `ulimit -a`       - see all limits configured
 
 - **`df`**: - display filesystem
     * Print filesystem usage.
@@ -587,6 +583,7 @@
 
 
  
+ ## Remote File System Access
 
 
 

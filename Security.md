@@ -7,9 +7,11 @@
 
 
 ## Hardening
-* **Chroot jail**
-    * Way to isolate a process and its children from the rest of the system
-    * Change the root directory for a process, creating an isolated environment
+* `chroot` - change root
+    * AKA **chroot jail** 
+    * `chroot` is a way to isolate a process and its children from the rest of the system
+    * It basically resets the root directory for a process, creating an isolated environment
+        * This does mean that in order to run a chroot process, all the process' dependencies must be within the chrooted directory
     * This is particularly useful for system recovery, testing, and creating sandboxed environments.​
     * `chroot [options] <new root dir> [command]`
         * `chroot /home/me /usr/bin/bash`
@@ -108,10 +110,12 @@
 
 
 ## **Mandatory Access Control (MAC)**
+* MAC are various Linux security solutions 
+* The two main ones are: SELinux in RHEL-based systems and AppArmor in Ubuntu-based systems
 
 * **MAC**
     * System-enforced access control based on subject clearance and object labels
-    * Ways to restrict access to system processes into the files, directories, network, prots and other things like that
+    * In other words, ways to restrict access to system processes into the files, directories, network, prots and other things like that
     * **Context-based permissions**
         * Permission scheme fthat defines various properties for a file or process
         * Grant or deny access 
@@ -120,65 +124,101 @@
         * In DAC, each object has a list of entities that are allowed to access it
         * The object owner administrates this, using `chown`, `chmod`, etc.
 
-* **SELinux**
-    * Does not allow DAC, but enforces MAC to do its permissions and access control
-    * SELinux is the default context-based permissions scheme provided within RHEL
-    * **Three main context for each file and process**
-        * **User** - Defines what users can access the object
-                * `unconfined_u` - all users
-                * `user_u` - unprivileged users
-                * `sysadm_u` - system admins
-                * `root` - root user
-        * **Role** - permits or denies users access to domains
-            * Users can be in roles, and those roles are typically used to permit or deny access to the given domain, or objects
-            * `object_r` - role applies to files and directories
-        * **Type** - Groups objects together that have similar securtity requirements or characteristics
-            * Most important context
-            * It is a label
-        * **Level** - describes the szensitivity level called "multi-level security" 
-            * It is completely optional
-            * Further finegrained access control
-    * **Three modes** 
-        * **Disabled**     - SELinux is turned off and the DAC method will be prevalent
-        * **Enforcing**    - SELinux security policies are enforced
-        * **Permissive**   - SELinux is enabled but the security policies are not enforced. This means that processes can bypass the security policies. 
-    * **Policy types**
-        * **Targeted**  - Default SELinux policy used in RHEL. Targeted processes are run in a confined domain, those not targeted are not run in a confined domain
-        * **Strict**    - System subject and object is enforced to operate on MAC. MAC is always enforced
-    * Managing SELinux:
-        * `semanage`    - Configure SELinux policies
-        * `sestatus`    - Get SELinux status
-        * `getenforce`  - Display SELinux mode
-        * `setenforce`  - Change SELinux mode 
-        * `getsebool`   - Display the on or off status
-        * `ls-Z`        - List directory contents
-        * `ps-Z`        - list running processes
-        * `chcon`       - Change the security context of a file
-        * `restorecon`  - Restore the default security context
-    * Violation messages
-        * These occur when an attempt to access or modify an object goes against an existing policy
-        * `sealert` - alert message. Difficult to read.
-        * `audit2why` - translate the violation
-        * `audit2allow` - Used to gather information from the denied operations log        
-
-* **AppArmor**
-    * High-level overview:
-        * Normally, a user account can write to its home directory... Makes sense
-        * Often, that user can also write to other place on the hard drive. 
-        * But some user accounts are not tied to a user, but to a service, e.g. Apache
-        * Does that need to write to the whole directory
-        * AppArmor locks down what applications can do
+### **AppArmor**
+* **High-level overview:**
+    * Normally, a user account can write to its home directory... Makes sense
+    * Often, that user can also write to other place on the hard drive. 
+    * But some user accounts are not tied to a user, but to a service, e.g. Apache
+    * Does that need to write to the whole directory
+    * AppArmor locks down what applications can do
+* **Characteristics***
     * Alternative context-based permissions scheme and MAC implementation for Linux
-    * Works with file system object, rather than referencing the inodes directly as SELinux does
-    * AppArmor is much easier to administrate
+    * AppArmor works with file system object, rather than referencing the inodes directly as SELinux does
+    * It is much easier to administrate than SELinux
     * Profiles are locted in the `/etc/apparmor.d/` directory
-    * Managing AppArmor:
-        * `apparmor_status`    - Display the current status    
-        * `aa-complain`        - Place a profile in complain mode
-        * `aa-enforce`         - place a profile in enforce mode
-        * `aa-disable`         - disable profile
-        * `aa-unconfined`      - list processes with open network sockets
+* **Managing AppArmor:**
+    * `apparmor_status`    - Display the current status    
+    * `aa-complain`        - Place a profile in complain mode
+    * `aa-enforce`         - place a profile in enforce mode
+    * `aa-disable`         - disable profile
+    * `aa-unconfined`      - list processes with open network sockets
+    * `aa-...`             - All AppArmor CLI starts with aa. Just look around 
 
+
+
+
+### **SELinux**
+* SELinux is the default label-based permissions scheme provided within RHEL
+* It provides a policy that identifies which source object has access to which target object
+    * Source objects are processes
+    * Target objects are files and ports
+* **Context and labels**
+    * Context and labels are the central components of SElinux
+    * **Security context** - or just context
+        * Refers to a structured string: `user:role:type:level`
+        * It is the format/structure used to describe the SELinux security attributes of an object or process.
+    * **Labels**
+        * Is the *actual implementation* of a security context applied to an object (like a file or process)
+        * Labels are how SELinux applies and enforces security contexts
+        * Rules in a policy reference these labels to decide what actions are allowed or denied
+* **Label Components (Security Context Fields)**
+    * **User** 
+        * Defines what users can access the object — not the same as a Unix/Linux user.
+        * Examples:
+            * `unconfined_u` - all users
+            * `user_u` - unprivileged users
+            * `sysadm_u` - system admins
+            * `root` - root user
+    * **Role** 
+        * Controls what types (domains) a user or process can access.
+        * Roles are more relevant for processes and users, not as much for files.
+        * Users can be in roles, and those roles are typically used to permit or deny access to the given domain, or objects
+        * Examples:
+            * `object_r` - default role for files and other passive objects
+            * `system_r` – role for system processes
+    * **Type** - 
+        * The most important field in most SELinux configurations.
+        * Defines the domain of a process or the type of an object.
+        * Policies are mostly written as rules like:
+            * `allow httpd_t httpd_sys_content_t:file read;`
+        * Examples:
+            * `httpd_t` – domain for Apache processes
+            * `httpd_sys_content_t` – type for web content served by Apache
+    * **Level** - describes the sensitivity level called "multi-level security" 
+        * It is completely optional
+        * Further finegrained access control
+* **SELinux states**
+    * Two states
+        * `selinux=0` - disabled
+        * `selinux=` - enabled
+        * SELinux can only be enabled or disabled at boot, by adding it as a grub parameter
+* **Modes**
+    * Apart from disabled, the possible modes are:
+        * **Permissive**   - SELinux is enabled but the security policies are not enforced. This means that processes can bypass the security policies. 
+        * **Enforcing**    - SELinux security policies are enforced
+    * Change `/etc/sysconfig.selinux` contents to set persistent state 
+    * `getenforce` - get the current mode
+    * `setenforce` - set the current mode
+* **Policy types**
+    * **Targeted**  - Default SELinux policy used in RHEL. Targeted processes are run in a confined domain, those not targeted are not run in a confined domain
+    * **Strict**    - System subject and object is enforced to operate on MAC. MAC is always enforced
+* **Managing SELinux:**
+    * `sestatus`    - Get SELinux status
+    * `getenforce`  - Display SELinux mode
+    * `setenforce`  - Change SELinux mode 
+    * `getsebool`   - Display the on or off status
+    * `semanage`    - Configure SELinux policies
+        * `semanage focontext` - set context labels on files, this will write to the **policy**
+        * `semanage port` - set context labels on network ports
+    * `ls -Z`       - Get context label info on files and directories 
+    * `ps -Z`       - Get context label info on processes
+    * `chcon`       - Change the security context of a file
+    * `restorecon`  - Restore the default security context
+* Violation messages
+    * These occur when an attempt to access or modify an object goes against an existing policy
+    * `sealert` - alert message. Difficult to read.
+    * `audit2why` - translate the violation
+    * `audit2allow` - Used to gather information from the denied operations log        
 
 
 
