@@ -253,16 +253,14 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * EFI system partition is identified
   * BIOS/UEFI loads the primary boot loader from the MBR or GPT, and loads the partition table with 
 
-
 **2. GRUB2** 
 * GRUB2 selects the OS 
 * GRUB2 determines the kernel and locates the kernel binary on the disk  
 * GRUB2 loads the kernel into memory and runs the kernel code 
 
 **3. Linux Kernel** 
-* Kernel is loaded
-* Kernel data structures get instantiated
-* Kernel checks the hardware, and decompresses the `initrd` or `initramfs` image to load the hardware drivers and other device drivers into memory \
+* After the kernel is loaded, data structures are instantiated
+* Kernel checks the hardware, and decompresses the `initrd` or `initramfs` image to load the hardware drivers and other device drivers into memory
   * `initramfs` contains all the drivers
 * Virtual devices such as RAID and LVM are initialized here
 * Kernel mounts the main root partition and releases unused memory back into the system
@@ -594,18 +592,16 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * `ipcs -p` - see names of processes using these system v IPCs
   * `ipcsc` - Print summary of usage of all IPC resource types
 
-
 * **D-Bus**  
   * Modern way of managing IPC
   * Applications like `NetworkManager` use D-Bus to communicate with the system's networking stack.
-
 
 ### Managing Out-of-Memory
 * **OOM**
   * When a Linux system runs out of memory, the OOM killer activates and kills the process with the highest OOM score
   * What process this is, can be manipulated
   * `/proc/sysrq-trigger` provides commands that can be used for testing specific functionality
-  * In some distro's it is disabled
+  * In some distros it is disabled
   * Commands:
     * `echo 1 > /proc/kernel/sys/rq` - enable full functionality 
     * `echo h > /proc/sysrq-trigger` - print sysrq-trigger help
@@ -622,7 +618,6 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 * `vmstat` 
   * Print various statistics about virtual memory, CPU, and I/O 
   * See section of system monitoring
-
 
 ## systemd management
 ### **Managing Services**
@@ -719,17 +714,6 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   ```
 
 
-
-
-
-
-
-
-
-
-
-
-
 * `sysv` specific management: 
   * `/etc/init.d`
     * Directory storing initialization scripts for services
@@ -776,7 +760,6 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 
 * `logrotate`
   * 
-
 
 ## Application management
 
