@@ -1,20 +1,20 @@
 # Storage
-- [Storage and File System Basics](#storage-and-file-system-basics)
-- [Partition Management](#partition-management)
+- [Storage and Filesystem Basics](#storage-and-filesystem-basics)
+- [Disk, partition, and Filesystem management](#disk-partition-and-filesystem-management)
 - [Logical Volume Manager](#logical-volume-manager)
 - [Archiving, Backup & Recovery](#archiving-backup--recovery)
 - [Storage Troubleshooting](#storage-troubleshooting)
-- [Remote File System Access](#remote-file-system-access)
+- [Remote Filesystem Access](#remote-filesystem-access)
 
 
-## Storage and File System Basics
+## Storage and Filesystem Basics
 * **Section overview**
-    * This section will offer a brief overview over storage and file system basics
-    * It covers the Linux file system, inodes, hard and symbolic linking, how to localize files, and the essential of RAID configuration
+    * This section will offer a brief overview over storage and filesystem basics
+    * It covers the Linux filesystem, inodes, hard and symbolic linking, how to localize files, and the essential of RAID configuration
 
-### The Linux File System
+### The Linux Filesystem
 
-* To read up on the Linux file system:
+* To read up on the Linux filesystem:
     * `man hier`
 
 `/` - Root
@@ -66,7 +66,7 @@
 
 `/var` - Variable Files
 - Contains files that change while the OS is running:
-  - Logs are stored here.
+  - Logs are stored here
 
 - `/tmp` - Temporary Files
 - Stores temporary files.
@@ -75,10 +75,13 @@
 `/proc` - Process Filesystem
 - An illusionary filesystem created in memory by the Linux kernel.
 - Used to keep track of running processes.
+    - In other words, files on all running processes found with `ps aux` can be found here 
+- Other useful files are: `cpuinfo`, `meminfo`, `version`, `sysrq-trigger`
+    * More on these in the System Administration chapter
 
 ### inodes
 * **inode** - index node 
-    - it is an object storing meta deta about a file or directory on a given file system
+    - it is an object storing meta deta about a file or directory on a given filesystem
     - It contains:
       - Last time of change, access, modification.
       - Owner/permission data.
@@ -95,7 +98,7 @@
 ### Hard and Symbolic Links
 - **Hard Link**
     - A link to another file’s inode.
-    - Can only occur within the same file system.
+    - Can only occur within the same filesystem.
     - `ls -la`: Displays hard link count (second column).
     - Directories have a minimum of 2 links: one for itself and one for its parent.
     - Files have a minimum of 1 link.
@@ -105,9 +108,9 @@
   
 - **Symbolic (Soft) Link**
     - A link to another file name.
-    - Can span across different file systems.
+    - Can span across different filesystems.
     - Akin to shortcuts in Windows.
-    - Useful for linking files between file systems.
+    - Useful for linking files between filesystems.
     - Create soft links with `ln -s <sourcefile> <destfile>`.
 
 ### File localization
@@ -148,7 +151,7 @@
     * gives more info than `which`
 
 - `stat`
-    - Display file or file system status 
+    - Display file or filesystem status 
     - Output includes details like: 
     -   File name 
     -   File size 
@@ -196,7 +199,7 @@
     * options:
         * `-c` - check for bad sectors before making the swap space
         * `-p` - Set the page size to be used
-        * `-L` - Active swap space using labels applied to partition or file systems
+        * `-L` - Active swap space using labels applied to partition or filesystems
 
 * `swapon <file>`
     * Activate a swap partition
@@ -213,36 +216,37 @@
     * `swapon 
 
 
-## Partition management
+## Disk, partition, and filesystem management
 
-### The storage structure is governed by **three** main layers:
-* **Partition table** (GPT/MBT)
-    * AKA disklabel or label
-    * This defines how a disk is partitioned
-    * it is the same for the whole disk 
-    * Examples: MBR (old, limited to 2TB) and GPT (modern, supports larger disks and more partitions).
-    * Created using `parted mklabel`. See below
+### Introduction and overview
+* The storage structure is governed by **three** main layers:
+    * **Partition table** (GPT/MBT)
+        * AKA disklabel or label
+        * This defines how a disk is partitioned
+        * it is the same for the whole disk 
+        * Examples: MBR (old, limited to 2TB) and GPT (modern, supports larger disks and more partitions).
+        * Created using `parted mklabel`. See below
 
 * **Partition**
     * Section of the storage drive that logically acts as a separate drive 
     * **Partition types**
-        * Primary   - contain one file system or logical drive. Sometimes called a Volume. 
+        * Primary   - contain one filesystem or logical drive. Sometimes called a Volume. 
             * Boot partition and swap space are normally created in the primary partition
-        * Extended  - contains several file systems which are referrred to as logical drives
+        * Extended  - contains several filesystems which are referrred to as logical drives
         * Logical   - partitioned and allocated as an independent unit and functions as a seperate drive
 
-* **File system**
+* **Filesystem**
     * A data structure used by an OS to store, retrieve, organize,  and manage files and riectories on storage devices 
-    * Common file systems
+    * Common filesystems
         * ext2/3/4
             * Native Linux
         * XFS
-            * high-performance journalisting file system
+            * high-performance journalisting filesystem
             * fast recovery
             * handles large files very well
         * BTRFS
             * supports huge volumes, 16 exabytes
-    * Other file systems
+    * Other filesystems
         * ZFS
             * Comparable to btrfs, but not supported by the Linux Kernel, only through fuse
             * see VFS
@@ -250,30 +254,26 @@
             * older
             * compatible with most other OS
         * ntfs-ng
-            * Windows NRFS compatible file system
+            * Windows NRFS compatible filesystem
         * NFS
-            * Network file system
+            * Network filesystem
             * Default for file sharing 
         * CIFS
             * Common Internet File System
             * USed to access Windows shares
 
-    * **VFS** - virtual file system
-        * VFS is a generic abstraction of all file systems
-        * It sits between the kernel and the actual file systems, mediating communication between both
-        * It translates the real file system's details over to the kernel
-        * Attached to VFS are all the different file system modules
+    * **VFS** - virtual filesystem
+        * VFS is a generic abstraction of all filesystems
+        * It sits between the kernel and the actual filesystems, mediating communication between both
+        * It translates the real filesystem's details over to the kernel
+        * Attached to VFS are all the different filesystem modules
             * XFS, ext4, btrfs
-            * One special file system module is fuse - file system in user space
-                * fuse enables working with file systems that are not directly supported by the Linux kernel, such as zfs 
-        * They will be recognizible by their file system labels
+            * One special filesystem module is fuse - filesystem in user space
+                * fuse enables working with filesystems that are not directly supported by the Linux kernel, such as zfs 
+        * They will be recognizible by their filesystem labels
             * These can be up to 16 characters long
-            * `e2label` - see or change ext-based file systems
-            * `xfs_admin` - same but for XFS-based file systems 
-
-### Managing partitions and file systems 
-* `findmnt` - find mount
-    * Show all mounts on the system
+            * `e2label` - see or change ext-based filesystems
+            * `xfs_admin` - same but for XFS-based filesystems 
 
 ### Managing disks and partitions
 * `lsblk` - list block
@@ -297,8 +297,9 @@
         * nvme0n1 - first nvme disk 
     
 * `blkid` - block id
-    * print the UUID of devices 
-    * this is used to add the devices to `/etc/fstab` 
+    * Print the UUID of devices 
+    * Use this to add the devices to `/etc/fstab` for mounting devices
+    * See below on mounting
 
 * `fdisk </dev>` / `gdisk </dev>`
     * Manage partition tables and partitions on a hard disk
@@ -309,12 +310,8 @@
         * `-H` - specify number of drive heads
         * `-S` - specify number of sectors per tracks
         * `-s` - print partition size in blocks
-    * within the fdisk tool, there are several options:
-        * `g` - create gpt disk label type
-        * `p` - print disk partition info
-        * `n` - create a new partition table
-        * `w` - write the changes
-        * `q` - cancel and quit
+    * Within the `f/disk` / `gdisk` tool, there are several options:
+        * `m` or `?` - for help, displaying all options
 
 * `parted`
     * Newer standard for table and partition management of disks 
@@ -335,81 +332,124 @@
     * It eliminates the necessity to reboot the system
 
 * `/proc/partitions`
-    * contains info about each partition attached to the system
-    * contains 
+    * Contains info about each partition attached to the system
+    * Contains 
         * major     - class of device
         * minor     - divides partitions into physical devices
         * blocks    - number of physical blocks the partition takes up
         * name      
-    * similar to `lsblk  `
+    * Similar to `lsblk  `
 
+### Mounting & unmounting
 * `mount [options] <dev> <mountpoint>`  
-    * mount a file system
-    * `-t` - specify target
-    * `--mkdir` - create directory if not exists
-    * `-a` - mount all file systems defined in `/etc/fstab`
-    * options are normally added in the `/etc/fstab` file
+    * Mount a filesystem
+    * Options
+        * `-a` - mount all. Great way of testing a recently reconfigured `/etc/fstab` file
+        * `-t` - specify target
+        * `--mkdir` - create directory if not exists
+        * `-a` - mount all filesystems defined in `/etc/fstab`
+    * Mounting this way is non-persistent between reboot 
+    * While booting, the `/etc/fstab` file is processed to persistently mount filesystems
+
+* `etc/fstab` - filesystem table
+    * On modern distros, this file is processed by systemd, which converts the mount in a systemd mount
+    * If during the boot procedure, a filesystem that is specifided in `/etc/fstab` does not mount sucessfully, typically a troubleshooting prompt is shown where the error must be fixed mnaually
+    * `/etc/fstab` dictates how mounting happens at startup
+    * It describes what devices are mounted, where, and with which options.
+    * **File components**
+        * **Filesystem** - what to mount
+            * Name or UUID of the partition
+            * UUID can be found using `blkid`
+            * This is best practice, since the device name might change while the UUID stays the name
+            * *Persistent naming*
+        * **Mount points** - where to mount it
+            * Location on the filesystem where it needs to be mounted
+        * **Type** - filesystem type
+            * Type of filesystem used by the partition
+        * **Options** - mount options
+            * Set of comma-separated options that will be activated when the filesystem is mounted
+            * See below for the full list 
+        * **dump** - create backup 
+            * Legacy, do not use. Just let it be `0`
+        * **pass** - Used by `fsck` to determine the order of filesystem checks at boot
+            * Legacy, do not use. Just let it be `0`
+            * Order:
+                - `0`: No check.
+                - `1`: Root disk.
+                - `2`: After root disk 
+    * **Mount options:**
         * auto      - device must be mounted automatically
         * noauto    - device should not be mounted automatically
-        * nouser    - Only root user can mount a device or file system
+        * nouser    - Only root user can mount a device or filesystem
         * user      - all users can mount 
-        * exec      - allow binaries in a file system to be executed
-        * noexec    - do not allow binaries in a file system to be executed
-        * ro        - mount file system as read only
-        * rw        - mount file system with read/write permissions
+        * exec      - allow binaries in a filesystem to be executed
+        * noexec    - do not allow binaries in a filesystem to be executed
+        * ro        - mount filesystem as read only
+        * rw        - mount filesystem with read/write permissions
         * sync      - input and output operations should be done synchronously
         * async     - input and output operations can be done asynchronously
 
+* `findmnt` - find mount
+    * Show all mounts on the system
+    * `findmnt --verify` - verify syntax of `/etc/fstab`
+
+* **UUIDs and labels**
+    * Use UUIDs when adding devices to `/etc/fstab`
+        * This is best practice, since device names are subject to change 
+        * List the UUID through `blkid`
+    * Admins can manually assign **labels** for *persistent naming*
+        * Set labels
+            * `tune2fs -L <labelname> <device>` - setting label on ext filesystems
+            * `xfs_admin -L <name> <device>` - Same for xfs 
+        * Then, instead of using the UUID, the label can used in the `/etc/fstab`
+        * Please note, before changing the label, filesystems must be unmounted
+
+* **systemd mounts**
+    * `/etc/fstab` is used as as input file from which systemd mount units are created
+    * systemd mounts are created in `/run/systemd/generator`
+        * Mount files can be created manually as well
+        * Note: the file `-.mount` is the file for the root mount point
+            * Instead a `/` a `-` is used
+    *  A reason to use systemd mounting is the dependency management of systemd
+        * If you want the mount only to occur when certain services are running, this can be done through systemd, not `/etc/fstab`
+    * `systemctl list-unit-files --type mount` - list all unit files for mounts
+
+* **systemd automount**
+    * 
+
+
+
 * `umount <mount point>` - unmount
-    * unmount a file system
+    * unmount a filesystem
     * options
         * `-f` - force
-        * `-l` - perform a lazy unmount. File system is detached from a hierarchy, but refereneces to that file system are not cleaned up until the file system is not being used
+        * `-l` - perform a lazy unmount. Filesystem is detached from a hierarchy, but refereneces to that filesystem are not cleaned up until the filesystem is not being used
         * `-R` - recursively unmounts the directories mount points
-        * `-t <fs type>` - unmount all file system types specified
-        * `-O` - unmount only the file systems with specified options in the `/etc/fstab` file
-        * `-fake` - dryrun it
+        * `-t <fs type>` - unmount all filesystem types specified
+        * `-O` - unmount only the filesystems with specified options in the `/etc/fstab` file
+        * `--fake` - dryrun it
 
-### Managing file systems
-* `wipefs` - wipe file system
-    * Wipe the file system using the `--all </dev/>` option
+### Managing filesystems
+* `wipefs` - wipe filesystem
+    * Wipe the filesystem using the `--all </dev/>` option
     * It does not wipe the files themselves
         * Use `shred` or `dd` for that
 
-* `mkfs.<type> /dev/sd#` - make file system
+* `mkfs.<type> /dev/sd#` - make filesystem
     - Build a filesystem on a hard disk partition
         - e.g. `mkfs.ext2/3/4` / `mkfs.xfs` / `mkfs.btrfs`
     - Some options:
         - `-v` - verbose
-        - `-c` - check for bad blocks before building the file system
-
-* `/etc/fstab` - file system table
-    - Dictates how mounting happens at startup.
-    - Describes what devices are mounted, where, and with which options.
-    - **components**
-        * File system
-            * name or UUID of the partition
-            * UUID can be found using `blkid`
-        * mount points
-            * location on the file system where it needs to be mounted
-        * type
-            * type of file system used by the partition
-        * options 
-            * set of comma-separated options that will be activated when the file system is mounted
-        - **dump**: If enabled, the dump command makes a backup.
-        - **pass**: Used by `fsck` to determine the order of file system checks at boot:
-            - `0`: No check.
-            - `1`: Root disk.
-            - `2`: After root disk
+        - `-c` - check for bad blocks before building the filesystem
 
 * `/etc/crypttab` 
     * A file containing information about encrypted devices and partitions that must be unlocked and mounted on system boot
 
 * `/etc/mtab` 
-    * reports the status of currently mounted file systems
+    * reports the status of currently mounted filesystems
 
 * `/proc/mounts`
-    * Same but more accurate and includes more up-to-date info on file systems
+    * Same but more accurate and includes more up-to-date info on filesystems
 
 * `smartctl` - SMART control
     * Self-Monitoring, Analysis, and Reporting Technology
@@ -418,22 +458,22 @@
     * `-t (short|long)` - do a disk drive test 
     * `-all` - print all info, including test result
 
-* **ext-specific file system management tools**
+* **ext-specific filesystem management tools**
     * `e2fsck`
-        * file system check
+        * filesystem check
 
-    * `fsck [options] <dev/fs name>`- file system check
+    * `fsck [options] <dev/fs name>`- filesystem check
         - Check the integrity of a filesystem or repair it
         - **Note**: cannot run on mounted disks.
         - `-a` - immediately repair all damaged blocks
         - `-r` - repair
 
     * `resize2fs [options] <dev> [<size>]`
-        * resize ext2, ext3, or ext4 **file systems**
+        * resize ext2, ext3, or ext4 **filesystems**
         * leaving out the size, defaults to going max size
         
     * `tune2fs` 
-        - Used to change variable file system parameters
+        - Used to change variable filesystem parameters
             * add/ remove reserved blocks
             * alter reserve block counts
             * specify number of mounts between chjecks
@@ -441,15 +481,15 @@
             * etc  
         - `tune2fs -l` - List all options
         - `tune2fs -l <disk>` - List all details of the disk.
-        - `tune2fs <disk> -L <volume name>`: Assign a volume name to a disk.
+        - `tune2fs -L <labelname> <disk>` - Assign a label or volume name to a disk.
 
     * `dumpe2fs` 
         - Displays all super block and block group information about a disk
-        - Includes block and superblock data, and metadata about the file system
+        - Includes block and superblock data, and metadata about the filesystem
 
 * **How to's**
     * **So in order to take a used disk and repurpose it:**
-        * wipe disk using `dd` (see below). Wiping the file system without deleting the files `wipefs` works as well 
+        * wipe disk using `dd` (see below). Wiping the filesystem without deleting the files `wipefs` works as well 
         * create a new drive label with `parted mklabel` and a new partition using `parted mkpart`
         * format the partition `mkfs.<type>`
         * add formatted partition to `/etc/fstab` so it can configured by the system to run at boot up
@@ -462,19 +502,17 @@
             * `d <swap partition>`
         * `parted` - you cannot resize partition in `fdisk`
             * `resizepart <partition number> <100%>` - now the partition is resizes
-        * `resize2fs <dev>` - after expanding the partition, the file system must be expanded
+        * `resize2fs <dev>` - after expanding the partition, the filesystem must be expanded
 
 
-### XFS-specific file system management tools
+### XFS-specific filesystem management tools
 * `xfs_info`        - display details 
 * `xfs_admin`       - change the parameters 
 * `xfs_metadump`    -  Copy the superblock metadata to a file 
-* `xfs_growfs`      -  expand the XFS file system to fill the drive size
-* `xfs_copy`        -  copy the contents of the XFS file system to another location
-* `xfs_repair`      -  repair and recover a corrupt XFS file system
-* `xfs_db`          -  Debug the XFS file system
-
-
+* `xfs_growfs`      -  expand the XFS filesystem to fill the drive size
+* `xfs_copy`        -  copy the contents of the XFS filesystem to another location
+* `xfs_repair`      -  repair and recover a corrupt XFS filesystem
+* `xfs_db`          -  Debug the XFS filesystem
 
 ## Logical Volume Manager
 * LVM - Logical Volume Manager
@@ -487,7 +525,7 @@
         * Physical volumes
         * Volume Group comprising of multiple of these physical volumes
         * Virtual Volumes carved from the Volume Group
-        * File Systems created from these Virtual Volumes
+        * Filesystems created from these Virtual Volumes
     * `/dev/mapper` contains all the logical volumes on a given system managed by LVM
 
 * Physical volume tools
@@ -608,9 +646,9 @@
 
 * **`quotas`** 
     * Package for managing user quotas
-    * `quotacheck`: Scan a file system for disk usage and create/repair quota files.
+    * `quotacheck`: Scan a filesystem for disk usage and create/repair quota files.
     * `edquota`: Edit the disk quota for a user.
-        - Specifies disk usage, inode usage, and the specific file system to which it applies.
+        - Specifies disk usage, inode usage, and the specific filesystem to which it applies.
     * `quotaon`: Enable quotas and apply the configuration set in `edquota`.
     * To implement quotas:
         * modify `/etc/fstab` file
@@ -618,7 +656,7 @@
 
 
  
- ## Remote File System Access
+ ## Remote Filesystem Access
 
 
 
