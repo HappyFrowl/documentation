@@ -378,7 +378,7 @@ filepath="/home/user/projects/myproject/file.txt"
   * **`y`** - copy
   * **`p`** - paste
   * **`u`** - undo 
-  * **`ctrl+r`** - Redo
+  * **`ctrl+r`** - redo
  
 * **Additional Commands:**
   * **`/`** - Search forward for a term.

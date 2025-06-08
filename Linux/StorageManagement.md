@@ -517,24 +517,36 @@
 * `xfs_repair`      -  repair and recover a corrupt XFS filesystem
 * `xfs_db`          -  Debug the XFS filesystem
 
+
 ## Logical Volume Manager
 * LVM - Logical Volume Manager
     * Tool for mapping whole physical devices and partitions into one or more virtual containers called **volume groups**
     * Within these volume groups, are one or more logical volumes
-    * It is analogous to Storage Spaces in Windows
-    * So
-        * Bunch of disks
-        * Partitions on those disks
-        * Physical volumes
-        * Volume Group comprising of multiple of these physical volumes
-        * Virtual Volumes carved from the Volume Group
-        * Filesystems created from these Virtual Volumes
+    * Its goal is to add flexibility to the storage layer
+    * It is analogous to Storage Spaces in W*ndows
+    * LVM benefits 
+        * Easy resizing
+        * Snapshots
+        * Software RAID
+        * Thin provisioning
+        * Multi-device
+    * LVM is built up as follows: 
+        * Bunch of **disks** 
+        * **Partitions** on those block devices
+        * The partitions come together into **Physical Volumes**
+        * **Volume Groups** comprising of multiple of these physical volumes
+        * **Logical Volumes** carved from the Volume Groups
+        * **Filesystems** created from these Logical Volumes
+    * From the LVM management point of view, there are three layers:
+        * Physical Volumes (PV) represent the block devices
+        * The Volume Group (VG) represent all of the available storage
+        * The Logical Volume (LV) are created as block devices fro mthe volume group and formatted with any filesystem
     * `/dev/mapper` contains all the logical volumes on a given system managed by LVM
 
 * Physical volume tools
     * `pvscan`      - scan for all physical devices being used as physical volumes
     * `pvcreate`    - Initializes a drive or partition to use as a physical volume
-        * It all starts with this
+         * It all starts with this
         * If creating a physical volume from a physical drive, the partitions and label must be wiped first
     * `pvdisplay`   - lists attributes of physical volumes
     * `pvchange`    - changes attributes of a physical volumes
@@ -615,30 +627,28 @@
         * `count={count}`  - Specify the number of blocks to be written. Optional
         * `status={level}` - Specify information to print to standard error
     * Command examples
-        * `dd if=/dev/sdX of=/path/to/backup.img bs=4M status=progress` 
-            * Create a disk image
-        * `dd if=/dev/zero of=/dev/sd# bs=1M status=progress`
-            * Secure wipe a disk  
-        * `dd if=/dev/sda of=/backup.bak bs=446 count=1`
-            * Copy or backup a disk to a file
-        * `dd if=/dev/sda of=/dev/sdb`
-            * Copy or backup a disk to another disk   
+        * Create a disk image
+            * `dd if=/dev/sdX of=/path/to/backup.img bs=4M status=progress` 
+        * Secure wipe a disk  
+            * `dd if=/dev/zero of=/dev/sdX bs=1M status=progress`
+        * Copy or backup a disk to a file
+            * `dd if=/dev/sdX of=/backup.bak bs=446 count=1`
+        * Copy or backup a disk to another disk   
+            * `dd if=/dev/sdX of=/dev/sdX`
     * Other things you do with `dd`
         * Converting files to lowercase
         * Disk performance tests
             * measuring read / write speed
 
+* `rsync`  remote sync
+    * Already discussed in the chapter on Networking,
 
 * `mirrorvg` - Mirror volume group
     * 
 
-
-
-
 ## Storage Troubleshooting
 
-
-- **`df`**: - display filesystem
+- **`df`** - display filesystem
     * Print filesystem usage.
     * `-h` - human-readable format (e.g., MiBs, GiBs).
     * `-i` - show inodes 
@@ -658,8 +668,7 @@
         * add `,usrquota` after `defaults`
 
 
- 
- ## Remote Filesystem Access
+## Remote Filesystem Access
 
 
 

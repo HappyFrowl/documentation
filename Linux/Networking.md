@@ -222,24 +222,25 @@
 ## File & data transfer
 
 * `scp` - secure copy
-    * copying over SSH
+    * Copying over SSH
+    * `scp path/to/local_file remote_host:path/to/remote_file`
+    * Not possible to send directories
 
 * `rsync` - remote sync
-    * transfer files either to or from a remote host
-        * can also be entirely local or mounts for remote directories
-    * supports resuming transfers and only copies changes
-    * it uses the ssh protocol
-    * `rsync <file or dir> <dir2>`d
+    * Transfer files or directories either to or from a remote host
+        * It can also be entirely local or mounts for remote directories
+        * sshd must be running on the remote host
+    * Supports resuming transfers and only copies changes
+    * It uses the ssh protocol
+    * `rsync <file or dir> <dir2>`
     * `rsync <directory> -rv --dry-run user@192.168.1.10:/home/user/backup` - transfer the contents of directory recursively and verbosely to /home/user/backup on remote host with IP 192.1681.1.10, but dry run it   
-        * this is not a sync utility, for it never removes files only appends and does nothing about similarly named duplicates
+        * This is not a sync utility, for it never removes files only appends and does nothing about similarly named duplicates
     * `rsync --delete -rv <dir> <host>:<dir>` - delete all the files in the target directory that are **not** included in the source directory
     * `-a` - archive option. This makes sure the metadata (the date) is the same between directories
     * `-z` - compress files 
 
-
 * `sftp`
     * more complex
-
 
 * `curl` - client url
     * interaction with REST API

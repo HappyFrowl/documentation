@@ -179,35 +179,11 @@
 
 ### Boot components 
 Before going into the actual boot process, first some notes on some important components of the boot process.
-The main components of the boot process are: BIOS/UEFI, which will be taken as general knowledge, the Linux kernel, discussed above,`initrd` and `grub2`, which will be discussed here. 
+The main components of the boot process are: BIOS/UEFI, which will be taken as general knowledge, the Linux kernel, discussed above, the bootloader, and init,  which will be discussed here. 
 
-* `initrd` - initial ram disk boot 
-    * It is a temporary file system 
-  * The bootloader starts the OS by using `initrd` - see below
-  * `initfs` - initial file system - is the successor of `initrd`  
-  * **Features and functions** 
-    * It contains programs to perform hardware detection 
-    * It loads the necessary modules to get the actual file system mounted 
-  * `initrd` image
-    * Archive fiel that contains all the esxsential files that are required for booting the OS
-    * It can be built or customized to include additional modules, remove unnecessary ones, or update yet other ones
-    * `initrd` image is stored in the `/boot` directory
-
-* `mkinitrd` - make initial ram disk
-  * Tool for creating the `initrd` image for preloading the kernel modules
-  * options: 
-    * `--preload=<module>`  - Load a module in the `initrd` image *before* loading of other modules
-    * `--with=<module>`     - Load a module in the `initrd` image *after* loading other modules
-    * `-f`                  - Overwrite an existing `initrd` image file
-    * `-nocompress`         - Disable the compression of the `initrd` image 
-  * `mkinitrd [options] <initrd image name> <kernel version>` 
-
-* `dracut` 
-  * Tool for creating `initramfs` images to boot the Linux kernel
-  * Analogous to `mkinitrd` but applies to `initfs`
-
-* **`GRUB2`** - GRand Unified Bootloader
-  * A **boot loader** is a small program stored in ROM of which GRUB2 is an example
+### Bootloader
+* A **boot loader** is a small program stored in ROM of which GRUB2 is an example
+  * **`GRUB2`** - GRand Unified Bootloader is the currently used bootloader in most distros
   * Among other things, the boot loader enables users to choose which OS and kernel version to boot
   * Moreover, it enables configuring boot laoder through scripts'
   * GRUB knows three important files/ directories:
@@ -229,6 +205,46 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
       * To generate a new or update an existing `grub.cfg`, run:  
         * In RHEL-based systems: `sudo grub2-mkconfig -o /boot/path/to/grub.cfg`
         * In Debian-based systems: `sudo update-grub2` 
+
+### init
+* `init` is the default system for starting services in Linux
+  * it brings up and maintains user space services 
+  * Init is the first process run by Linux, so it aways has process ID 1
+* Originally introduced in UNIX System V (sysv)
+  * The kernel started `/sbin/init` and init started init scripts in `/etc/init.d`
+  * What scripts are run depends on the default runlevel
+* **Upstart** was an improvement to this implementation of init
+* Nowawdays, for many distros, `**systemd**` is the used init system 
+
+* `systemd` searches for the `default.target` file
+  * This contains details on the services that need to be started
+* Then it mounts the file system based on the `/etc/fstab` file
+* When using a `graphical.target` then the login screen is loaded and the user can log in
+
+* **`initrd` - initial ram disk boot**
+    * It is a temporary file system 
+  * The bootloader starts the OS by using `initrd` - see below
+  * `initfs` - initial file system - is the successor of `initrd`  
+  * **Features and functions** 
+    * It contains programs to perform hardware detection - device drivers or modules
+    * It loads the necessary modules to get the actual file system mounted 
+  * `initrd` image
+    * Archive file that contains all the esxsential files that are required for booting the OS
+    * It can be built or customized to include additional modules, remove unnecessary ones, or update yet other ones
+    * `initrd` image is stored in the `/boot` directory
+
+* `mkinitrd` - make initial ram disk
+  * Tool for creating the `initrd` image for preloading the kernel modules
+  * options: 
+    * `--preload=<module>`  - Load a module in the `initrd` image *before* loading of other modules
+    * `--with=<module>`     - Load a module in the `initrd` image *after* loading other modules
+    * `-f`                  - Overwrite an existing `initrd` image file
+    * `-nocompress`         - Disable the compression of the `initrd` image 
+  * `mkinitrd [options] <initrd image name> <kernel version>` 
+
+* `dracut` 
+  * Tool for creating `initramfs` images to boot the Linux kernel
+  * Analogous to `mkinitrd` but applies to `initfs`
 
 
 ### **The Boot Process**
@@ -266,33 +282,20 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 
 **4. init** - Initialization system 
 * init/ systemd executes startup scripts
-
-* **Background on `init`**
-  * `init` brings up and maintains user space services 
-  * Init is the first process run by Linux, so it always has process ID 1
-  * For many distros, `**systemd**` is the used init system 
-      * Others are `sysv` and `upstart`
-      * `systemd` was spearheaded by RedHat 
-  * `systemd` is a collection of units (e.g. services, mounts, etc) 
-      * Systemctl, journalctl, loginct, notify, analyze, cgls, cgtop, nspawn 
-      * To query all units, run: systemctl list-unit-files 
-      * Also see which are enabled, disabled, masked 
-* `systemd` searches for the `default.target` file
-  * This contains details on the services that need to be started
-* Then it mounts the file system based on the `/etc/fstab` file
-* When using a `graphical.target` then the login screen is loaded and the user can log in
+* logind is started so can you can login
 
 
-### **Run levels**
-* Way of booting the system 
-* Only used in **SysV** systems, not in systemd systems
-* take particular note of run level 1 - single user mode
-  * this boots the system into a single user mode, requiring no password
+### **Runlevels**
+* A runlevel defines how a system is started
+  * What startup scripts must be run, and therefore what services must be started 
+* It only used in sysv and upstart systems, not in systemd systems
+* Take particular note of run level 1 - single user mode
+  * This boots the system into a single user mode, requiring no password
   * THIS is the way to reset the root's password 
 
 * **For Debian-based distros:**
   * 0. halt
-  * 1. single user mode 
+  * 1. single user mode - aka rescue mode
   * 2. full, multi user, GUI if installed
   * 3. nothing
   * 4. nothing
@@ -301,16 +304,17 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 
 * **For RHEL-based distros:**
   * 0. Halt
-  * 1. single user mode
-  * 2. multi user, no net
-  * 3. mutli user, with net
+  * 1. single user mode - aka rescue mode
+  * 2. multi user, no network
+  * 3. mutli user, with network
   * 4. nothing
   * 5. multi user GUI
   * 6. reboot 
 
 
 ### **Boot Targets**
-* Boot targets are the modern equivalent of runlevels used in systemd
+* Boot targets are the modern equivalent of runlevels,
+  * They are used in systemd
   * More flexible and descriptive way of managing system states
   * Boot targets are particularly useful when troubleshooting the system, especially when it does not want to boot properly.
   * Some targets are isolatable which ameans that you can use them to defined the state your system should be started in 
@@ -319,7 +323,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * **rescue.target**    - single-user mode with basic services, **used to change root password**
   * **multiuser.target** - multi-user mode with no GUI
   * **graphical.target** - multi-user mode with GUI
-* Besides these, there are **two** targets that are not **boot targets**
+* Besides these, there are **two** targets that are not *boot* targets technically
   * These are: 
     * poweroff.target
     * reboot.target
@@ -342,16 +346,20 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
       - this takes effect immediately
 
 ### Troubleshooting the boot process
-* If the **bootloader** does not show or load
-  * Then you need a rescue disk
+* **Bootloader** does not load
+  * You need a rescue disk
   * This is new copy of installation disk of the Linux distro
   * From there you can access a prompt through which you can access the hard drive and troubleshoot or reinstall grub2
-* If grub2 is shown, but the **kernel** is not
-  * Make changes to the **grub2 menu** so that it loads the OS properly
-* If **systemd** is not loading
+* **Kernel** does not load  
+  * From the grub2 menu, make changes to the kernel boot script, viz. the parameters
+  * Probably there is some mistake in there 
+* **systemd** does not load
   * Use `init=/bin/bash` if systemd is not loading at all
   * Use `emergency.target` or even `rescue.target` if systemd is loading but there are still issues
+    * In this state, the filesystem is read-only
+    * Run `mount -o remount.rw /` to make it writeable
   * Both can be added as kernel parameters in the **grub2 menu**
+
 
 ## Localization and time 
 
