@@ -12,6 +12,7 @@
     * This section will offer a brief overview over storage and filesystem basics
     * It covers the Linux filesystem, inodes, hard and symbolic linking, how to localize files, and the essential of RAID configuration
 
+
 ### The Linux Filesystem
 
 * To read up on the Linux filesystem:
@@ -664,8 +665,8 @@
         - Specifies disk usage, inode usage, and the specific filesystem to which it applies.
     * `quotaon`: Enable quotas and apply the configuration set in `edquota`.
     * To implement quotas:
-        * modify `/etc/fstab` file
-        * add `,usrquota` after `defaults`
+        * Modify `/etc/fstab` file
+        * Add `,usrquota` after `defaults`
 
 
 ## Remote Filesystem Access

@@ -25,6 +25,7 @@
 * The scripts can be found: `/etc/sysconfig/network-scripts/`
     * Specifically, `ifcfg-<network-adapter>` is used for IP address configuration
 
+
 ###  **NetworkManager**
 - Entire suite of programs to manage networking
 - Changes made are persistent
@@ -50,6 +51,7 @@
         - `-f` - field: specific which fields you wanted printed
             - especially good in combination for scripting
         - `-p` - make it pretty - always good to use in combination with `show`
+
 
 ### Netplan
 * `netplan`
@@ -213,10 +215,9 @@
 ## DHCP
 
 * `/etc/dhcp/dhclient.conf`
-    * configuration file for DHCP
+    * Configuration file for DHCP
     * Edited using `nmcli`
     * Add line `supersede domain-name-server <IP DNS servers>`.
-
 
 
 ## File & data transfer
@@ -228,8 +229,8 @@
 
 * `rsync` - remote sync
     * Transfer files or directories either to or from a remote host
-        * It can also be entirely local or mounts for remote directories
         * sshd must be running on the remote host
+        * It can also be entirely local or mounts for remote directories
     * Supports resuming transfers and only copies changes
     * It uses the ssh protocol
     * `rsync <file or dir> <dir2>`
@@ -237,7 +238,8 @@
         * This is not a sync utility, for it never removes files only appends and does nothing about similarly named duplicates
     * `rsync --delete -rv <dir> <host>:<dir>` - delete all the files in the target directory that are **not** included in the source directory
     * `-a` - archive option. This makes sure the metadata (the date) is the same between directories
-    * `-z` - compress files 
+    * `-z` - zip or compress files 
+    * `-P` - Show the progress
 
 * `sftp`
     * more complex
@@ -308,6 +310,7 @@
         * `ufw deny out to 93.214.56.31 proto tcp port 443` - deny 443/tcp to 93.214.56.31
         * `ufw deny out on eth0 to 192.168.1.100 port 80 proto tcp` - deny based on interface
     * `delete <rule number>` - delete a firewall by specifying its number
+
 
 ### RHEL Firewall
 * `firewalld`

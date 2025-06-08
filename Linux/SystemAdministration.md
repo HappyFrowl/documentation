@@ -9,7 +9,6 @@
 - [Application management](#application-management)
 - [Task Automation](#task-automation)
 
-
 ## Kernel management
 
 **Kernel basics**:
@@ -345,6 +344,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
       - Temporarily change the boot target
       - this takes effect immediately
 
+
 ### Troubleshooting the boot process
 * **Bootloader** does not load
   * You need a rescue disk
@@ -427,7 +427,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   - `ntpdate`
     - Sync and set the date and tiem via NTP
   - Not necessary to use or configure, when using `systemd`
-  - 
+
     
 ## Process management
 - `ps` - Lists running processes.
@@ -565,7 +565,6 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * It works with `/etc/security/limits.conf` and `/etc/security/limits.d/*.conf`
   * For the how to, see `man 5 limits.conf`
     * For example: limit the amount of concurrent logins (`maxlogins`) for a certain group or user
-
 
 * Cgroup resource limits
   * Cgroups place resource in controllers that represent the type of resource, like cpu, memory, blkio
