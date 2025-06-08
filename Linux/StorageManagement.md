@@ -278,11 +278,14 @@
 ### Managing disks and partitions
 * `lsblk` - list block
     - Lists information about storage devices, such as
-        - Device and partition name
+        - `NAME` - Device and partition name
         - `MAJ:MIN` - Major Number (Maj): Identifies the device type (e.g., 8 is for SCSI/SATA disks) and Minor Number (Min): Differentiates individual devices or partitions under the same major number.
-        - size of the device or partition
+            - `/proc/devices` contains the Major numbers and linking them to block device modules. E.g. `259 blkext`
+        - `RM` - is the device removeable. `0` for No , `1` for yes 
+        - `SIZE` - size of the device or partition
         - `RO` - Read-Only value. `0` for read-write and `1` for read-only
-        - mount points
+        - `TYPE` - disk or partition
+        - `MOUNTPOINTS` - mount points on the filesystem
     - Partially same info as `fdisk -l`
     - Options:
         - `-a` - list empty devices

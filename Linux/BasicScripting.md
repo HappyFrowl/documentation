@@ -7,6 +7,7 @@
 
 
 ## Basic commands
+
 ### Man pages
 * `man` - manual
   * find info on commands
@@ -36,6 +37,7 @@
     - **`whatis`**: Display a brief description of a command.
     - **`info`**: Display the info page of a command.
 
+
 ### **File Text Operations:**
 - **`cp`**
   - `*` the wildcard of wildcards, it's used to represent all single characters or any string.
@@ -48,7 +50,8 @@
 
 - **`mkdir`**
   - `-p` - include the parent directories if not existing
-
+  - `--mode <mask>` - Set the permissions directly at creating
+    - e.g. `mkdir /dir --mode 700` 
 
 - **`ls`**
   - `ls -lrt` - list files in long format, sorted by time, oldest first
@@ -160,6 +163,7 @@
   - Perform mathematical operations
   - Example: `expr 5 \* 3`
 
+
 ### Regular Expressions
 Regular expressions (regex) are sequences of symbols and characters used to express patterns for searching text.
 
@@ -181,7 +185,6 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
 - `{n}`: Matches the preceding element exactly `n` times.
 - `{min,}`: Matches the preceding element at least `min` times.
 - `{min,max}`: Matches the preceding element between `min` and `max` times.
-
 
 * **Environment and Basics**
   - **`env`**: Display user environment variables (temporary, only for the session).
@@ -253,11 +256,6 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
     ```
 
 
-
-
-
----
-
 ## Basic shell scripting
 
 ### Pattern-matching operator
@@ -279,7 +277,6 @@ filename="backup_2025-05-18.tar.gz"
 | `${filename##*.}`  | Longest from front        | `backup_2025-05-18.tar.`  | `gz`                       |
 | `${filename%.*}`   | Shortest from back        | `.gz`                     | `backup_2025-05-18.tar`    |
 | `${filename%%.*}`  | Longest from back         | `.tar.gz`                 | `backup_2025-05-18`        |
-
 
 # another example 
 
@@ -383,7 +380,6 @@ filepath="/home/user/projects/myproject/file.txt"
   * **`u`** - undo 
   * **`ctrl+r`** - Redo
  
-
 * **Additional Commands:**
   * **`/`** - Search forward for a term.
   * **`?`** - Search backward for a term.
@@ -399,7 +395,6 @@ filepath="/home/user/projects/myproject/file.txt"
 ### Good shit
 * `:%s/<oldstring>/<newstring>/g`
   * replace **all** occurrences of `oldstring` by `newstring`
-
 
 
 ## git
@@ -467,16 +462,16 @@ filepath="/home/user/projects/myproject/file.txt"
   * `git checkout master` - then merge from there
   
 ### **git conflicts:**
-  * resolving must be done manually in the code editor
-  * the conflict is shown highlighted in green and blue 
+  * Resolving must be done manually in the code editor
+  * The conflict is shown highlighted in green and blue 
   * Green - branch that you are on
   * Blue - conflict that came from another branch (merge)
   * Keep what you want, **remove markers** and save 
 
 ### Managing changes
 * `git diff` - differences
-  * compare a file between different commits or between different branches
-  * symbols indicate how files have changed
+  * Compare a file between different commits or between different branches
+  * Symbols indicate how files have changed
     * `------` is an indication for file 1
     * `++++++` is an indication for file 2
   * `git diff --staged` - compare between the latest commit file and the staged file  
@@ -484,7 +479,7 @@ filepath="/home/user/projects/myproject/file.txt"
 
 * `git stash` - Stash local Git changes in a temporary area.
   * `git stash` is about saving your work temporarily
-  * it can also be a solution for when **conflicts** arise due to having uncommited changes in an existing branch and existing file 
+  * It can also be a solution for when **conflicts** arise due to having uncommited changes in an existing branch and existing file 
   * **Walkthrough**:
     * Be on any branch (e.g., main).
     * Modify an existing file (a file that has already been committed).
@@ -493,11 +488,10 @@ filepath="/home/user/projects/myproject/file.txt"
       * Commit the changes.
       * Stash the changes using git stash.
   * `git stash pop` - bring the changes back
-    * it works also between branches
+    * It works also between branches
   * `git stash list` - list all stashes
   * `git stash apply stash@{#}` - choose which stash to apply
-  * 
-    * 
+
 
 ### git history and rewrites
 * `git rebase` 

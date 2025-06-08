@@ -1,5 +1,4 @@
 # Host Security
-
 - [Authentication](#authentication)
 - [Mandatory Access Control (MAC)](#mandatory-access-control-mac)
 - [SSH](#SSH)
@@ -143,9 +142,6 @@
     * `aa-disable`         - disable profile
     * `aa-unconfined`      - list processes with open network sockets
     * `aa-...`             - All AppArmor CLI starts with aa. Just look around 
-
-
-
 
 ### **SELinux**
 * SELinux is the default label-based permissions scheme provided within RHEL
