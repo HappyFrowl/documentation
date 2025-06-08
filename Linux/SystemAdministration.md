@@ -357,7 +357,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * Use `init=/bin/bash` if systemd is not loading at all
   * Use `emergency.target` or even `rescue.target` if systemd is loading but there are still issues
     * In this state, the filesystem is read-only
-    * Run `mount -o remount.rw /` to make it writeable
+    * Run `mount -o remount,rw /` to make it writeable
   * Both can be added as kernel parameters in the **grub2 menu**
 
 
@@ -428,7 +428,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     - Sync and set the date and tiem via NTP
   - Not necessary to use or configure, when using `systemd`
 
-    
+
 ## Process management
 - `ps` - Lists running processes.
   - By default, it only shows processes for the current user.
@@ -622,7 +622,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 
 ## systemd management
 ### **Introduction**
-* To recapitulate, systemd is a type of `init`
+* To recapitulate, systemd is an implementation of `init`
   * `init` has the goal of making sure the system runs the right complement of services and daemons at any given time
   * To serve this goal, init maintains a notion of the mode in which the system should be operating
   * Commonly defined modes are: single-user, multi-user.
@@ -637,6 +637,9 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     * `/usr/lib/systemd/system` is the main place where packages deposit their unit files during installation
     * `/lib/systemd/systemd` is another place where they might be stored
     * **Local unit files** and customizations can go in `/etc/systemd/system`
+  * `systemctl` or `systemctl list-units` (they output the same)
+    * This outputs all loaded and active services, sockets, targets, mounts, and devices
+    * `--type=<type>` - show a specific unit type 
 
 ### **Managing Services**
 * Services:
@@ -648,7 +651,21 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     * `status`, `start`, `stop`, `restart`, `enable`, `disable` - speak for themselves. All used in conjunction with a service or unit 
     * `set-default`         - set the default boot target for the system to use on boot, e.g. when you want to change the root password
     * `mask`/ `unmask`      - prevent/ enable the provided unit file from being enabled or activated
-    * `list-unit-files`     - Showing all the unit files used on the system and their status
+    * `list-units`          - Show all loaded and *active* services, sockets, targets, mounts, and devices
+    * `list-unit-files`     - Showing all the unit files used on the system and their status. Unlike `list-units` this outputs all installed units, active or not 
+
+  * **Unit file statuses**
+    * `systemctl list-unit-files` outputs a state for each unit
+    * These are also shown when checking the unit with `systemctl status <unit>`
+    * The possible states are:
+      * bad       - Some kind of problem within systemd; usually a bad unit file
+      * disabled  - Present, but not configured to start autonomously       
+      * enabled   - Installed and runnable; will start automatically     
+      * indirect  - Disabled, but has peers in *Also* clauses that may be enabled       
+      * linked    - Unit file available through a symlink     
+      * masked    - Banished from the systemd world from a logical perspective    
+      * static    - Depended upon by another unit; has no install requirements    
+
 
 ### **Targets**
 * A target is group of services
@@ -695,6 +712,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 * It basically replaces cron jobs
 * To create it, create a file in `/lib/systemd/systemd`
 
+
 ### Control groups
 * Cgroups place resources in controllers that represent the type of resource
 * Common default controllers are: cpu, memory, blkio
@@ -704,13 +722,14 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 * Cgroups can be applied from the commnad line or from systemd
   * Manual creation happened through the **`cgconifg`** service and the **`cgred`** process
 * Docker and Kubernetes use `cgroups` to manage container resource allocation 
- 
- ### Depdendency management
- * Different statements can be used in hte unit sectiopn to define unit file dependencies:
-  * **before**: This unit starts before the specified unit 
-  * **after**: This unit starts when the specified unit is started
-  * **requires**: when this unit starts, the unit listed here is also started. If the specified unit fails, this one also fails
-  * **wanted**:  when this unit starts, the unit listed here is also started
+
+
+### Depdendency management
+ * Different statements can be used in the unit section to define unit file dependencies:
+  * **Before**: This unit starts before the specified unit 
+  * **After**: This unit starts when the specified unit is started
+  * **Requires**: when this unit starts, the unit listed here is also started. If the specified unit fails, this one also fails
+  * **WantedBy**:  when this unit starts, the unit listed here is also started
 * To create such a dependency:
   * `systemctl edit <name.service>`
   * add lines
@@ -719,6 +738,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   Requires=other.service
   ```
 * Targets  are better for a more consistent dependency management
+
 
 ### systemd self-healing
 * Get service to restart when they get into a failed state
@@ -730,7 +750,6 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   Restart=always
   RestartSec=<TimeInSeconds>
   ```
-
 
 * `sysv` specific management: 
   * `/etc/init.d`
