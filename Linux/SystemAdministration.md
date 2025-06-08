@@ -109,7 +109,7 @@
     - `/proc/cpuinfo`     - CPU details 
     - `/proc/meminfo`     - memory usage
     - `/proc/cmdline`     - contains options passed by GRUB during boot
-    - `/proc/devices`     - contains a list of character and block device drivers loaded into the currently running kernel
+    - `/proc/devices`     - contains a list of character and block device drivers loaded into the currently running kernel. The drivers are the kernel modules 
     - `/proc/filesystems` - contains a list of file systems types that are supported by the kernel
     - `/proc/modules`     - contains informatiokns about modules currently installed on the system
     - `/proc/stat`        - contains various statistics about hte system's last reboot
@@ -146,7 +146,6 @@
     - Check `/sys/class/net` for network interface details.
   - **Commands**
     - `udevadm` is the command that provides an interface to query device information from `/sys`
-
 
 * **`udev`**
   - **Type**: Device Manager  
@@ -206,7 +205,6 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 * `dracut` 
   * Tool for creating `initramfs` images to boot the Linux kernel
   * Analogous to `mkinitrd` but applies to `initfs`
-
 
 * **`GRUB2`** - GRand Unified Bootloader
   * A **boot loader** is a small program stored in ROM of which GRUB2 is an example
@@ -411,7 +409,6 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   - File is symlinked to the appropriate timezone file
   - File cannot be read since it is a binary 
 
-
 ### NTP
 * **Configure NTP *server*:**
   - Install the daemon: `apt install ntp`
@@ -423,10 +420,8 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     - Sync and set the date and tiem via NTP
   - Not necessary to use or configure, when using `systemd`
   - 
-
     
 ## Process management
-
 - `ps` - Lists running processes.
   - By default, it only shows processes for the current user.
   - options:
@@ -609,7 +604,6 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     * `echo f > /proc/sysrq-trigger` - trigger the OOM killer
     * `journalctl | grep -A 10 "Out-of-Memory"` - Monitor what has happened
 
-
 ### I/O Monitoring
 * `top` 
   * Check the `weight` parameter
@@ -620,6 +614,23 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * See section of system monitoring
 
 ## systemd management
+### **Introduction**
+* To recapitulate, systemd is a type of `init`
+  * `init` has the goal of making sure the system runs the right complement of services and daemons at any given time
+  * To serve this goal, init maintains a notion of the mode in which the system should be operating
+  * Commonly defined modes are: single-user, multi-user.
+    * See the section on Boot Targets
+* systemd is unique among init systems in that it formalizes and unifies how services should be configured, accessed, and managed
+  * Besides managing processes in parallel, it also manages network connection (`networkd`), kernel log enties (`journald`), and logins (`logind`)
+  * systemd is a collection of programs, daemons, libraries, technologies, and kernel components
+* **Unit and unit files**
+  * Entities managed by systemd are known as **units** 
+  * A unit can be a service, socket, device, mount point, automount, swap file or partition, startup target, watched filesystem path, timer, resource management slice, or a group of externally created processes
+  * Unit files can live in different places:
+    * `/usr/lib/systemd/system` is the main place where packages deposit their unit files during installation
+    * `/lib/systemd/systemd` is another place where they might be stored
+    * **Local unit files** and customizations can go in `/etc/systemd/system`
+
 ### **Managing Services**
 * Services:
   * Running programs or processes that provide support for requests and monitoring from other processes or external clients
