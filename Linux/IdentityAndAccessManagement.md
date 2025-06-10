@@ -1,26 +1,26 @@
 # Identity and Access Management
-- [user and group management](#user-and-group-management)
+- [User and Group Management](#user-and-group-management)
 - [File permissions and ownership](#file-permissions-and-ownership)
 - [LDAP](#ldap)
 
-## user and group management
+## User and Group Management
 
 ### **Users**
 
 **User types**
-* **Root:**
-  - super user
-  - admin 
-  - UID 0 
+* **Root**
+  - Super user
+  - Admin user
+  - User ID 0 
 
 * **Regular user:**
   - Runs apps
   - Configures databases, websites, etc
 
 * **Service user:**
-- Specific to the service (webserver, database)
-- No interactive login
-- Runs in the background
+  - Specific to the service (webserver, database)
+  - No interactive login
+  - Runs in the background
 
 
 **Substituting/ switching users:**
@@ -30,18 +30,22 @@
 - `su -`, `su - root` or `sudo su` - switch to root
 - `sudoedit` - gain elevated editing permissions to a specific file if, and only if, the user is member of `editors` group and the group has editing permissions to the file
     - `%editors ALL = sudoedit /path/to/file`
+
 - `visudo`
-    - edits `/etc/sudoers`
+    - This is the command in order to edit `/etc/sudoers`
     - Add users to `sudo` group 
     - `visudo -c` checks the sudoers file for errors
-    - add user to sudoers
-        - `username ALL=(ALL) All:ALL`
-    - ensure all user can use `command`
-        - `ALL ALL=(ALL) /bin/last`
-    - give `user` access to `command` and to `updatedb`
-        - `user ALL=/path/to/command, /bin/updatedb`
-    - let `user` use `updatedb` without prompting for password
-        - `username ALL=NOPASSWD:/bin/updatedb`
+    - The basic structure of a sudoers rule is as follows:
+      - `<user> <host>= (<run-as user>) <command> : <SELinux role>`
+    - Examples
+      - Add john to sudoers
+          - `john ALL=(ALL) ALL:ALL`
+      - Ensure all users can use `command`
+          - `ALL ALL=(ALL) /bin/command`
+      - Give `john` access to `command` and to `updatedb`
+          - `john ALL=/path/to/command, /bin/updatedb`
+      - Let `user` use `updatedb` without prompting for password
+          - `username ALL=(ALL) NOPASSWD: /bin/updatedb`
 
 
 ### **Creating and managing users and groups:**
@@ -164,7 +168,7 @@
 - **How to read:** 
   - The first bit is the file type - `-` for file, and `d` for directory
   - The rest of the bits are grouped in pairs of three 
-    - The first three being user permissons, second three group permissions, last three other 
+    - The first three being user permissions, second three group permissions, last three other 
   - The last bit is the access method. 
     - `.` - SELinux 
     - `+` - Other 
@@ -223,7 +227,7 @@
 **Attributes**
 * Attributes are a POSIX style of adding security to files
 - `lsattr`
-  - list attibutes of files and directories
+  - list attributes of files and directories
   - Of the ones mentioned below, the `immutable` attribute is one of the most used
   - Many other ones are not supported or used any more
 
@@ -318,13 +322,6 @@
   ```
 
 
-
 ## **LDAP**
 
 * `sssd`
-
-* `ldapsearch`
-
-* `ldapadd`
-
-

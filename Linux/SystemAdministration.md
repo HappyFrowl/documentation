@@ -430,6 +430,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 
 
 ## Process management
+
 - `ps` - Lists running processes.
   - By default, it only shows processes for the current user.
   - options:
@@ -443,7 +444,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   -  identify a process ID based on the process name
 
 - `pidof` - PID of 
-  - works similar to pgrep
+  - Works similar to pgrep
 
 * `fuser` - file user
     * Display process IDs currently using files or sockets
@@ -503,31 +504,37 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * `-p` - filter on PID
   * `-u` - filter on a specific user
 
-- `kill` Command - Sends signals to processes to perform specific actions.
-    **Signals**:
-    - **SIGINT**:
-      - Interrupt signal 
-      - Stops the process, allowing it to clean up resources.
-      - like Ctrl + C
-      - value 2
-    - **SIGKILL**:
-      - Forces the process to terminate immediately
-      - value 9
-    - **SIGTERM**:
-      - Request the process to terminate gracefully
-      - Allows time for cleanup, but the process can ignore it.
-      - value 15
-    - **SIGSTOP**:
-      - Pauses the process 
-      - like Ctrl + z
-      - value 17, 19, 23
-    - **SIGSTP**
-      - Pause a proces from the terminal
-      - value 18, 20, 24
+**Signals**:
+  * Signals are process-level interrupt requests
+  * Find info on them with `man signal`
+  - **SIGINT**:
+    - Interrupt signal 
+    - Stops the process, allowing it to clean up resources.
+    - like Ctrl + C
+    - value 2
+  - **SIGKILL**:
+    - Forces the process to terminate immediately
+    - value 9
+  - **SIGTERM**:
+    - Request the process to terminate gracefully
+    - Allows time for cleanup, but the process can ignore it.
+    - value 15
+  - **SIGSTOP**:
+    - Pauses the process 
+    - like Ctrl + z
+    - value 17, 19, 23
+  - **SIGTSTP**
+    - Pause a process from the terminal
+    - value 18, 20, 24
+
+
+- `kill` - Sends signals to processes to perform specific actions.
+  - `kill -l` - display full list of signals
+
 
 - `killall` - Kills all processes by name.
     - Only affects the current user's processes unless used with `sudo`.
-    - `kill -9 brave` - SIGKILL brave
+    - `killall -9 brave` - SIGKILL brave
 
 - `pkill`- Similar to `killall` but more flexible and potentially dangerous.
     - Allows matching processes based on name or other attributes.

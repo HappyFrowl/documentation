@@ -395,6 +395,8 @@ filepath="/home/user/projects/myproject/file.txt"
 ### Good shit
 * `:%s/<oldstring>/<newstring>/g`
   * replace **all** occurrences of `oldstring` by `newstring`
+* `:m` - move a line
+  * `:m-68` - move the line where the cursor by 68 lines upward
 
 
 ## git
