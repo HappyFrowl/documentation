@@ -96,7 +96,7 @@
 * This is not persistent however
 * **`procfs`**
   * The `/proc` directory is a directory that is backed up by the **virtual file system** `procfs`
-  * `/proc` is the mount point for procfs, meaning that all files and directories inside `/proc` come from `procfs`
+  * `/proc` is the mount point for `procfs`, meaning that all files and directories inside `/proc` come from `procfs`
   * `procfs` is a pseudo-filesystem, meaning it doesn’t store real files on disk but instead dynamically presents system and process-related information.
   - **Purpose**: 
     * Provides an interface to kernel data structures.  
@@ -104,16 +104,18 @@
     - Presents information about:  
       - Processes  
       - System information  
+    - `ps` and `top` read their statuses from the `/proc` directory
   - **Examples**:  
     - `/proc/cpuinfo`     - CPU details 
     - `/proc/meminfo`     - memory usage
     - `/proc/cmdline`     - contains options passed by GRUB during boot
     - `/proc/devices`     - contains a list of character and block device drivers loaded into the currently running kernel. The drivers are the kernel modules 
     - `/proc/filesystems` - contains a list of file systems types that are supported by the kernel
-    - `/proc/modules`     - contains informatiokns about modules currently installed on the system
-    - `/proc/stat`        - contains various statistics about hte system's last reboot
-    - `/proc/version`     - specifies several points of informations about the Linux Kernel. Similar to `uname`
+    - `/proc/modules`     - contains information about modules currently installed on the system
+    - `/proc/stat`        - contains various statistics about the system's last reboot
+    - `/proc/version`     - specifies several points of information about the Linux Kernel. Similar to `uname`
   * All the numbers shown in the directory are process IDs. Inside them you will find process info that can be shown by `ps` as well
+  * For more info see `man procfs`
 
 * `sysctl` - sys control
   * Not be confused with `systemctl`
@@ -434,11 +436,34 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 - `ps` - Lists running processes.
   - By default, it only shows processes for the current user.
   - options:
-    - `a` - displays all user-triggered processes
-    - `u` - list proceses along with the username and start time
+    - `a` - Displays all user-triggered processes
+    - `u` - "user-oriented": Show username instead of UID
     - `x` - include processes without a terminal
     - `fax` - shows parent child relationship 
+    - `l`  - output a long format 
   - Processes in **square brackets** are system or kernel processes.
+  - The output of `ps aux` is as follows: 
+    - Skipping USER, PID, %CPU, %MEM, for it being obvious
+    - VSZ - virtual size of the process
+    - RSS - Resident set size (number of pages in memory)
+    - TTY - control terminal ID
+    - STAT - Current process ID
+      - R = Runnable
+      - S = Sleeping (< 20 seconds>)
+      - Z = Zombie
+      - D = In uninterruptible sleep
+      - T = traced or stopped 
+      - W = processes is swapped out
+      - < = Process has higher than normal priority
+      - N = Process has lower than normal priority
+      - L = sem pages are locked in core
+      - s = Process is a session leader
+    - TIME = CPU time the process has consumed
+    - COMMAND = command name and arguments (can be inaccurate)
+  - `ps lax` additionally shows:
+    - PPID = parent PID
+    - NI = niceness
+    - WCHAN = type of resource on which the process is waiting. AKA Wait channel
 
 - `pgrep <process name>` - process grep
   -  identify a process ID based on the process name
@@ -448,6 +473,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 
 * `fuser` - file user
     * Display process IDs currently using files or sockets
+    * `fuser -c /home/` - Print the PID of every process that's using a file or directory on the provided filesystem, plus a series of letter codes that show the nature of the activity
 
 * `top`
   * Display Linux processes
@@ -481,7 +507,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 
 * `nice`
   * Processes are prioritized based on a number ranging from -20 to 19
-  * The lower the number, the *higher* the priority
+  * The *lower* the number, the *higher* the priority
   * 0 is the default
   * By default, `nice` prints the default nice number
   * `-n` - increment the nice value
@@ -489,7 +515,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 * `renice`
   * Alter the scheduling priority of an already running process
   * options: 
-    * `-n` - specify the new nice value for a running process
+    * `-n <number>` - specify the new nice value for a running process
     * `-g` - alter the nice value of a processes in a process group
     * `-u` - alter the nice value of the processes associated to a user
 
@@ -507,6 +533,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 **Signals**:
   * Signals are process-level interrupt requests
   * Find info on them with `man signal`
+  * or list them with `kill -l`
   - **SIGINT**:
     - Interrupt signal 
     - Stops the process, allowing it to clean up resources.
@@ -527,32 +554,62 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     - Pause a process from the terminal
     - value 18, 20, 24
 
+* Most important ones are
+
+
+| #      | Name  | Description              | Default Action | Catchable | Can block?| Core Dump | Example  |
+|--------|-------|--------------------------|----------------|-----------|-----------|-----------|----------|  
+| 1      | HUP   | Hangup                   | Terminate      | Yes       | Yes       | No        | Two interpretations:<br>1. reset request. <br> 2. "clean up" processes attached to a terminal, see `nohup` |  
+| 2      | INT   | Interrupt                | Terminate      | Yes       | Yes       | No        | <Control-C> |  
+| 3      | QUIT  | Quit                     | Terminate      | Yes       | Yes       | Yes       | Similar to TERM but defaults to producing a core dump          |  
+| 9      | KILL  | Kill                     | Terminate      | No        | No        | No        | Kernel level termination         |  
+| 10     | BUS   | Bus Error                | Terminate      | Yes       | Yes       | Yes       |          |  
+| 11     | SEGV  | Segmentation Fault       | Terminate      | Yes       | Yes       | Yes       |          |  
+| 15     | TERM  | Software Termination     | Terminate      | Yes       | Yes       | No        | Request for termination  |  
+| 17     | STOP  | Stop                     | Stop           | No        | No        | No        |          |  
+| 18     | TSTP  | Terminal Stop (Keyboard) | Stop           | Yes       | Yes       | No        |          |  
+| 19     | CONT  | Continue After Stop      | Ignore         | Yes       | No        | No        |          |  
+| 28     | WINCH | Window Size Changed      | Ignore         | Yes       | Yes       | No        |          |  
+| 30     | USR1  | User-Defined Signal 1    | Terminate      | Yes       | Yes       | No        |          |  
+| 31     | USR2  | User-Defined Signal 2    | Terminate      | Yes       | Yes       | No        |          |  
+
+* `nohup` - no hiccup
+  * prevent a command from stopping when the user that initiated it logs off
+  * `nohup.script.sh`
 
 - `kill` - Sends signals to processes to perform specific actions.
+  - It can send any signal, but by defaults it sends a TERM
+  - `kill -9 <process>` - send a terminating kill signal
   - `kill -l` - display full list of signals
-
 
 - `killall` - Kills all processes by name.
     - Only affects the current user's processes unless used with `sudo`.
-    - `killall -9 brave` - SIGKILL brave
+    - `killall brave` - SIGKILL brave
 
 - `pkill`- Similar to `killall` but more flexible and potentially dangerous.
     - Allows matching processes based on name or other attributes.
+    - `pkill -u ben` - kill all processes run by user ben
 
 * `fg` - foreground
   * Bring a process back to foreground
 
 * `bg` - background
   * Move a process to the background
-  * Alternatively, use ctrl+z
+  * Alternatively, use <CONTROL+Z>
   * or start a command with `&` at the end 
 
 * `jobs`
   * Prints all foreground and background jobs running
 
-* `nohup` - no hiccup
-  * prevent a command from stopping when the user that initiated it logs off
-  * `nohup.script.sh` 
+* `strace` - system trace
+  * Trace system calls and signals
+  * Its use case is to figure out what a process is **exactly** doing
+    * First step is of course `ps`, but that barely scratches the surface
+    * `strace` uncovers the whole truth
+  * `strace -p <PID>` 
+  * It outputs:
+    * name of every system call made by the process
+    * Decodes the arguments and shows the result code that the kernel returns
 
 
 ### Resource Limits
@@ -574,7 +631,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     * For example: limit the amount of concurrent logins (`maxlogins`) for a certain group or user
 
 * Cgroup resource limits
-  * Cgroups place resource in controllers that represent the type of resource, like cpu, memory, blkio
+  * Cgroups place resource in controllers that represent the type of resource, like cpu, memory, `blkio`
     * By default, processes get an equal amount of resources
     * Cgroups are used to limit the availability of resources using limits and weights
     * Integrated with systemd
@@ -584,14 +641,14 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
       * User for user sessions
   * See below on its own section
 
-### Inter-Process Communication
+### Inter-Process Communication (IPC)
 * This is about how different processes communicate with each other in user space
 * Current options are:
   * **Remote Procedure Calls (RPC)**
   * **D-Bus**
 * IPC mechanisms:
   * **Shared files:** two programs read/write to a shared file
-  * **Shared memory with semaphores:** values in memory that can be tested and set by mutliple programs
+  * **Shared memory with semaphores:** values in memory that can be tested and set by mutiple programs
   * **Named and unnamed pipes:** output of one program is used as input by another
   * **Message queues:** One process writes to the queue, multiple processes can access
   * **Sockets:** Local or network port used for communication

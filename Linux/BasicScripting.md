@@ -397,7 +397,8 @@ filepath="/home/user/projects/myproject/file.txt"
   * replace **all** occurrences of `oldstring` by `newstring`
 * `:m` - move a line
   * `:m-68` - move the line where the cursor by 68 lines upward
-
+* `$` - jump to end of line 
+* `0` - jump to beginning of line
 
 ## git
 
@@ -547,3 +548,111 @@ filepath="/home/user/projects/myproject/file.txt"
   * `git remote set-url origin git@github.com:<username>/<repo>.git`
 
 
+
+
+
+
+
+
+
+## Lessons from Exercism
+
+```bash
+
+main(){
+  echo "one for ${1-you}, one for me"                       #  ${1-you} output the first argument given with the command, or else a string of your choosing, in this case 'you'  
+
+}               
+main "$@"                                                   # Best always to encapsulate "$@" to prevent globbing and word splitting
+
+
+(( $# == 0 )) && name=you || name="$1"                    # shorthand way of an if-conditional. If length of argument is 0, then name equals you, else, it is the value of the argument
+
+[[ $total == $number ]] && echo "true" || echo "false"      # if $total equals $number, then echo "true", else echo "false"
+
+
+
+(( $1 % 3 )) || output+=Pling                 # If the input is devisable by 3, 5, or 7, append to output a Pling, Plang, Plong.
+(( $1 % 5 )) || output+=Plang
+(( $1 % 7 )) || output+=Plong
+
+echo ${output:-$1} 
+
+
+# calling individual characters in a string
+var=894
+echo ${#var}                                  # ${#var} output the length of the $var
+    3                                         # Great way of checking the length of the input argument in a script
+echo ${var:0:1}                               # Split or cat separate characters of a string
+    8
+echo ${var::1}                                # same as above
+    8
+echo ${var::2}                                                   
+    89
+echo ${var:2:3}
+    4
+
+echo ${var:i:1}                               # good for in for loops
+
+var="Hello World!"
+echo ${var:2:3}                               # read it as: the first digit is the index of the string from which to start. The second digit is how many characters should be printed
+  llo                                         # print 3 characters, starting from index 2
+
+
+# for loops
+for (( i=0 ; i<$1 ; i++ )); do                # Note the DOUBLE parentheses
+  <command>
+done
+
+(( i=1 ; i<$(( ${#x} - y )) ; i++ ))          # perfectly fine to do some arithmetic inside 
+
+
+for i in $var; do                             # No parentheses necessary 
+  <command>
+done
+
+# arithmetic
+echo $(( 5 * 5 ))
+25
+
+x=5
+y=5
+echo $(( x * y ))
+25
+
+z=5
+echo $(( x * y + z ))
+30
+
+
+
+
+# Arrays
+declare -a array=()          # create a regular array
+declare -A array=()          # create an associative array (key-value pairs)
+declare -a -r array=()          # create a read only array
+
+
+# or just 
+
+array=()                  # for a regular array
+
+var=6896246
+for (( i=0 ; i< ${#var} ; i++ )); do     # While i is smaller than the length of $var, 
+  array+=(${var:i:1})
+done
+
+echo ${array[*]}                         # 6 8 9 6 2 4 6
+echo ${var:1:1}                          # 6 
+
+o=1
+echo ${var:o:1}                          # 6 
+
+
+
+
+## Sorting Arrays
+IFS=$'\n' largest=($(sort <<<"${products[*]}"))          # A-Z
+IFS=$'\n' largest=($(sort -nr <<<"${products[*]}"))      # integers
+
+IFS= 
