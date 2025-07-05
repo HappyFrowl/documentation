@@ -1,7 +1,16 @@
 # Identity and Access Management
-- [User and Group Management](#user-and-group-management)
-- [File permissions and ownership](#file-permissions-and-ownership)
-- [LDAP](#ldap)
+- [Identity and Access Management](#identity-and-access-management)
+  - [User and Group Management](#user-and-group-management)
+    - [**Users**](#users)
+    - [**Creating and managing users and groups:**](#creating-and-managing-users-and-groups)
+    - [**sudo groups**](#sudo-groups)
+    - [Managing user sessions](#managing-user-sessions)
+  - [File permissions and ownership](#file-permissions-and-ownership)
+    - [**File ownership**](#file-ownership)
+    - [**File permissions**](#file-permissions)
+    - [**Access Control Lists**](#access-control-lists)
+    - [**Special permissions**](#special-permissions)
+  - [LDAP](#ldap)
 
 ## User and Group Management
 

@@ -1,7 +1,14 @@
 # Monitoring
-- [System logging](#system-logging)
-- [Syslog](#syslog)
-- [Systemd-journald](#systemd-journald)
+- [Monitoring](#monitoring)
+  - [System logging](#system-logging)
+  - [Syslog](#syslog)
+  - [Systemd-journald](#systemd-journald)
+  - [Routing Logs to TTY](#routing-logs-to-tty)
+    - [`top`](#top)
+  - [Modifying Process Execution Priorities](#modifying-process-execution-priorities)
+    - [Nice Value](#nice-value)
+    - [`nice` command](#nice-command)
+    - [`renice` command](#renice-command)
 
 ## System logging
 * **File locations**
@@ -126,8 +133,6 @@
   4. Run the following commands:
      - `sudo chown syslog /dev/tty10`
      - `sudo service rsyslog restart`
-
-
 
 
 ### `top`
