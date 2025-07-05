@@ -1,9 +1,19 @@
 # Networking
-- [Configuring network interfaces](#Configuring-network-interfaces)
-- [Network Troubleshooting](#Network-Troubleshooting)
-- [Firewall](#Firewall)
-- [DNS](#DNS)
-- [DHCP](#DHCP)
+- [Networking](#networking)
+  - [Configuring network interfaces](#configuring-network-interfaces)
+    - [Introduction](#introduction)
+    - [**Configuration scripts**\*](#configuration-scripts)
+    - [**NetworkManager**](#networkmanager)
+    - [Netplan](#netplan)
+  - [Network troubleshooting](#network-troubleshooting)
+  - [DNS](#dns)
+  - [DHCP](#dhcp)
+  - [File \& data transfer](#file--data-transfer)
+  - [Firewall](#firewall)
+    - [iptables](#iptables)
+    - [Netfilter](#netfilter)
+    - [Uncomplicated firewall](#uncomplicated-firewall)
+    - [RHEL Firewall](#rhel-firewall)
 
 
 ## Configuring network interfaces

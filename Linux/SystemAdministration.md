@@ -1,13 +1,44 @@
 # System Administration
-- [Kernel management](#kernel-management)
-- [Boot Process and GRUB Management](#boot-process-and-grub-management)
-- [Localization and Time](#Localization-and-time)
-- [Process Management](#Process-management)
-- [systemd Management](#systemd-management)
-- [System Monitoring](#system-monitoring)
-- [Log Management](#log-management)
-- [Application management](#application-management)
-- [Task Automation](#task-automation)
+- [System Administration](#system-administration)
+  - [Kernel management](#kernel-management)
+    - [**Kernel modules**](#kernel-modules)
+    - [Tuning the kernel](#tuning-the-kernel)
+    - [Managing Devices](#managing-devices)
+  - [Boot process and GRUB management](#boot-process-and-grub-management)
+    - [Boot components](#boot-components)
+    - [Bootloader](#bootloader)
+    - [init](#init)
+    - [**The Boot Process**](#the-boot-process)
+    - [**Runlevels**](#runlevels)
+    - [**Boot Targets**](#boot-targets)
+    - [Troubleshooting the boot process](#troubleshooting-the-boot-process)
+  - [Localization and time](#localization-and-time)
+    - [Time](#time)
+    - [NTP](#ntp)
+  - [Process management](#process-management)
+    - [Resource Limits](#resource-limits)
+    - [Inter-Process Communication (IPC)](#inter-process-communication-ipc)
+    - [Managing Out-of-Memory](#managing-out-of-memory)
+    - [I/O Monitoring](#io-monitoring)
+  - [systemd management](#systemd-management)
+    - [**Introduction**](#introduction)
+    - [**Managing Services**](#managing-services)
+    - [**Targets**](#targets)
+    - [**Editing systemd units**](#editing-systemd-units)
+    - [systemd sockets](#systemd-sockets)
+    - [systemd timers](#systemd-timers)
+    - [Control groups](#control-groups)
+    - [Depdendency management](#depdendency-management)
+    - [systemd self-healing](#systemd-self-healing)
+  - [System monitoring](#system-monitoring)
+  - [Log management](#log-management)
+  - [Application management](#application-management)
+    - [RedHat-based systems](#redhat-based-systems)
+    - [Debian-based systems](#debian-based-systems)
+    - [Repos](#repos)
+    - [Compiling software](#compiling-software)
+    - [Software troubleshooting](#software-troubleshooting)
+  - [Task Automation](#task-automation)
 
 ## Kernel management
 
@@ -743,7 +774,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * `get-default`         
   * `set-default`         
 
-### * **Editing systemd units**
+### **Editing systemd units**
 * `systemctl show <unit.type>`
   * Print all editable parameters
 * **`man systemd.directives`**
