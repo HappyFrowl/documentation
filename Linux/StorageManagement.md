@@ -1,10 +1,22 @@
 # Storage
-- [Storage and Filesystem Basics](#storage-and-filesystem-basics)
-- [Disk, partition, and Filesystem management](#disk-partition-and-filesystem-management)
-- [Logical Volume Manager](#logical-volume-manager)
-- [Archiving, Backup & Recovery](#archiving-backup--recovery)
-- [Storage Troubleshooting](#storage-troubleshooting)
-- [Remote Filesystem Access](#remote-filesystem-access)
+- [Storage](#storage)
+  - [Storage and Filesystem Basics](#storage-and-filesystem-basics)
+    - [The Linux Filesystem](#the-linux-filesystem)
+    - [inodes](#inodes)
+    - [Hard and Symbolic Links](#hard-and-symbolic-links)
+    - [File localization](#file-localization)
+    - [RAID](#raid)
+    - [Swap management](#swap-management)
+  - [Disk, partition, and filesystem management](#disk-partition-and-filesystem-management)
+    - [Introduction and overview](#introduction-and-overview)
+    - [Managing disks and partitions](#managing-disks-and-partitions)
+    - [Mounting \& unmounting](#mounting--unmounting)
+    - [Managing filesystems](#managing-filesystems)
+    - [XFS-specific filesystem management tools](#xfs-specific-filesystem-management-tools)
+  - [Logical Volume Manager](#logical-volume-manager)
+  - [Archiving, Backup \& Recovery](#archiving-backup--recovery)
+  - [Storage Troubleshooting](#storage-troubleshooting)
+  - [Remote Filesystem Access](#remote-filesystem-access)
 
 
 ## Storage and Filesystem Basics

@@ -1,5 +1,4 @@
 # Networking
-
 - [Configuring network interfaces](#Configuring-network-interfaces)
 - [Network Troubleshooting](#Network-Troubleshooting)
 - [Firewall](#Firewall)

@@ -1,8 +1,16 @@
 # Host Security
-- [Authentication](#authentication)
-- [Mandatory Access Control (MAC)](#mandatory-access-control-mac)
-- [SSH](#SSH)
-- [Pluggable Authentication Modules (PAM)](#pluggable-authentication-modules-pam)
+- [Host Security](#host-security)
+  - [Hardening](#hardening)
+  - [Authentication](#authentication)
+  - [Encryption](#encryption)
+  - [System auditing](#system-auditing)
+  - [Mandatory Access Control (MAC)](#mandatory-access-control-mac)
+    - [AppArmor](#apparmor)
+    - [SELinux](#selinux)
+  - [SSH](#ssh)
+    - [Configuring SSH Server](#configuring-ssh-server)
+    - [Configuring SSH client](#configuring-ssh-client)
+  - [Pluggable Authentication Modules (PAM)](#pluggable-authentication-modules-pam)
 
 
 ## Hardening
@@ -108,7 +116,7 @@
 
 
 
-## **Mandatory Access Control (MAC)**
+## Mandatory Access Control (MAC)
 * MAC are various Linux security solutions 
 * The two main ones are: SELinux in RHEL-based systems and AppArmor in Ubuntu-based systems
 
@@ -123,7 +131,7 @@
         * In DAC, each object has a list of entities that are allowed to access it
         * The object owner administrates this, using `chown`, `chmod`, etc.
 
-### **AppArmor**
+### AppArmor
 * **High-level overview:**
     * Normally, a user account can write to its home directory... Makes sense
     * Often, that user can also write to other place on the hard drive. 
@@ -143,7 +151,7 @@
     * `aa-unconfined`      - list processes with open network sockets
     * `aa-...`             - All AppArmor CLI starts with aa. Just look around 
 
-### **SELinux**
+### SELinux
 * SELinux is the default label-based permissions scheme provided within RHEL
 * It provides a policy that identifies which source object has access to which target object
     * Source objects are processes
@@ -270,7 +278,7 @@
     - X11 forwarding
 
 
-## **Pluggable Authentication Modules (PAM)**
+## Pluggable Authentication Modules (PAM)
 * PAM is used to help apps make proper use of user accounts 
   * Think programs like: Login, GDM, SSHD, FTPD
 * LDAP is one of the ways, such as W*ndws' Active Directory

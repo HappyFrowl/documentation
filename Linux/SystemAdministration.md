@@ -25,7 +25,7 @@
 * **types of kernels**
   * **monolithic** - all system modules, e.g. device drivers or file systems, run in kernel space
     * Linux is a monolithic kernel
-  * **microkernel** - kernel runs the minimum amount of resources necessary to run fully functional OS
+  * **micro kernel** - kernel runs the minimum amount of resources necessary to run fully functional OS
     * smaller in size
     * more stable
     * worse performance
@@ -34,7 +34,7 @@
   * `-r` - print kernel version
 
 **Kernel Layers**
-* Sytem Call Interface (SCI)
+* System Call Interface (SCI)
   * Handles system calls sent from user apps to the kernel
   * Think: processing time, memory allocation
 * Process management

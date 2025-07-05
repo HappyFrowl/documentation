@@ -1,4 +1,4 @@
-# Basic Linux command and Scripting
+# Basic Linux commands and Scripting
 - [Basic commands](#Basic-commands)
 - [Streams and Redirection](Streams-and-Redirection)
 - [Basic shell scripting](#basic-shell-scripting)
