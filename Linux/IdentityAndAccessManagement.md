@@ -6,10 +6,11 @@
     - [**sudo groups**](#sudo-groups)
     - [Managing user sessions](#managing-user-sessions)
   - [File permissions and ownership](#file-permissions-and-ownership)
-    - [**File ownership**](#file-ownership)
-    - [**File permissions**](#file-permissions)
-    - [**Access Control Lists**](#access-control-lists)
-    - [**Special permissions**](#special-permissions)
+    - [File ownership](#file-ownership)
+    - [File permissions](#file-permissions)
+    - [Access Control Lists](#access-control-lists)
+    - [File Attributes](#file-attributes)
+    - [Special permissions](#special-permissions)
   - [LDAP](#ldap)
 
 ## User and Group Management
@@ -158,13 +159,13 @@
 
 ## File permissions and ownership
 
-### **File ownership** 
+### File ownership
 -  `chown` / `chgrp`
   - `(chgrp|chown) testuser path/to/file_or_dir` - change owner or group of a file or directory
   - `(chgrp|chown) -R path/to/file_or_dir` - change group recursively
   - `chown user:group path/to/file_or_dir` - change owner and group of the file or directory 
 
-### **File permissions**
+### File permissions
 - `ls –la` results in something like this:
 
   - ```bash
@@ -221,7 +222,7 @@
   - `umask 777` - restrict `rwx` for everyone
   - `umask  a-e` - remove default execute permissions for everyone
 
-### **Access Control Lists**
+### Access Control Lists
 - More granular file control than permissions
   - Set access to one or multiple directories
   - Grant permission to more than one user and/or group 
@@ -233,7 +234,7 @@
   - `-b` - Remove all entries except standard permissions
 
 
-**Attributes**
+### File Attributes
 * Attributes are a POSIX style of adding security to files
 - `lsattr`
   - list attributes of files and directories
@@ -267,7 +268,7 @@
   - `-R` - same but recursively
 
 
-### **Special permissions**
+### Special permissions
 * Less privileged users are allowed to execute a file by assuming the privileges of the file's owner or group
 * Three types: **SUID**, **SGID**, **Sticky Bit**
 * They are represented by the characters `s` and `t`  in place of the execute (x) permission for the user, group, and others in the permission string.

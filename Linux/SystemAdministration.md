@@ -467,11 +467,13 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 - `ps` - Lists running processes.
   - By default, it only shows processes for the current user.
   - options:
-    - `a` - Displays all user-triggered processes
+    - `a` - Displays all *user-triggered* processes. in other words: all processes except both session leaders and processes not associated with a terminal
+    - `-A` - Select all processes, Identical to `-e`
     - `u` - "user-oriented": Show username instead of UID
     - `x` - include processes without a terminal
     - `fax` - shows parent child relationship 
     - `l`  - output a long format 
+    - `-f` - Do full-format listing. 
   - Processes in **square brackets** are system or kernel processes.
   - The output of `ps aux` is as follows: 
     - Skipping USER, PID, %CPU, %MEM, for it being obvious
@@ -988,6 +990,8 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     * Identify what dependencies are required
   * `apt-cache depends <package name>`
     * Identify what dependencies are required
+
+
 
 
 ## Task Automation 
