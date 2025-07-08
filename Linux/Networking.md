@@ -2,8 +2,8 @@
 - [Networking](#networking)
   - [Configuring network interfaces](#configuring-network-interfaces)
     - [Introduction](#introduction)
-    - [**Configuration scripts**\*](#configuration-scripts)
-    - [**NetworkManager**](#networkmanager)
+    - [Configuration scripts](#configuration-scripts)
+    - [NetworkManager](#networkmanager)
     - [Netplan](#netplan)
   - [Network troubleshooting](#network-troubleshooting)
   - [DNS](#dns)
@@ -27,7 +27,7 @@
     3. Network Manager 
 
 
-### **Configuration scripts*** 
+### Configuration scripts
 * This is the system used by SysV
 * Configuration scripts are just that, bash scripts that configure the network adapters
 * These run each time the system is booted 
@@ -35,7 +35,7 @@
     * Specifically, `ifcfg-<network-adapter>` is used for IP address configuration
 
 
-###  **NetworkManager**
+###  NetworkManager
 - Entire suite of programs to manage networking
 - Changes made are persistent
 - `nmcli` - CLI tool 

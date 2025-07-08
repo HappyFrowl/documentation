@@ -4,7 +4,7 @@
     - [The Linux Filesystem](#the-linux-filesystem)
     - [inodes](#inodes)
     - [Hard and Symbolic Links](#hard-and-symbolic-links)
-    - [File localization](#file-localization)
+    - [File types and localization](#file-types-and-localization)
     - [RAID](#raid)
     - [Swap management](#swap-management)
   - [Disk, partition, and filesystem management](#disk-partition-and-filesystem-management)
@@ -24,26 +24,46 @@
     * This section will offer a brief overview over storage and filesystem basics
     * It covers the Linux filesystem, inodes, hard and symbolic linking, how to localize files, and the essential of RAID configuration
 
-
 ### The Linux Filesystem
-
 * To read up on the Linux filesystem:
     * `man hier`
-
-`/` - Root
-- The root directory is the top-level directory in the Linux filesystem hierarchy.
 
 `/bin` - Essential Binaries
 - Contains binaries or executables that are essential to the entire OS.
 - Commands like `gzip`, `curl`, `ls` are stored here.
 - All users can by default run these 
 
-`/sbin` - System Binaries
-- Contains system binaries or executables for the superuser (root).
-- Example: `mount`.
+`/boot` - Boot Files
+- Contains files required to boot the system:
+  - `initrd`
+  - The Linux kernel:
+    - `vmlinux`: Uncompressed kernel
+    - `vmlinuz`: Compressed kernel
+
+`/dev` - Device Files
+- Provides access to hardware and drivers as if they are files.
+
+`/etc` - Editable Text Config
+- Critical startup and system configuration files
+
+`/home` - User Files
+- Contains user-specific files
 
 `/lib` - Libraries
-- Shared libraries for essential binaries in `/bin` and `/sbin` are stored here.
+- Libraries, shared libraries, and comamnds by `/bin` and `/sbin`
+
+`/media`
+-  Mount points for filesystems on removable media 
+
+`/mnt`
+- Temporary mount points  
+
+`/opt` - Optional Software
+- Stores optional or add-on software.
+
+`/proc` - Process Filesystem
+- Information about all running processes
+- More on these in the System Administration chapter
 
 `/usr` - User Directory
 - Contains non-essential binaries or executables intended for the end user.
@@ -58,39 +78,43 @@
   - All these binaries are mapped together using the `PATH` environment variable (`$PATH`).
   - `which` command shows the location of a binary and gives precedence to `/usr/bin` if the command exists in multiple places.
 
-`/etc` - Editable Text Config
-- Stores system configuration files (e.g., `.config` files).
+`/root` - Root
+- Home directory for root 
 
-`/home` - User Files
-- Contains user-specific files and configurations.
+`/run`
+- Rendezvous point for running programs
 
-`/boot` - Boot Files
-- Contains files required to boot the system:
-  - `initrd`
-  - The Linux kernel:
-    - `vmlinux`: Uncompressed kernel.
-    - `vmlinuz`: Compressed kernel.
+`/sbin` - System Binaries
+- Contains core system binaries or executables for the superuser (root).
+- Example: `mount`
 
-`/dev` - Device Files
-- Provides access to hardware and drivers as if they are files.
+`/srv` 
+- Files held for distribution through web or other servers
 
-`/opt` - Optional Software
-- Stores optional or add-on software.
-
-`/var` - Variable Files
-- Contains files that change while the OS is running:
-  - Logs are stored here
-
-- `/tmp` - Temporary Files
+`/tmp` - Temporary Files
 - Stores temporary files.
 - Files in `/tmp` are non-persistent between reboots.
 
-`/proc` - Process Filesystem
-- An illusionary filesystem created in memory by the Linux kernel.
-- Used to keep track of running processes.
-    - In other words, files on all running processes found with `ps aux` can be found here 
-- Other useful files are: `cpuinfo`, `meminfo`, `version`, `sysrq-trigger`
-    * More on these in the System Administration chapter
+`/usr` 
+- Hierarchy of secondary files and commands
+    - `/usr/bin` - Most commands and executable files
+    - `/usr/include` - Header files for compiling C programs
+    - `/usr/lib` - Libraries; also support files for standard programs
+    - `/usr/local` - Local software or config data
+    - `/usr/sbin` - Less essential command for administration and repair
+    - `/usr/share` - Items that might be common to multiple systems
+    - `/usr/share/man` - On-line man pages
+    - `/usr/src` - Source code  for nonlocal software (not widely used)
+    - `/usr/tmp` - More temporary space (preserved between reboots)
+
+`/var` - Variable Files
+- system specific data and few config files
+    - `/var/adm` - varies: logs, setup records, strange admin bits
+    - `/var/log` - system log files
+    - `/var/run` - same function as /run; now a symlink
+    - `/var/spool` - Spooling (that is, storage) directories for printers, mail, etc.
+    - `/var/tmp` - more temporary space (preserved between reboots)
+
 
 ### inodes
 * **inode** - index node 
@@ -126,7 +150,17 @@
     - Useful for linking files between filesystems.
     - Create soft links with `ln -s <sourcefile> <destfile>`.
 
-### File localization
+### File types and localization
+
+* **File types** - and their symbol
+  * Regular files   - `-`
+  * Directories - `d`
+  * Character device fils   - `c`
+  * Block device files  - `b`
+  * Local domain sockets  - `s`
+  * Named pipes (FIFOs) - `p`
+  * Symbolic links  - `l`
+
 * `type`
     - Determines if a command is a shell built-in, alias, or external command.
 

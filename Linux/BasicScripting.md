@@ -163,11 +163,18 @@
 - **`sort`**
   * Utility for sorting lines of text files
   * Options:
+    * `-b` - Ignore leading whitespace
+    * `-f` - Sort case-insensitively
+    * `-h` - sort human readable numbers (MBs)
     * `-k <column numbers>` - Specify field values
-    * `-k2`- Indicate second field
-    * `-n` - Compare and sort line based on the string numerical value
+      * `-k2`- Indicate second field
+    * `-n` - Compare and sort lines based on the string numerical value
     * `-r` - Sort fields in descending order
-    * `-t` - Separate one field from another
+    * `-t <delimiter>` - Separate one field from another by the provided delimiter, default is whitespace
+    * `-u` - output only unique numbers
+    * Example:
+      * `sort -t: -n -k3,3 /etc/passwd`
+      * Sort the passwd file, by separating the field based on the `:` delimiter, select the third field, and sort numerically
 
 - **`fmt`** - Format text.
 
