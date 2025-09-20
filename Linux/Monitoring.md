@@ -98,7 +98,7 @@
   * Logs can be queried using `systemctl status <unit>`
     * Or in their entirety with `journalctl`
   * `journalctl` - command line utility to control journald
-    * Query and print logs 
+    * Query and f logs 
   * **Commonly used commands:**
     * `-n {number of lines}` - specify number of lines printed
     * `-o <output format>` - specify output format
