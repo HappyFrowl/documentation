@@ -274,21 +274,42 @@
 * `iptables`
     * Applies to a certain context and consists of rule sets (aka chains) 
     * `iptables [options] [-t table] [commands] {chain/rule spec}`
-    * Five default tables 
+    * Five default tables - used for the `--table` or `-t` option
         * **Filter table**
-            * Default table used to typical packet filtering functionality
+            * This  is  the  default table (if no -t option is passed).
+            * It contains the built-in chains INPUT (for packets destined to local sockets), FORWARD (for packets being routed through the box), and OUTPUT (for locally-generated packets)
+            * `filter`
         * **NAT table**
-            * Implement NAT
+            * This table is consulted when a packet that creates a new connection is encountered.
+            * Consists of four built-ins:
+              * PREROUTING (for altering packets as soon as they come in)
+              * INPUT (for altering  packets  destined for local sockets), OUTPUT (for altering locally-generated packets before routing)
+              * OUTPUT (for altering locally-generated packets before routing)
+              * POSTROUTING (for altering packets as they are about to go out)
+            * It can be used for IP forwarding
+            * `nat`
         * **Mangle table**
             * Alter or rewrite packets' TCP/IP header
+            * This  table  is used for specialized packet alteration.
+            * `mangle`
         * **Raw table**
             * Configure exeptions involved in connection tracking
+            * Used  mainly for configuring exemptions from connection tracking in combination with the NOTRACK target.
+            * `raw`
         * **Security table**
-            * Mark packets with SELinux security context 
-    * By default, rule sets are lost on reboot
-    * To get around this, install `iptables-services` or `iptables-persistent` on RHEL and Debian respectively
+            * Mark packets with SELinux security context
+            * This table is used for Mandatory Access Control (MAC) networking rules, such as those enabled by the SECMARK and CONNSECMARK targets. 
+            * `security`
+    * **Saving iptable configurations**
+        * By default, rule sets are lost on reboot; they are non-persistent
+        * To save them, install `iptables-services` or `iptables-persistent` on RHEL and Debian respectively
+          * Save them with `iptables-save > /etc/iptables/rules.v4` **as root**
+          * Running just `iptables-save` dumps the contents of the configured iptables and does not save them
     * **Logging:**
         * Event for iptables are written to `/var/log/messages` or `/var/log/kern.log` files
+    * **Examples**
+      * `iptables -t[able] nat -A[ppend] POSTROUTING -d[estination] <IP> -p[rotocol] <protocol>  -j[ump] DNAT --to-destination <IP:port>`
+      * `iptables -t nat -A PREROUTING -i <interface> -p <protocol> --dport <port> -j MASQUERADE`
 
 ### Netfilter
 * `nftables` - net filter
@@ -344,7 +365,8 @@
     * **`firewalld` components:**
         * **Zones**
             * Collection of network cards that is facing a specific direction and to which rules can be assigned
-                * For example: Public, DMZ, block
+                * For example: Public, DMZ, block, home, etc
+                * More can be created manually with `firewall-cmd --new-zone=`
             * Located `/etc/firewalld/zones/`
             * By default, there always is a `public.xml` zone
         * **Interfaces**
@@ -364,12 +386,38 @@
                 * This allow incoming ftp traffic from 192.168.1.1/32
             * `firewall-cmd --add-rich-rule='<rule>'` 
             * Check `man 5 firewalld.richlanguage` for the syntax
-    * **Basic commands:**
+    * **Changing rules:**
         * `firewall-cmd --add-port=8080/tcp` - open up port 8080/tcp
             * this configuration will be visible in `nft list ruleset`
+            * Remember: `--permanent` was not provided, so this setting will last until reboot
+        * `firewall-cmd --add-service=http` - open ports associated to the service
         * `firewall-cmd --list-all-zones`
             * View all available firewall zones and rules in their runtime configuration state 
         * `--permenant` - make permanent changes 
+        * `firewall-cmd --runtime-to-permanent` - make changes made in the runtime permanent. Great for first testing a config without the `--permanent` flag, then after testing, making it permanent 
+    * **Limiting rule scope**:
+      * Not all rules should apply to all (incoming or outgoing) devices. In order to limit the scope of a rule, do the following:
+        1. Create a new zone - `firewall-cmd --permanent --new-zone={zone-name}` 
+        2. Limit the scope of this zone - `firewall-cmd --permanent [--source={source-IP} | --destination={destination-IP} --]`
+        3. Add rules to this scope - `firewall-cmd --add-port={port/protocol}`
+        4. Test it out
+        5. Make permanent - `firewall-cmd --runtime-to-permanent`
+      * This way firewall rules applied to this zone, only apply to a specific source or destination address  
+    * **Checking config**
+      * `firewall-cmd --list-ports` - list all the ports added.
+      * `firewall-cmd --get-active-zones` - Print currently active zones altogether with interfaces and sources used in these zones.
+      * `firewall-cmd --zone=public --list-all` - list everything added to a specific zone 
+    * **Logging**
+      * Checking and setting the log status
+        * From command line
+          * `firewall-cmd --get-log-denied` - get the current status for log handling
+          * `firewall-cmd --set-log-denied=all` - set the log handling status to `all` 
+        * From the config file
+          * `/etc/firewalld/firewalld.conf`
+          * Change `LogDenied=denied` to `LogDenied=all`
+      * Reading logs:
+        * `journalctl -xe` - check for the yellow lines starting with `filter_IN_public_REJECT`
+    * 
 
 
 
