@@ -276,6 +276,10 @@
        - `ssh-add` 
 - `ssh -X`
     - X11 forwarding
+- To seamlessly use the right ssh key and username, enabling sshing by just `ssh <hostname>`, ensure the following:
+  - Modify `~/.ssh/config`
+  - Include the host, hostname, user, and identityfile
+  - Otherwise you might need to explicitly point to the ssh key file `ssh -i <file> <user>@<host>` 
 
 
 ## Pluggable Authentication Modules (PAM)
