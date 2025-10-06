@@ -387,9 +387,12 @@
             * `firewall-cmd --add-rich-rule='<rule>'` 
             * Check `man 5 firewalld.richlanguage` for the syntax
     * **Changing rules:**
-        * `firewall-cmd --add-port=8080/tcp` - open up port 8080/tcp
-            * this configuration will be visible in `nft list ruleset`
-            * Remember: `--permanent` was not provided, so this setting will last until reboot
+        * `firewall-cmd --zone=<zone> --add-port=8080/tcp ` - open up port 8080/tcp. 
+          * A zone must always be provided for the change to be applied. **Moreover, it must be called FIRST**
+          * Remember: `--permanent` was not provided, so this setting will last until reboot
+          * Always check whether the configuration was applied correctly: `firewall-cmd --get-all-zones | grep <port/service>`
+            * The success echo means very little, in my experience 
+          * This configuration will be visible in `nft list ruleset`
         * `firewall-cmd --add-service=http` - open ports associated to the service
         * `firewall-cmd --list-all-zones`
             * View all available firewall zones and rules in their runtime configuration state 
