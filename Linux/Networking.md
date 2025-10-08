@@ -63,11 +63,17 @@
 
 
 ### Netplan
-* `netplan`
-    * YAML network configuration abstraction for various backends
-    * It is a way of declaratively ocnfigure interface devices 
+* The network configuration utility developed by Canonical
+* It provides a network configuration abstraction over the currently supported two “backend” system (“renderer” in Netplan terminology): networkd and NetworkManager
+* **netplan yml files**
+  * Netplan provides the ability to set network configuration using yaml files
+    * It is a way of declaratively configure interface devices 
+    * There are three locations in which Netplan configuration files can be placed. In order of priority they are:
+      * `/run/netplan`
+      * `/etc/netplan`
+      * `/lib/netplan`
 * **Configuration**
-    * `/etc/netplan/*`
+    * `/etc/netplan/*.yml`
     * `netplan try` 
         * Command to run to test the changes
     * `netplan apply`
@@ -77,10 +83,7 @@
     * Several mode, but two are important:
         1. Mode 4: 802.3ad - industry standard for network bonds. It does require switch support
         2. Mode 5: balance-alb (all load balance). Incoming and outgoing traffic is distributed over all available NICs. This mode does not require switch support
-    * Configuring it:
-        * Modify `/etc/netplan` file   
-        * Add section `bonds:` etc 
-            * Just look this up 
+    * Add section `bonds:` etc 
 
 
 ## Network troubleshooting
@@ -271,49 +274,101 @@
 ## Firewall
 
 ### iptables
-* `iptables`
-    * Applies to a certain context and consists of rule sets (aka chains) 
+
+* **Overview**
+  * Tool to manage firewall rules and network traffic
+  * It lets admins configure rules that help how packets are filtered, translated, or forwarded
+  * Control incoming and outgoing traffic, define port forwarding, and implement network address translation (NAT)
+* **Components**
+  * Tables
+      * Collection of chains
+      * aka name for a set of chains
+  * Chain
+      * Collection of rules 
+  * Rule
+      * Condition used to match packet
+  * Target
+      * Action taken when a rule matches
+      * aka what must be done with a packet
+      * This can be the name of a user-defined chain or one of the special values:
+      * ACCEPT
+      * DROP
+      * QUEUE
+      * RETURN
+  * Policy
+      * Default action taken in case of no match with the inbuilt chains 
+      * Possible actions
+      * ACCEPT
+      * DROP
+
+* **Tables**
+  * * Five default tables - used for the `--table` / `-t` option
+    * **Filter**
+        * This  is  the  default table (if no -t option is passed) for packet filtering
+        * Chains included: 
+          * INPUT, OUTPUT and FORWARD.
+        * `filter`
+    * **NAT**
+        * Related to Network Address Translation
+          * It can also be used for IP forwarding
+        * This table is consulted when a packet that creates a new connection is encountered
+        * Chains included:
+          * PREROUTING, POSTROUTING
+        * `nat`
+    * **Mangle**
+        * For specialized packet alteration
+          * Alter or rewrite packets' TCP/IP header
+        * Included chains:
+          * PREROUTING, OUTPUT
+        * `mangle`
+    * **Raw**
+        * Configure exceptions involved in connection tracking
+          * Used  mainly for configuring exemptions from connection tracking in combination with the NOTRACK target.
+        * Chains included:
+          * PREROUTING, OUTPUT
+        * `raw`
+    * **Security**
+        * Used for MAC, e.g. SElinux, AppArmor
+  
+  * **Chains**
+    * INPUT - A set of rules for packets destined to localhost sockets.
+    * FORWARD - For packets routed through the device
+    * OUTPUT - It is locally generated packets, meant to be transmitted outside
+    * PREROUTING - It is used for modifying packets as they arrive
+    * POSTROUTING - It helps in modifying packets as they are leaving
+
+  * **User-defined chains**
+    * User-defined chains can also be created. The following are the some of the possible one with examples:
+      * `-A`, `--append`: Append to the chain provided in parameters
+      * `-D`, `--delete`: Delete rule from specified chain
+      * `-C`, `--check`: Check if rule is present in the chain or not
+  * **Common used options**
+    * `-p`, `--proto` - protocol that the packet follows
+    * `-s`, `--source` - source IP of the packet
+    * `-d`, `--destination` - destination IP of the packet
+    * `-i`, `--in-interface` - Matches packets with specified in-interface 
+    * `-o`, `--out-interface` - Matches packets with specified out-interface
+    * `-j`, `--jump` - Specifies the action to be taken on a match
+      * ACCEPT, DROP, MASQUERADE, DNAT, LOG, MARK, MIRROR, QUEUE, REDIRECT, REJECT, RETURN, SNAT, TOS, TTL, ULOG
     * `iptables [options] [-t table] [commands] {chain/rule spec}`
-    * Five default tables - used for the `--table` or `-t` option
-        * **Filter table**
-            * This  is  the  default table (if no -t option is passed).
-            * It contains the built-in chains INPUT (for packets destined to local sockets), FORWARD (for packets being routed through the box), and OUTPUT (for locally-generated packets)
-            * `filter`
-        * **NAT table**
-            * This table is consulted when a packet that creates a new connection is encountered.
-            * Consists of four built-ins:
-              * PREROUTING (for altering packets as soon as they come in)
-              * INPUT (for altering  packets  destined for local sockets), OUTPUT (for altering locally-generated packets before routing)
-              * OUTPUT (for altering locally-generated packets before routing)
-              * POSTROUTING (for altering packets as they are about to go out)
-            * It can be used for IP forwarding
-            * `nat`
-        * **Mangle table**
-            * Alter or rewrite packets' TCP/IP header
-            * This  table  is used for specialized packet alteration.
-            * `mangle`
-        * **Raw table**
-            * Configure exeptions involved in connection tracking
-            * Used  mainly for configuring exemptions from connection tracking in combination with the NOTRACK target.
-            * `raw`
-        * **Security table**
-            * Mark packets with SELinux security context
-            * This table is used for Mandatory Access Control (MAC) networking rules, such as those enabled by the SECMARK and CONNSECMARK targets. 
-            * `security`
-    * **Saving iptable configurations**
-        * By default, rule sets are lost on reboot; they are non-persistent
-        * To save them, install `iptables-services` or `iptables-persistent` on RHEL and Debian respectively
-          * Save them with `iptables-save > /etc/iptables/rules.v4` **as root**
-          * Running just `iptables-save` dumps the contents of the configured iptables and does not save them
-    * **Logging:**
-        * Event for iptables are written to `/var/log/messages` or `/var/log/kern.log` files
-    * **Examples**
-      * `iptables -t[able] nat -A[ppend] POSTROUTING -d[estination] <IP> -p[rotocol] <protocol>  -j[ump] DNAT --to-destination <IP:port>`
-      * `iptables -t nat -A PREROUTING -i <interface> -p <protocol> --dport <port> -j MASQUERADE`
+
+* **Saving iptable configurations**
+    * By default, rule sets are lost on reboot; they are non-persistent
+    * To save them, install `iptables-services` or `iptables-persistent` on RHEL and Debian respectively
+    * Save them with `iptables-save > /etc/iptables/rules.v4` **as root**
+    * Running just `iptables-save` dumps the contents of the configured iptables and does not save them
+* **Logging:**
+    * Events for iptables are written to `/var/log/messages` or `/var/log/kern.log` files
+* **Examples**
+* `iptables -t[able] nat -A[ppend] POSTROUTING -d[estination] <IP> -p[rotocol] <protocol>  -j[ump] DNAT --to-destination <IP:port>`
+* `iptables -t nat -A PREROUTING -i <interface> -p <protocol> --dport <port> -j MASQUERADE`
+
 
 ### Netfilter
-* `nftables` - net filter
-    *  
+* Framework that allows various networking-related operations to be implemented in the form of customized handlers
+* It is the framework underlying iptables
+* All rules defined in iptables utilize Netfilter’s capabilities to process packets as they traverse the network stack.
+* Moreover, as we will shortly see, the uncomplicated firewall and firewalld utilize and leverage netfilter to process packets as trey traverse the network stack.
 
 
 ### Uncomplicated firewall
@@ -419,8 +474,7 @@
           * `/etc/firewalld/firewalld.conf`
           * Change `LogDenied=denied` to `LogDenied=all`
       * Reading logs:
-        * `journalctl -xe` - check for the yellow lines starting with `filter_IN_public_REJECT`
-    * 
+        * `journalctl -xe` - check for the yellow lines starting with `filter_IN/OUT_public_REJECT` 
 
 
 
