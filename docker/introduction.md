@@ -17,7 +17,7 @@
   * A dockerfile always starts with this
   * It specifies on which other image it is built
   * e.g. `ubuntu` or `python`
-  * This installs ubuntu or python in the container
+  * This installs ubuntu or python in the containerddd
 * `ENV`
   * Optionally define environment variables
   * Better practices to define these in the docker compose 
@@ -50,7 +50,14 @@ Creating docker images
 * `-t` - add a tag or image name 
 * The command is always executed against the directory in which the dockerfile exists (along with the app code etc)
 * A docker image is often nothing more than a specific version of an application
-* 
+* `docker images` 
+  * List images
+* `docker pull` 
+  * Download image
+* `docker rmi`
+  * Remove image
+* `docker build -t <name>`
+  * Build image
 
 
 ## **Docker containers**
@@ -58,8 +65,8 @@ Creating docker images
 * After creating the Docker image, the image can be used to spin up one or more instances of it
   * aka containers
 * This is done with `docker run`
-  * This downloads and starts a docker image 
-  * `docker run nginx` - This run an instance of nginx 
+  * This downloads an image if it hasn't been already, creates and starts the docker container
+  * `docker run nginx` - This runs an instance of nginx 
   * This can be run also without having a custom image 
   * In that case an image is downloaded from the Docker Hub 
     * This is a central repository for docker images
@@ -94,14 +101,19 @@ Creating docker images
   * `docker -v /path/to/host/directory:/container/path/to/container/directory`
   * This way you can edit and use files on the host and the container will use them for its purposes
   * See data persistence below
+* To run a detached container and print the docker logs output run:
+  * `docker logs <container>`
+  * `-f` - flag to follow the logs as the appear 
+* To interact with the container run
+  * `docker exec -it <container> <command>` - the flag stands for interactive terminal
+  * To go inside the container, run it with the `sh` command
 
 **More docker run flags**
 * `docker run -e` - run the container with added environment variables
 * `docker run --rm` - Remove the container when it exists, rather than just exiting/ stopping
 
 
-
-**Docker Networking**
+## **Docker Networking**
 * **Default**
     * Bridge
     * None
@@ -125,12 +137,15 @@ Creating docker images
   * You can also create multiple, separate networks for some docker containers to share
   * `docker network create --drive bridge --subnet 182.18.0.0/16 custom-isolated-network`
   * `docker network ls` - list them
+  * `docker network connect <network> <container>`
+    * Connect connect to network
 
-**Embedded DNS**
+## **Embedded DNS**
 * Containers on the same network can always resolve each other's container name
 * They have an internal DNS on  127.0.0.11
 
-**Docker Storage**
+## **Docker Storage**
+### Overview
 * When Docker is installed, a folder structure is created on the host
 * `/var/lib/docker` - so this is on the host
 * Here docker data is stored related to images, containers, volumes
@@ -152,7 +167,8 @@ Creating docker images
     * This does not mean files, like code files added to containers in the underlying layers, cannot be changed
     * When editing these files, docker copies them to the container layer where they can be written to 
       * **copy on write mechanism**
-**Data persistence**
+      * 
+### **Data persistence**
 * Containers are ephemeral by default, which means any data stored in the container will be lost once it is terminated
 * To overcome this, there are two ways:
   * **Volume Mounts**
@@ -180,18 +196,45 @@ Creating docker images
   * This is dependent on the underlying Linux distribution 
   * This is always known as Union Filesystems, or UnionFS. 
   * Docker chooses this automatically
+* **Docker volume commands**
+  * `docker volume ls`
+    * List volumes
+  * `docker volume create <name>` 
+    * Create volume
+  * `docker run -v <volume>:/data <image>`
+    * Run docker image with a mounted volume 
 
 * **cgroups**
   * Linux kernel features that limit and manage system resources like CPU, memory, and I/O for process groups
   * Docker uses cgroups to enforce resource constraints on containers, ensuring predictable performance and preventing containers from consuming excessive system resources.
 
+## Docker security
+### Docker security commands
+* `docker scan <image>`
+  * Scan image for issues
+* `docker history <image>`
+  * Get image change log
+* `docker inspect <container>`
+  * Get container details
+* `docker run --read-only <image>`
+  * Run in read-only mode
 
+## Cleaning up Docker
+* `docker system prune -a`
+  * Remove all unused data (containers, images, volumes)
+* `docker image prune -a`
+  * Remove all unused images
+* `docker container prune`
+  * Remove stopped containers
+* `docker volume prune`
+  * Remove unused volumes
 
-**Docker compose**
+## **Docker compose**
 * Docker compose is a way of creating config files in yml format 
-* It is especially useful when creating containers with a relative complex sub structure of programs
-* starting a file with `services:`  creates a bridged network between all the containers specified in the file 
-* When `services:` would not be specified, links between the containers should be explicitly mentioned with the `links:` array
+* A powerful aspect of Docker compose is that you can spin up multiple containers all in one go
+  * Rather than running `docker run` for the DB, the frontend, and the backend, all these components of the same app can be defined in a single file and be treated/ managed as a single entity
+* Starting a file with `services:` creates a bridged network between all the containers specified in the file 
+  * When `services:` would not be specified, links between the containers should be explicitly mentioned with the `links:` array
 * Networks can also be explicitly created in a docker compose file
 ``` 
 networks:
@@ -200,9 +243,43 @@ networks:
 ```
 
 * This creates two networks, one called front-end, another called back-end
+* **Essential docker compose commands**
+  * `docker compose up`
+    * Build and start a container attached to the terminal
+  * `docker compose up -d`
+    * Build and start a container detached from  the terminal
+  * `docker compose --project <name> up -d` 
+    * Give a project name to the docker file
+    * By default it will use the name of the directory 
+  * `docker compose -p <name> up -d`
+    * same but shortcut
+  * `docker compose ls`
+    * List all projects
+  * `docker compose pull`
+    * Pull updated image versions from the registry 
+  * `docker compose ps`
+    * Show running services
+
+### Resource limits
+* In a docker compose file, resource limits can be provided 
+* **limits** are the limit which a container can use
+* **reservations** are the initial allocation
+```
+services:
+    redis:
+        image: redis:alpine
+        deploy:
+            resources:
+                limits:
+                    cpus: '0.50'
+                    memory: 150M
+                reservations:
+                    cpus: '0.25'
+                    memory: 75M
+```
 
 
-**Docker registry** 
+## **Docker registry** 
 * Docker central repo for all images
 * When `docker run nginx` is run, an image is pulled from this repo
 * Such image is always comprised of a Registry, User and Image 
@@ -214,7 +291,7 @@ networks:
 * Registries can also be private
 
 
-**Docker engine**
+## **Docker engine**
 * It is the bread and butter of Docker 
 * It is the core of Docker that is installed on a host
 * Actually installing the Docker Engine on a host consists of installing three pieces of software
@@ -227,9 +304,11 @@ networks:
   * Docker Daemon
     * The element that manages containers, images, networks, and volumes     
   
-* **Namespaces**
-  * An element that is used to isolate workspaces
-    * Process IDs, networks, mounts, interprocesses, and unix timesharing are created in each namespace
-  *  This is important because on both the host and the container there will be a process id 1
-  *  With namespaces this is mapped to a higher process ID 
-     *  
+## **Namespaces**
+* An element that is used to isolate workspaces
+* Process IDs, networks, mounts, interprocesses, and unix timesharing are created in each namespace
+  * This is important because on both the host and the container there will be a process id 1
+  * With namespaces this is mapped to a higher process ID 
+  * E.g., running an nginx container will show nginx with `pid 1` inside the container
+    * On the host, nginx will run on a higher process id 
+  * 
