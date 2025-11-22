@@ -328,7 +328,7 @@
         - `NAME` - Device and partition name
         - `MAJ:MIN` - Major Number (Maj): Identifies the device type (e.g., 8 is for SCSI/SATA disks) and Minor Number (Min): Differentiates individual devices or partitions under the same major number.
             - `/proc/devices` contains the Major numbers and linking them to block device modules. E.g. `259 blkext`
-        - `RM` - is the device removeable. `0` for No , `1` for yes 
+        - `RM` - is the device removable. `0` for No , `1` for yes 
         - `SIZE` - size of the device or partition
         - `RO` - Read-Only value. `0` for read-write and `1` for read-only
         - `TYPE` - disk or partition
@@ -400,6 +400,9 @@
         * `-a` - mount all filesystems defined in `/etc/fstab`
     * Mounting this way is non-persistent between reboot 
     * While booting, the `/etc/fstab` file is processed to persistently mount filesystems
+    * Mounting NFS
+      * `mount -t nfs <ip>:</path/to/share> </path/to/local/directory>`
+      * Note: this is made persistent in `/etc/fstab`
 
 * `etc/fstab` - filesystem table
     * On modern distros, this file is processed by systemd, which converts the mount in a systemd mount
@@ -412,6 +415,7 @@
             * UUID can be found using `blkid`
             * This is best practice, since the device name might change while the UUID stays the name
             * *Persistent naming*
+            * For NFS mounts use the IP address and share path
         * **Mount points** - where to mount it
             * Location on the filesystem where it needs to be mounted
         * **Type** - filesystem type
@@ -438,6 +442,8 @@
         * rw        - mount filesystem with read/write permissions
         * sync      - input and output operations should be done synchronously
         * async     - input and output operations can be done asynchronously
+    * Mounting NFS
+      * `192.168.1.50:/path/to/share/on/NAS /local/path nfs defaults 0 0`
 
 * `findmnt` - find mount
     * Show all mounts on the system

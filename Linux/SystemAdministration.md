@@ -241,12 +241,13 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 ### init
 * `init` is the default system for starting services in Linux
   * it brings up and maintains user space services 
-  * Init is the first process run by Linux, so it aways has process ID 1
+  * Init is the first process run by Linux, so it always has process ID 1
 * Originally introduced in UNIX System V (sysv)
   * The kernel started `/sbin/init` and init started init scripts in `/etc/init.d`
   * What scripts are run depends on the default runlevel
 * **Upstart** was an improvement to this implementation of init
-* Nowawdays, for many distros, `**systemd**` is the used init system 
+* Nowadays, for many distros, `**systemd**` is the used init system
+  * Alpine Linux uses OpenRC
 
 * `systemd` searches for the `default.target` file
   * This contains details on the services that need to be started
@@ -779,9 +780,9 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 ### **Editing systemd units**
 * `systemctl show <unit.type>`
   * Print all editable parameters
-* **`man systemd.directives`**
+* `man systemd.directives`
   * Look up information on the parameters
-* `systemctl cat <unit.type>`
+* `systemctl cat <unit.type>` 
   * Show the currently configured parameters
 * `systemctl edit <unit.type>`
   * edit the unit 
@@ -811,13 +812,14 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 
 
 ### Control groups
-* Cgroups place resources in controllers that represent the type of resource
-* Common default controllers are: cpu, memory, blkio
-* These controlelrs are dubdivided ina  tree structure where differenw eights or limits are applied to each branch
-  * Each of thewse branches is a Cgroup
-  * One or more processes are assigned to a Cgroup
+* aka cgroups
+* These provide a mechanism for easily managing and monitoring system resources
+* It does so by partitioning CPU time, system memory, disk bandwidth, network bandwidth into groups and then assinging tasks to these groups
+* These controllers are dubdivided in a tree structure where different rights or limits are applied to each branch
+  * Each of these branches is a cgroup
+  * One or more processes are assigned to a cgroup
 * Cgroups can be applied from the commnad line or from systemd
-  * Manual creation happened through the **`cgconifg`** service and the **`cgred`** process
+  * Manual creation happened through the **`cgconfig`** service and the **`cgred`** process
 * Docker and Kubernetes use `cgroups` to manage container resource allocation 
 
 
@@ -958,7 +960,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 
 
 ### Compiling software
-* **compling**
+* **compiling**
   * Compiling is the process of translating the source code into binary, something the computer can actually understand
   * `gcc` - GNU Compiler Collection. This is the built in Linux compiler
 * All dependencies of the software are in the `.h` or the `.a` file - the header or library file
@@ -969,6 +971,36 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     * `/usr/lib`  - general access
     * `/lib`      - essential binary access
   * `ldd <binary>` - view shared library dependencies for a porgram
+
+* `make`
+  * The Makefile describes how a program should be made
+  * Programs written in C, C++, and Go, tyhe build process is a compilation, often initiated by `make`
+  * This results in a binary that is executable
+  * The output of the build stage is a **build artifact**
+  * **common artifacts**
+    * `.jar` or `.war` - java archive or java web app archive
+    * Static binary - statically compiled programs, commonly C or Go
+    * `.rpm` or `.deb` - OS-native packages for Red Hat or Debian
+    * `pip` or `gem` - Packaged Python or Ruby apps
+    * Container image - Apps that run under Docker
+    * Machine image - Virtual servers, esp for public or private cloud
+    * `.exe` - Windows executable
+
+* `cmake`
+  * Build tool to take source code (C and C++) and one build script to build the software for multiple systems (MacOS, Windows, Linux)
+  * Based on the build script it creates the software
+  * **Stages**
+    * **Configuration stage**
+      * Read build script
+      * Executes build logic
+      * Outputs variable cache
+    * **Generation stage**
+      * Runs toolchain specific generator
+        * This can be specific for Visual Studio
+      * Reads configuration
+      * Generates build script for target toolchain
+    * **Build stage**
+      * Your chosen toolchain or build-system does the actual build 
 
 ### Software troubleshooting
 * **Package mananger config file**

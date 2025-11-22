@@ -172,7 +172,7 @@
     * Test the maximum throughput of an interface
 
 * `iftop` - interface top
-    * Display bandwidth usage infoirmation for a system
+    * Display bandwidth usage information for a system
 
 * `mtr` 
     * Combination of `ping` and `traceroute`
@@ -407,26 +407,28 @@
         * Oracle Enterprise Linux
     * **Terminology**
         * `netfilter `
-            * Actual Linux firewall
-            * Packet filtering code that is built-in the Linux Kernel
+            * This is the actual Linux firewall that runs the firewall underneath the hood
+            * It is the packet filtering code that is built-in the Linux Kernel
             * To interact with it, a helper program is needed (e.g `iptables`, `nftables`, `firewalld`)
         * `iptables`
             * Default firewall manager for many distros
         * `nftables`
             * Newer, better, easier than `iptables`
         * `firewalld` 
-            * command line frontend for `iptables` or `nftables`
-            * this injects the rules into `iptables` or `nftables` 
+            * Command line frontend for `iptables` or `nftables`
+            * This injects the rules into `iptables` or `nftables` 
     * **`firewalld` components:**
         * **Zones**
-            * Collection of network cards that is facing a specific direction and to which rules can be assigned
-                * For example: Public, DMZ, block, home, etc
+            * Predefined security profiles that define the level of trust for network connections, allowing for customizable firewall rules based on the designated zone for each network interface
+                * Examples of zones are: Public, DMZ, block, home, docker, etc
                 * More can be created manually with `firewall-cmd --new-zone=`
-            * Located `/etc/firewalld/zones/`
-            * By default, there always is a `public.xml` zone
+            * The relationship between NICs and zones is many-to-one.
+              * This means that multiple NICs can be associated with a single zone, but each NIC can ONLY be associate to a single zone
+              * `firewall-cmd --get-active-zones` - shows what zones are active and what NICs are connected to them. 
         * **Interfaces**
             * Individual network cards
             * Always assigned to zones
+            * One NIC can be associated with one zone MAX
         * **Services**
             * An XML-based configuration that specifies ports to be opeened and modules that should be used
         * **Forward ports**
@@ -434,12 +436,12 @@
         * **Masquerading**
             * Provides NAT
         * **Rich rules**
+            * `firewall-cmd --add-rich-rule='<rule>'` 
             * Extension to the `firewalld` syntax to make more complex configuration possible
             * Create custom rules that cannot be created with the basic syntax
             * For example: configure logging, port forwarding, masquerading, rate limiting
                 * `sudo firewall-cmd --add-rich-rule="rule family="ipv4" source address="192.168.1.1/32" service name="ftp" accept"`
                 * This allow incoming ftp traffic from 192.168.1.1/32
-            * `firewall-cmd --add-rich-rule='<rule>'` 
             * Check `man 5 firewalld.richlanguage` for the syntax
     * **Changing rules:**
         * `firewall-cmd --zone=<zone> --add-port=8080/tcp ` - open up port 8080/tcp. 
