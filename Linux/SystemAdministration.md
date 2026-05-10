@@ -202,7 +202,7 @@
   - The `/tmp` directory is often mounted as `tmpfs`.
 
 * `dmesg` - display / driver messages
-  * Prints messages that have been sent to the kernel's mesasge during andd after system boot
+  * Prints messages that have been sent to the kernel's message during andd after system boot
   * Drivers can also send diagnostics messages to the kernel when they encounter errors
   * Great for troubleshooting and driver validation
 

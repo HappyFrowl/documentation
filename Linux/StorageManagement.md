@@ -272,7 +272,7 @@
         * This defines how a disk is partitioned
         * it is the same for the whole disk 
         * Examples: MBR (old, limited to 2TB) and GPT (modern, supports larger disks and more partitions).
-        * Created using `parted mklabel`. See below
+        * Created using `gparted mklabel`. See below
 
 * **Partition**
     * Section of the storage drive that logically acts as a separate drive 

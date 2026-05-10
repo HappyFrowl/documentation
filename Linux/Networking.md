@@ -373,12 +373,12 @@
 
 ### Uncomplicated firewall
 * `ufw` 
-    * The standard in Ubuntu-like distro's
-    * interface for IP tables and is desgiend to simplify the process of configuring firewalls 
+    * The standard in Ubuntu-like distros
+    * interface for IP tables and is designed to simplify the process of configuring firewalls 
     * Like any firewall, allow and block traffic by port number and IP address
     * `status` - active/ inactive
         * `verbose` - print more info
-        * `numbered` - print the rule numbersc
+        * `numbered` - print the rule numbers
         * list the firewall rules
     * `enable` / `disable`
     * `reset` - resets firewall to its default configuration
@@ -388,10 +388,10 @@
         * `allow ssh` - allow incoming ssh traffic
             * `allow 22` - same but with the port number
         * `deny http` - deny http
-        * `deny proto (tcp|udp) from (any|IP) to any port <port numbers>` 
+        * `deny proto (tcp|udp) from (any|IP) to any port <port number, port number>` 
         * `(allow|deny) from (subnet|IP) to any port <port numbers>`
     * **Managing outgoing rules:**
-        * `ufw (allow|deny) out <to IP | on {interface}> <proto (tcp|udp)> <port {number}>`
+        * `ufw (allow|deny) out <to IP | on {interface}> <proto (tcp|udp)> <port number>`
         * `ufw deny out to 93.214.56.31 proto tcp port 443` - deny 443/tcp to 93.214.56.31
         * `ufw deny out on eth0 to 192.168.1.100 port 80 proto tcp` - deny based on interface
     * `delete <rule number>` - delete a firewall by specifying its number
@@ -414,7 +414,7 @@
             * Default firewall manager for many distros
         * `nftables`
             * Newer, better, easier than `iptables`
-        * `firewalld` 
+        * `firewall-cmd` 
             * Command line frontend for `iptables` or `nftables`
             * This injects the rules into `iptables` or `nftables` 
     * **`firewalld` components:**
@@ -422,6 +422,7 @@
             * Predefined security profiles that define the level of trust for network connections, allowing for customizable firewall rules based on the designated zone for each network interface
                 * Examples of zones are: Public, DMZ, block, home, docker, etc
                 * More can be created manually with `firewall-cmd --new-zone=`
+                * Simply put: a zone is a profile stating the firewall rules, i.e. what traffic is allowed and what is not allowed
             * The relationship between NICs and zones is many-to-one.
               * This means that multiple NICs can be associated with a single zone, but each NIC can ONLY be associate to a single zone
               * `firewall-cmd --get-active-zones` - shows what zones are active and what NICs are connected to them. 
@@ -430,7 +431,7 @@
             * Always assigned to zones
             * One NIC can be associated with one zone MAX
         * **Services**
-            * An XML-based configuration that specifies ports to be opeened and modules that should be used
+            * An XML-based configuration that specifies ports to be opened and modules that should be used
         * **Forward ports**
             * Used to forward traffic on a specific port to another port, maybe on a different machine 
         * **Masquerading**
@@ -453,7 +454,7 @@
         * `firewall-cmd --add-service=http` - open ports associated to the service
         * `firewall-cmd --list-all-zones`
             * View all available firewall zones and rules in their runtime configuration state 
-        * `--permenant` - make permanent changes 
+        * `--permanent` - make permanent changes 
         * `firewall-cmd --runtime-to-permanent` - make changes made in the runtime permanent. Great for first testing a config without the `--permanent` flag, then after testing, making it permanent 
     * **Limiting rule scope**:
       * Not all rules should apply to all (incoming or outgoing) devices. In order to limit the scope of a rule, do the following:
@@ -477,6 +478,10 @@
           * Change `LogDenied=denied` to `LogDenied=all`
       * Reading logs:
         * `journalctl -xe` - check for the yellow lines starting with `filter_IN/OUT_public_REJECT` 
+    * **Notes**
+      * By default, Docker configs bypass firewalld by creating iptables configs
+        * There do not adhere to firewalld rules/ zones/ profiles
+      * 
 
 
 
