@@ -150,7 +150,7 @@
 
 * `sysctl` - sys control
   * Not be confused with `systemctl`
-  * Interface to dynamically change kernel parameters **persistently** 
+  * Sysctl is the tool to change and manage kernel settings
   * Kernel parameters are stored in `/proc/sys`
   * Kernel parameters can be configured to:
     * Improve performance
@@ -163,6 +163,8 @@
     * `-p <filename>`         - load sysctl settings from a specified file
     * `-e`                    - ignore errors
   * `/etc/sysctl.conf` enables configuration changes to a running Linux kernel
+    * Instead of configuring changes via `sysctl -w` you can list them all in this file
+    * Save the setting afterwards with `sysctl -p`
 
 
 ### Managing Devices 
@@ -181,8 +183,9 @@
 
 * **`udev`**
   - **Type**: Device Manager  
-  - **Purpose**: Responsible for dynamically managing device nodes in the `/dev/` directory.  
+  - **Purpose**: Responsible for dynamically creating and managing device nodes () in the `/dev/` directory.  
     - Device nodes represent hardware devices like disks, USB drives, network interfaces, and more.  
+    - It is the automated variant of manually creating devices with `mknod` 
   - **Capabilities**:  
     - Low-level access to the Linux device tree  
     - Handles user-space events (e.g., loading firmware, adding hardware)  
@@ -205,6 +208,19 @@
   * Prints messages that have been sent to the kernel's message during andd after system boot
   * Drivers can also send diagnostics messages to the kernel when they encounter errors
   * Great for troubleshooting and driver validation
+
+**Managing devices**
+* This is the directory that stores device files
+* The kernel maps operation on these files into call to the code of the driver
+* Device files are best recognizable by their major and minor device number associated to them
+  * list it with `ls -l`
+  * The major device number identifies the driver with which the file is associated (aka, the type of the device)
+  * The minor device number usually identifies which particular instance of  given device type is to be addressed
+    * Also called a unit number
+* Manual creation of device files
+  * `mknod <filename> <type> <major> <number>` 
+  * This command lets you create a device file
+  * In modern systems, this is done automatically by `udev` 
 
 
 ## Boot process and GRUB management
