@@ -294,6 +294,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 * `dracut` 
   * Tool for creating `initramfs` images to boot the Linux kernel
   * Analogous to `mkinitrd` but applies to `initfs`
+  * Used on RHEL-based systems
 
 
 ### **The Boot Process**
@@ -907,8 +908,76 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * Display a report of CPU and disk statistics since system startup
 
 ## Log management
+Log management typically involes a few major subtasks:
+1. Collecting logs from various sources
+2. Providing a structured interface for querying, analyzing, filtering, and monitoring messages
+3. Managing the retention and expiration of messages 
+
+* `syslog`
+  * System that presents apps with a standardized interface for submitting logs
+  * Syslog sorts messages and saves them to files or forwards them to another host
+  * It is very old
+  * These messages are put into the `/dev/log` socket
+  * Syslog is the system itself, while `syslogd` and - more newer - `rsyslog`
+
+* `systemd-journald`
+  * Another attemt at bringing sanity to logging
+  * Big differnce with syslog is that while syslog are plain text files, systemd-journal are binaries
+    * This makes it easier to query and search
+  * **sources:**
+    *  `/dev/log` socket - to harvest messages from software that submits messages according to syslog conventions
+    *  `/dev/kmsg` - for kernel messages
+    *  `/run/systemd/journal/stdout` socket, to service software that writes log messages to standard output
+    *  `/run/systemd/journal/socket` socket, to service software that submits messages through the systemd journal API
+    *  audit messages from the kernel's auditd daemon
+ *  `systemd-journal-remote` - utility to send journal logs to another host on the network. Similar to syslog but less developed.
+ *  **Configuring systemd journal**
+    *  `/etc/systemd/journald.conf` - The default conifg
+    *  `/etc/systemd/journald.conf.d` - the directory for custom configs
+    *  Set for example whether the journald messages are stored persistently between reboot or whether they are stored. 
+    *  Or, set whether messages are forwarded to syslog
+  * Some useful commands:
+    * `-f` - follow. Like `tail -f` 
+    * `-u` - user: Specificy the user that ran the process
+    * `--disk-usage` - how much disk space is being used
+    * `--list-boots` - how many boots are saved
+    * `-b` - query logs from a specific boot. By default it is current boot. Specify other with `-1`
+    * `-n 123` - get ast 123 messages
+    * `--since [yesterday | 5 min ago]` - specify time period
+    * `--until [today | some time]` - specify time period
+
+**systemd journal vs syslog:**
+ * systemd journal is missing a lot of features that are in syslog
+ * rsyslog can receive messages from a variety of input plug-ins and forward them to a diverse set of outputs according to rules and filters
+ * This is all not possible with systemd journal
+ * syslog can, however, also retrieve log messages from systemd journal in two ways:
+   * systemd journal can forward messages to another socket (typically `/run/systemd/journal/syslog`)
+     * Then, the syslog daemon can read them 
+     * In this mode, systemd journal simulates the original message submitters and conforms the to the standard syslog API
+     * This does mean that some systemd-specific metadata is lost
+   * Syslog can consume messages directly from the journal API, in the same way journalctl does
+     * This makes the metadata being preserved 
+   * By default Debian/Ubuntu uses the former system, and RHEL the latter.
+     * To determine which type of integration is configured, inspect the `ForwardToSyslog` option in `/etc/systemd/journald.conf`  
+  * The lost metadata is:
+    * _SYSTEMD_UNIT (unit/service name)
+    * _SYSTEMD_USER_UNIT
+    * _SYSTEMD_SLICE
+    * _PID (original process id) — may be replaced by the syslogd sender PID
+    * _COMM (process name)
+    * _EXE (executable path)
+    * _CMDLINE (full command line)
+    * _UID / _GID (original user/group IDs) — may be absent or generic
+    * _CAP_EFFECTIVE (capabilities)
+    * _SOURCE_REALTIME_TIMESTAMP / monotonic timestamps (high‑precision timestamps)
+    * _MACHINE_ID, _HOSTNAME (may be present but less reliably preserved)
+    * Any custom journal fields (e.g., MESSAGE_ID, structured fields added by services)
+
 * `rsyslog`
-  * sent system logs from all kinds of devices to a centralized server
+  * Modern application of syslog, syslog daemon
+  * send system logs from all kinds of devices to a centralized server
+  * `/etc/rsyslog.conf` - config file for rsyslog
+  *  
 
 * `logrotate`
   * 
