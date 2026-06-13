@@ -1,9 +1,9 @@
 # System Administration
 - [System Administration](#system-administration)
-  - [Kernel management](#kernel-management)
+  - [Device and Kernel management](#device-and-kernel-management)
     - [**Kernel modules**](#kernel-modules)
     - [Tuning the kernel](#tuning-the-kernel)
-    - [Managing Devices](#managing-devices)
+    - [Managing drivers and the kernel](#managing-drivers-and-the-kernel)
   - [Boot process and GRUB management](#boot-process-and-grub-management)
     - [Boot components](#boot-components)
     - [Bootloader](#bootloader)
@@ -40,7 +40,7 @@
     - [Software troubleshooting](#software-troubleshooting)
   - [Task Automation](#task-automation)
 
-## Kernel management
+## Device and Kernel management
 
 **Kernel basics**:
 * Kernel is the core of an OS
@@ -120,7 +120,6 @@
 * `rmmod` - remove module
   * removes a module from the kernel
 
-
 ### Tuning the kernel
 * The `/proc` pseudo filesystem is used for kernel tuning and optimization
 * This can be done by modifying specific kernel parameters directly
@@ -167,47 +166,35 @@
     * Save the setting afterwards with `sysctl -p`
 
 
-### Managing Devices 
-* **`sysfs`**
-  - **Type**: Virtual Filesystem  
-  - **Purpose**: Exposes kernel device and subsystem information to user space.  
-    - Mounted at `/sys` and provides information about devices and their attributes
-    - Presents information about:  
-      - Various kernel subsystems  
-      - Hardware devices  
-      - Drivers  
-  - **Example**:  
-    - Check `/sys/class/net` for network interface details.
-  - **Commands**
-    - `udevadm` is the command that provides an interface to query device information from `/sys`
-
+### Managing drivers and the kernel
 * **`udev`**
   - **Type**: Device Manager  
-  - **Purpose**: Responsible for dynamically creating and managing device nodes () in the `/dev/` directory.  
-    - Device nodes represent hardware devices like disks, USB drives, network interfaces, and more.  
+  - **Purpose**: Responsible for dynamically creating and managing device nodes in the `/dev/` directory.  
+    - Device nodes represent hardware devices like disks, USB drives, network interfaces, but also `/dev/null` which outputs zeroes, or `/dev/random` which output random.  
     - It is the automated variant of manually creating devices with `mknod` 
+    - Access is provided by a temporary filesystem (`tmpfs`) mounted to `/dev/`
   - **Capabilities**:  
     - Low-level access to the Linux device tree  
     - Handles user-space events (e.g., loading firmware, adding hardware)  
   - **Example**:  
-    - Access is provided by a temporary filesystem (`tmpfs`) mounted to `/dev/`
-
-* **`devtmpfs`**
-  - **Type**: Virtual Filesystem  
-  - **Purpose**: Automatically populates the `/dev` directory with device nodes at boot, which are then managed by `udev`.  
-  - **Example**:  
-    - Handles module loading for hardware devices
-
-* **`tmpfs`**
-- **Type**: Temporary Filesystem  
-- **Purpose**: A memory-based filesystem used for temporary data storage that does not persist after reboot.  
-- **Example**:  
-  - The `/tmp` directory is often mounted as `tmpfs`.
-
-* `dmesg` - display / driver messages
-  * Prints messages that have been sent to the kernel's message during andd after system boot
-  * Drivers can also send diagnostics messages to the kernel when they encounter errors
-  * Great for troubleshooting and driver validation
+    - Devices are detected and corresponding device files are created (e.g. USB thumb print is plugged or unplugged)
+  - **udevd**
+    - Unix device manager daemon
+    - Sometimes there's a lot more than might be wanted to do with a newly discovered device than just creating a device file for it
+      - E.g. you might want to automount it as a file system
+      - Or it is a communications device, like a hub,  it needs the appropriate kernel subsystem
+      - udevd is the **user-space** daemon that takes care of this
+      - `udevadm` - udevd manager - is the command to interact with it
+  - **`udevadm`**
+    - Query device info, trigger events, control the udevd daemon, and monitor udev and kernel events
+    - The command expects one of six commands as its first arguments
+      1. info
+      2. trigger
+      3. settle
+      4. control
+      5. monitor
+      6. test
+   - All paths are relative to `/sys`
 
 **Managing devices**
 * This is the directory that stores device files
@@ -221,6 +208,48 @@
   * `mknod <filename> <type> <major> <number>` 
   * This command lets you create a device file
   * In modern systems, this is done automatically by `udev` 
+
+* **`devtmpfs`**
+  - **Type**: Virtual Filesystem  
+  - **Purpose**: Automatically populates the `/dev` directory with device nodes at boot, which are then managed by `udev`.  
+  - **Example**:  
+    - Handles module loading for hardware devices
+
+* **`sysfs`**
+  - **Type**: Virtual Filesystem  
+  - **Purpose**
+    - Mounted at `/sys` and provides information about devices and their attributes
+    - It provides a detailed and well-organized information about the system's available devices, their configs, and their state
+    - Presents information about:  
+      - Various kernel subsystems  
+      - Hardware devices  
+      - Drivers  
+    - Control the kernel options
+      - This is where kernel hardening occurs
+      - Block IPv4/IPv6 settings among others
+  - **subdirectories of `/sys`**
+    - block - devices, such as hard disks
+    - bus - PCI-E, SCSI, USB
+    - class - a tree organized by functional types of devices, e.g. sound, graphic, input, nic
+    - dev - device information split between character and block devices
+    - devices - ancestrally correct representation of all discoverd devices
+    - firmware - interfaces to platform-specific subsystems such as ACPI
+    - fs - directory for some,, filesystems
+    - kernel - kernel internals such as cache and virtual memory status 
+    - module - dynamic modules loaded by the kernel
+    - power - few details on the system's power state, mostly unused
+  - **Commands**
+    - `sysctl`
+
+* **`tmpfs`**
+- **Type**: Temporary Filesystem  
+- **Purpose**: A memory-based filesystem used for temporary data storage that does not persist after reboot.  
+- **Example**:  
+  - The `/tmp` directory is often mounted as `tmpfs`.
+
+
+
+
 
 
 ## Boot process and GRUB management
@@ -977,7 +1006,11 @@ Log management typically involes a few major subtasks:
   * Modern application of syslog, syslog daemon
   * send system logs from all kinds of devices to a centralized server
   * `/etc/rsyslog.conf` - config file for rsyslog
-  *  
+
+
+* `dmesg`
+  * Utility to view kernel messages
+  * 
 
 * `logrotate`
   * 
