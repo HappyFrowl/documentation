@@ -14,6 +14,7 @@
     - [Managing filesystems](#managing-filesystems)
     - [XFS-specific filesystem management tools](#xfs-specific-filesystem-management-tools)
   - [Logical Volume Manager](#logical-volume-manager)
+    - [Tutorial: Creating LVM from a raw disk](#tutorial-creating-lvm-from-a-raw-disk)
   - [Archiving, Backup \& Recovery](#archiving-backup--recovery)
   - [Storage Troubleshooting](#storage-troubleshooting)
   - [Remote Filesystem Access](#remote-filesystem-access)
@@ -396,7 +397,7 @@
     * Options
         * `-a` - mount all. Great way of testing a recently reconfigured `/etc/fstab` file
         * `-t` - specify target
-        * `--mkdir` - create directory if not exists
+        * `-m | --mkdir` - create directory if not exists
         * `-a` - mount all filesystems defined in `/etc/fstab`
     * Mounting this way is non-persistent between reboot 
     * While booting, the `/etc/fstab` file is processed to persistently mount filesystems
@@ -406,7 +407,7 @@
 
 * `etc/fstab` - filesystem table
     * On modern distros, this file is processed by systemd, which converts the mount in a systemd mount
-    * If during the boot procedure, a filesystem that is specifided in `/etc/fstab` does not mount sucessfully, typically a troubleshooting prompt is shown where the error must be fixed mnaually
+    * If during the boot procedure, a filesystem that is specified in `/etc/fstab` does not mount successfully, typically a troubleshooting prompt is shown where the error must be fixed manually
     * `/etc/fstab` dictates how mounting happens at startup
     * It describes what devices are mounted, where, and with which options.
     * **File components**
@@ -438,12 +439,14 @@
         * user      - all users can mount 
         * exec      - allow binaries in a filesystem to be executed
         * noexec    - do not allow binaries in a filesystem to be executed
+        * nosuid    - do not allow sticky bits 
+        * nodev     - do not allow device files
         * ro        - mount filesystem as read only
         * rw        - mount filesystem with read/write permissions
         * sync      - input and output operations should be done synchronously
         * async     - input and output operations can be done asynchronously
     * Mounting NFS
-      * `192.168.1.50:/path/to/share/on/NAS /local/path nfs defaults 0 0`
+      * `192.168.1.50:/path/to/share/on/NAS /local/path nfs defaults,noexec,nosuid,nodev 0 0`
 
 * `findmnt` - find mount
     * Show all mounts on the system
@@ -471,10 +474,14 @@
     * `systemctl list-unit-files --type mount` - list all unit files for mounts
 
 * **systemd automount**
+    * systemd automount units are used as a modifier to a mount unit
+    * when using automount, the automount file should be enabled, not the mount file
+    * The automount and the mount filenames should be the same
+    * An automount file makes sure that a mount is only performed when the directory is activated
     * 
 
 
-
+ 
 * `umount <mount point>` - unmount
     * unmount a filesystem
     * options
@@ -545,12 +552,12 @@
 
 * **How to's**
     * **So in order to take a used disk and repurpose it:**
-        * wipe disk using `dd` (see below). Wiping the filesystem without deleting the files `wipefs` works as well 
-        * create a new drive label with `parted mklabel` and a new partition using `parted mkpart`
-        * format the partition `mkfs.<type>`
-        * add formatted partition to `/etc/fstab` so it can configured by the system to run at boot up
-        * run `partprobe` if needing to use the drive immediately without rebooting
-        * mount it using `mount`
+        * Wipe disk using `dd` (see below). Wiping the filesystem without deleting the files `wipefs` works as well 
+        * Create a new drive label with `parted mklabel <mbt/gpt>` and a new partition using `parted mkpart`
+        * Format the partition `mkfs.<type>`
+        * Add formatted partition to `/etc/fstab` so it can configured by the system to run at boot up
+        * Run `partprobe` if needing to use the drive immediately without rebooting. Or run `systemctl daemon-reload`
+        * Mount it using `mount`
 
     * **Remove swap partition and expand root partition**
         * `swapoff <swap space>`
@@ -633,6 +640,16 @@
     * `lvresize`    - resizes logical volumes
     * `lvremove`    - removes a logical volume
 
+### Tutorial: Creating LVM from a raw disk
+* `wipefs -a /dev/sdX`
+* `parted /dev/sdXY mklabel <label, e.g. gpt|mbr>`
+* `parted /dev/sdXY mkpart <partition_name> <size, e.g. 100%>s `
+* `pvcreate /dev/sdXY`
+* `vgcreate <volume_group_name> /dev/sdXY`
+* `lvcreate --size <size> --name <logical_volume_name> <volume_group_name>`
+
+
+After this you might need to run `xfs_growfs <path/to/mount>`  to increase the size on the fs itself
 
 ## Archiving, Backup & Recovery
 
@@ -644,11 +661,12 @@
         - `-t` - List archive contents.
         - `-f` - Specify the filename.
         - `-v` - Verbose (list files being processed).
-        - `-z` - Compress or decompress with gzip
+        - `-z` - Compress or decompress with **gzip**
         - `-C` - Specify the output file
     - **Examples:**
         * `tar -cvf <file>.tar <files>` - Create a tarball from specified files  
         * `tar -xvf <file>.tar` - Extract **all** files in tarball
+            * TAR extract ze vucking files
             * `tar -xvf <file>.tar <files>` - Extract only the mentioned files from tarball
             * `tar -xvf <file>.tar -C <directory>` - Extract the tarball into the specified directory 
         * `tar -tvf <file>.tar` - List files in tarball
@@ -705,6 +723,7 @@
     * Print filesystem usage.
     * `-h` - human-readable format (e.g., MiBs, GiBs).
     * `-i` - show inodes 
+    * `-T` - show file system type, (i.e. NFS, LVM, XFS, EXT4, etc)
 
 * `du` - disk usage 
     * `-h` - human readable 

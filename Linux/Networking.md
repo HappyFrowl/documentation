@@ -398,90 +398,112 @@
 
 
 ### RHEL Firewall
-* `firewalld`
-    * The standard in RHEL, and used by
-        * RHEL
-        * CentOS
-        * Alma Linux
-        * Rocky Linux
-        * Oracle Enterprise Linux
-    * **Terminology**
-        * `netfilter `
-            * This is the actual Linux firewall that runs the firewall underneath the hood
-            * It is the packet filtering code that is built-in the Linux Kernel
-            * To interact with it, a helper program is needed (e.g `iptables`, `nftables`, `firewalld`)
-        * `iptables`
-            * Default firewall manager for many distros
-        * `nftables`
-            * Newer, better, easier than `iptables`
-        * `firewall-cmd` 
-            * Command line frontend for `iptables` or `nftables`
-            * This injects the rules into `iptables` or `nftables` 
-    * **`firewalld` components:**
-        * **Zones**
-            * Predefined security profiles that define the level of trust for network connections, allowing for customizable firewall rules based on the designated zone for each network interface
-                * Examples of zones are: Public, DMZ, block, home, docker, etc
-                * More can be created manually with `firewall-cmd --new-zone=`
-                * Simply put: a zone is a profile stating the firewall rules, i.e. what traffic is allowed and what is not allowed
-            * The relationship between NICs and zones is many-to-one.
-              * This means that multiple NICs can be associated with a single zone, but each NIC can ONLY be associate to a single zone
-              * `firewall-cmd --get-active-zones` - shows what zones are active and what NICs are connected to them. 
-        * **Interfaces**
-            * Individual network cards
-            * Always assigned to zones
-            * One NIC can be associated with one zone MAX
-        * **Services**
-            * An XML-based configuration that specifies ports to be opened and modules that should be used
-        * **Forward ports**
-            * Used to forward traffic on a specific port to another port, maybe on a different machine 
-        * **Masquerading**
-            * Provides NAT
-        * **Rich rules**
-            * `firewall-cmd --add-rich-rule='<rule>'` 
-            * Extension to the `firewalld` syntax to make more complex configuration possible
-            * Create custom rules that cannot be created with the basic syntax
-            * For example: configure logging, port forwarding, masquerading, rate limiting
-                * `sudo firewall-cmd --add-rich-rule="rule family="ipv4" source address="192.168.1.1/32" service name="ftp" accept"`
-                * This allow incoming ftp traffic from 192.168.1.1/32
-            * Check `man 5 firewalld.richlanguage` for the syntax
-    * **Changing rules:**
-        * `firewall-cmd --zone=<zone> --add-port=8080/tcp ` - open up port 8080/tcp. 
-          * A zone must always be provided for the change to be applied. **Moreover, it must be called FIRST**
-          * Remember: `--permanent` was not provided, so this setting will last until reboot
-          * Always check whether the configuration was applied correctly: `firewall-cmd --get-all-zones | grep <port/service>`
-            * The success echo means very little, in my experience 
-          * This configuration will be visible in `nft list ruleset`
-        * `firewall-cmd --add-service=http` - open ports associated to the service
-        * `firewall-cmd --list-all-zones`
-            * View all available firewall zones and rules in their runtime configuration state 
-        * `--permanent` - make permanent changes 
-        * `firewall-cmd --runtime-to-permanent` - make changes made in the runtime permanent. Great for first testing a config without the `--permanent` flag, then after testing, making it permanent 
-    * **Limiting rule scope**:
-      * Not all rules should apply to all (incoming or outgoing) devices. In order to limit the scope of a rule, do the following:
-        1. Create a new zone - `firewall-cmd --permanent --new-zone={zone-name}` 
-        2. Limit the scope of this zone - `firewall-cmd --permanent [--source={source-IP} | --destination={destination-IP} --]`
-        3. Add rules to this scope - `firewall-cmd --add-port={port/protocol}`
-        4. Test it out
-        5. Make permanent - `firewall-cmd --runtime-to-permanent`
-      * This way firewall rules applied to this zone, only apply to a specific source or destination address  
-    * **Checking config**
-      * `firewall-cmd --list-ports` - list all the ports added.
-      * `firewall-cmd --get-active-zones` - Print currently active zones altogether with interfaces and sources used in these zones.
-      * `firewall-cmd --zone=public --list-all` - list everything added to a specific zone 
-    * **Logging**
-      * Checking and setting the log status
-        * From command line
-          * `firewall-cmd --get-log-denied` - get the current status for log handling
-          * `firewall-cmd --set-log-denied=all` - set the log handling status to `all` 
-        * From the config file
-          * `/etc/firewalld/firewalld.conf`
-          * Change `LogDenied=denied` to `LogDenied=all`
-      * Reading logs:
-        * `journalctl -xe` - check for the yellow lines starting with `filter_IN/OUT_public_REJECT` 
-    * **Notes**
-      * By default, Docker configs bypass firewalld by creating iptables configs
-        * There do not adhere to firewalld rules/ zones/ profiles
+`firewalld`
+  * The standard in RHEL, and used by
+      * RHEL
+      * CentOS
+      * Alma Linux
+      * Rocky Linux
+      * Oracle Enterprise Linux
       * 
+  * **Terminology**
+      * `netfilter `
+          * This is the actual Linux firewall that runs the firewall underneath the hood
+          * It is the packet filtering code that is built-in the Linux Kernel
+          * To interact with it, a helper program is needed (e.g `iptables`, `nftables`, `firewalld`)
+      * `iptables`
+          * Default firewall manager for many distros
+      * `nftables`
+          * Newer, better, easier than `iptables`
+      * `firewall-cmd` 
+          * Command line frontend for `iptables` or `nftables`
+          * This injects the rules into `iptables` or `nftables` 
+          * 
+  * **`firewalld` components:**
+      * **Zones**
+          * "A zone is a trust profile — public, internal, trusted, drop. Interfaces bind to one zone; their traffic gets that zone's allowed services and rules. I check bindings with get-active-zones."
+          * Predefined security profiles that define the level of trust for network connections, allowing for customizable firewall rules based on the designated zone for each network interface
+              * Examples of zones are: Public, DMZ, block, home, docker, etc
+              * More can be created manually with `firewall-cmd --new-zone=`
+              * Simply put: a zone is a profile stating the firewall rules, i.e. what traffic is allowed and what is not allowed
+          * The relationship between NICs and zones is many-to-one.
+            * This means that multiple NICs can be associated with a single zone, but each NIC can ONLY be associate to a single zone
+            * `firewall-cmd --get-active-zones` - shows what zones are active and what NICs are connected to them. 
+      * **Interfaces**
+          * Individual network cards
+          * Always assigned to zones
+          * One NIC can be associated with one zone MAX
+      * **Services**
+          * An XML-based configuration that specifies ports to be opened and modules that should be used
+      * **Forward ports**
+          * Used to forward traffic on a specific port to another port, maybe on a different machine 
+      * **Masquerading**
+          * Provides NAT
+      * **Policies**
+        * Policies are sets of firewall rules that control traffic flowing between zones in a stateful, unidirectional way (for example, from an ingress zone to an egress zone). 
+        * Unlike zones, policies can filter across directions (input, forwarded, and output) by matching traffic based on the ingress and egress zones and the services/ports rules you define
+        * **Block outgoing ssh**
+          * Outbound traffic is best handled with a policy and rich rule:
+            * `sudo firewall-cmd --permanent --new-policy block-ssh`
+            * `sudo firewall-cmd --permanent --policy block-ssh --add-ingress-zone HOST`
+            * `sudo firewall-cmd --permanent --policy block-ssh --add-egress-zone ANY`
+            * `sudo firewall-cmd --permanent --policy block-ssh --add-rich-rule='rule family="ipv4" port port="22" protocol="tcp" reject'`
+            * `sudo firewall-cmd --reload`
+      * **Rich rules**
+          * Rich rules handle fine-grained policy — source IP, port/protocol combos, logging, rate limits. I use --add-service for simple cases and rich rules when I need allow-from-one-IP or drop-with-log.
+          * `firewall-cmd --add-rich-rule='<rule>'` 
+          * Extension to the `firewalld` syntax to make more complex configuration possible
+          * Create custom rules that cannot be created with the basic syntax
+          * For example: configure logging, port forwarding, masquerading, rate limiting, blocking certain IPs, blocking specific incoming or outgoing traffic
+          * Check `man 5 firewalld.richlanguage` for the syntax
+          * Examples
+            * **Allow incoming ftp traffic from 192.168.1.1/32**
+                * `sudo firewall-cmd --add-rich-rule="rule family="ipv4" source address="192.168.1.1/32" service name="ftp" accept"`
+
+  * **Adding/removing rules:**
+      * `firewall-cmd --zone=<zone> --add-port=8080/tcp ` - open up port 8080/tcp. 
+        * A zone must always be provided for the change to be applied. **Moreover, it must be called FIRST**
+        * Remember: `--permanent` was not provided, so this setting will last until reboot
+        * Always check whether the configuration was applied correctly: `firewall-cmd --get-all-zones | grep <port/service>`
+          * The success echo means very little, in my experience 
+        * This configuration will be visible in `nft list ruleset`
+      * `firewall-cmd --add-service=http` - open ports associated to the service
+      * `firewall-cmd --list-all-zones`
+          * View all available firewall zones and rules in their runtime configuration state 
+      * `--permanent` - make permanent changes 
+      * `firewall-cmd --runtime-to-permanent` - make changes made in the runtime permanent. Great for first testing a config without the `--permanent` flag, then after testing, making it permanent 
+
+  * **Limiting rule scope**:
+    * Not all rules should apply to all (incoming or outgoing) devices. In order to limit the scope of a rule, do the following:
+      1. Create a new zone - `firewall-cmd --permanent --new-zone={zone-name}` 
+      2. Limit the scope of this zone - `firewall-cmd --permanent [--source={source-IP} | --destination={destination-IP} --]`
+      3. Add rules to this scope - `firewall-cmd --add-port={port/protocol}`
+      4. Reload firewall - `firewall-cmd --reload`
+      5. Test it out
+      6. Make permanent - `firewall-cmd --runtime-to-permanent`
+    * This way firewall rules applied to this zone, only apply to a specific source or destination address  
+
+  * **Checking config**
+    * `firewall-cmd --list-ports` - list all the ports added.
+    * `firewall-cmd --get-active-zones` - Print currently active zones altogether with interfaces and sources used in these zones.
+    * `firewall-cmd (--zone=public) --list-all` - list everything added (to a specific zone)
+
+  * **Logging**
+    * Checking and setting the log status
+      * From command line
+        * `firewall-cmd --get-log-denied` - get the current status for log handling
+        * `firewall-cmd --set-log-denied=all` - set the log handling status to `all` 
+      * From the config file
+        * `/etc/firewalld/firewalld.conf`
+        * Change `LogDenied=denied` to `LogDenied=all`
+    * Reading logs:
+      * `journalctl -xe` - check for the yellow lines starting with `filter_IN/OUT_public_REJECT` 
+
+  * **Notes**
+    * By default, Docker configs bypass firewalld by creating iptables configs
+      * They do not adhere to firewalld rules/ zones/ profiles/ policies
+      * Podman does not do this. So for podman, you must add firewall rules
+    * 
 
 
 
