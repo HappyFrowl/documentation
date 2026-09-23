@@ -370,32 +370,34 @@
 * All rules defined in iptables utilize Netfilter’s capabilities to process packets as they traverse the network stack.
 * Moreover, as we will shortly see, the uncomplicated firewall and firewalld utilize and leverage netfilter to process packets as trey traverse the network stack.
 
+-----------
 
 ### Uncomplicated firewall
-* `ufw` 
-    * The standard in Ubuntu-like distros
-    * interface for IP tables and is designed to simplify the process of configuring firewalls 
-    * Like any firewall, allow and block traffic by port number and IP address
-    * `status` - active/ inactive
-        * `verbose` - print more info
-        * `numbered` - print the rule numbers
-        * list the firewall rules
-    * `enable` / `disable`
-    * `reset` - resets firewall to its default configuration
-    * `default (allow|deny) (incoming|outgoing)` - manage the default rules
-    * **Managing incoming rules:**
-        * `ufw (allow|deny) (service|subnet|IP)`  
-        * `allow ssh` - allow incoming ssh traffic
-            * `allow 22` - same but with the port number
-        * `deny http` - deny http
-        * `deny proto (tcp|udp) from (any|IP) to any port <port number, port number>` 
-        * `(allow|deny) from (subnet|IP) to any port <port numbers>`
-    * **Managing outgoing rules:**
-        * `ufw (allow|deny) out <to IP | on {interface}> <proto (tcp|udp)> <port number>`
-        * `ufw deny out to 93.214.56.31 proto tcp port 443` - deny 443/tcp to 93.214.56.31
-        * `ufw deny out on eth0 to 192.168.1.100 port 80 proto tcp` - deny based on interface
-    * `delete <rule number>` - delete a firewall by specifying its number
+`ufw` 
+  * The standard in Ubuntu-like distros
+  * interface for IP tables and is designed to simplify the process of configuring firewalls 
+  * Like any firewall, allow and block traffic by port number and IP address
+  * `status` - active/ inactive
+      * `verbose` - print more info
+      * `numbered` - print the rule numbers
+      * list the firewall rules
+  * `enable` / `disable`
+  * `reset` - resets firewall to its default configuration
+  * `default (allow|deny) (incoming|outgoing)` - manage the default rules
+  * **Managing incoming rules:**
+      * `ufw (allow|deny) (service|subnet|IP)`  
+      * `allow ssh` - allow incoming ssh traffic
+          * `allow 22` - same but with the port number
+      * `deny http` - deny http
+      * `deny proto (tcp|udp) from (any|IP) to any port <port number, port number>` 
+      * `(allow|deny) from (subnet|IP) to any port <port numbers>`
+  * **Managing outgoing rules:**
+      * `ufw (allow|deny) out <to IP | on {interface}> <proto (tcp|udp)> <port number>`
+      * `ufw deny out to 93.214.56.31 proto tcp port 443` - deny 443/tcp to 93.214.56.31
+      * `ufw deny out on eth0 to 192.168.1.100 port 80 proto tcp` - deny based on interface
+  * `delete <rule number>` - delete a firewall by specifying its number
 
+-----------
 
 ### RHEL Firewall
 `firewalld`
