@@ -423,6 +423,7 @@ filepath="/home/user/projects/myproject/file.txt"
 
 ### Good shit
 * `:%s/<oldstring>/<newstring>/g`
+  * stream edit with in vim
   * replace **all** occurrences of `oldstring` by `newstring`
 * `:m` - move a line
   * `:m-68` - move the line where the cursor by 68 lines upward
@@ -447,21 +448,24 @@ filepath="/home/user/projects/myproject/file.txt"
   * `HEAD -> main, origin/main` - 
 
 * `git status` - Show the changes to files in a Git repository.
-  * `--verbose --verbose` - see information on changes in both the statging are and working directory
+  * `--verbose --verbose` - see information on changes in both the staging are and working directory
 
 ### **configuring git:**
 * `git config --global` - configure git: user info, default text editor
   * `user.name "<name>"`
   * `user.email "<email>"`
   * `core.editor <e.g. nano, vim, code --wait>` - configure default text editor
-
-* `.gitignore`
-  * mention all files that should be ignored from tracking
-    * e.g. `.env`
+* Change the global config either in `~/.gitconfig` or through `git config --global edit`
+    * `git config list` - List config
+    * `git config` 
  
 * `~/.gitconfig`
   * config file for git
   * contains user, email, text editor, signin key 
+
+* `.gitignore`
+  * mention all files that should be ignored from tracking
+    * e.g. `.env`
 
 * `.git` - inside each init directory.
   * **key directories:**
@@ -481,6 +485,7 @@ filepath="/home/user/projects/myproject/file.txt"
   * branches are like timelines that can diverge and converge
   * `git branch <name>` - create a new branch
   * `-m <oldname> <newname>` - move or rename a branch
+  * `-c <newbranch>` - create new branch and immediately checkout in it
   * When in doubt, keep an eye on the git folder to see where HEAD is pointing to
 
 * `git checkout`
@@ -539,7 +544,7 @@ filepath="/home/user/projects/myproject/file.txt"
     * `git reset --soft HEAD~#` 
       * after this, make the new commit and this will replace all #-amount commits previously done
       * after making the final commit, run: `git push --force` to apply the changes 
-      * don't do this on branches where you collaborate
+      * **Don't do this on branches where you collaborate**
 
 
 ### remote repos - e.g. github
@@ -564,7 +569,8 @@ filepath="/home/user/projects/myproject/file.txt"
 ### Github specific
 
 * `gh repo` - github specific commands
-  * `gh repo create <repo-name> --public` - Create a github repo
+  * `gh auth login` - login 
+  * `gh repo create <repo-name> --public` - Create a public github repo
   * `gh repo delete <repo-name> --yes` - Delete github repo
 
 * **Key authentication**
