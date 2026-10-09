@@ -12,6 +12,7 @@
     - [File Attributes](#file-attributes)
     - [Special permissions](#special-permissions)
   - [LDAP](#ldap)
+  - [User resource limits](#user-resource-limits)
 
 ## User and Group Management
 
@@ -79,7 +80,7 @@
 - `usermod` - modify a user
     - `-l` - set new login name
     - `-u` - set new uid
-    - `-a -G` - add the user to a group
+    - `-aG` - add the user to a group
     - `-L` - lock user
     - `-U` - unlock user
 - `groupadd` - create a group
@@ -89,8 +90,8 @@
     - `--gid` - set gid
     - `-o` - create group with duplicate gid
 - `groupmod` - modify group
-    - `-g` - change name
-    - `-u` - change gid
+    - `-g` - change gid
+    - `-n` - change name
 - `gpasswd` - modify group membership
     - `-A user1,user2 group` - define group admins
     - `-M user1,user2 group` - set list of group members
@@ -105,7 +106,7 @@
         - It contains:
             - Username
             - Password
-                - if the password is `!` and more nothing, the password is invalid
+                - if the password is `!` and more nothing, the password is locked
                 - if it contains something like `!$y$j9T$TW4`, **then the user is disabled**
             - Total number of days since 1 jan 1970 since the password was changed
             - Min days of days required between password changes 
@@ -203,7 +204,7 @@
 - `chmod` symbolic mode:
   - `chmod ug+w [file]` - add write permissions to user and group
   - `-v` - verbose for debugging
-  - `-f` - change permissions recursively
+  - `-R` - change permissions recursively
   - `-f` - hide errors
   - `-c` - display output of changes
 
@@ -212,6 +213,7 @@
   - `2` - write 
   - `1` - execute
   - `chmod -c 777 file.txt` - give rwxrwxrwx permissions to file.txt. Everyone can read, write and execute 
+    - `-c` like verbose but report only when a change is made
 
 - `umask`
   - This sets the default file permissions for newly created files
@@ -226,12 +228,22 @@
 - More granular file control than permissions
   - Set access to one or multiple directories
   - Grant permission to more than one user and/or group 
-- `getfacl` - Get current file ACL. It outputs:
+- `getfacl` - get file access control list 
+- Get current file ACL. It outputs:
   - file, owner, group, and user/group/other permissions
-- `setfacl` - set file ACL for a user or group specifically
+- `setfacl` - set access control list
+  - set file ACL for a user or group specifically
   - `setfacl -m u:username:rwx /path/to/file_or_directory` - give `username` read, write, and execute permissions to `file`
-  - `setfacl -x -all path/to/file_or_directory` - remove all permissions for all users. Same as `chmod 0000 path/to/file_or_directory`
+  - `setfacl -x -all path/to/file_or_directory` - remove all permissions for all users.s
   - `-b` - Remove all entries except standard permissions
+  - `-k` - Remove the Default ACL. If no Default ACL exists, no warnings are issued.
+  - `-R` - Apply recursive
+  - `-m` `-M` - modify the ACL of a file or directory.
+  - `-x` `-X` - remove the ACL of a file or directory.
+  - examples:
+    - `setfacl -m u:lisa:r file` - Granting an additional user read access
+    - `setfacl -m m::rx file` - Revoking write access from all groups and all named users (using the effective rights mask)
+    - `setfacl -x g:staff file` - Removing a named group entry from a file's ACL
 
 
 ### File Attributes
@@ -241,23 +253,23 @@
   - Of the ones mentioned below, the `immutable` attribute is one of the most used
   - Many other ones are not supported or used any more
 
-| Position | Attribute | Meaning                                                                |
-|----------|-----------|------------------------------------------------------------------------|
-| 1        | a         | Append-only: File can only be opened in append mode.                  |
-| 2        | c         | Compressed: File is compressed on disk automatically by the filesystem.|
-| 3        | d         | No dump: File will not be backed up by the dump program.              |
-| 4        | e         | Extents: File is using extents for mapping blocks (ext4-specific).    |
-| 5        | i         | Immutable: File cannot be modified, deleted, or renamed.             |
-| 6        | j         | Data journaling: All data is written to the journal first.            |
-| 7        | s         | Secure deletion: File contents are erased securely (if supported).    |
-| 8        | t         | No tail-merging: Disable tail-merging for this file.                  |
-| 9        | u         | Undeletable: File can be recovered after deletion.                   |
-| 10       | A         | No atime updates: Access timestamp is not updated.                   |
-| 11       | D         | Synchronous directory updates.                                        |
-| 12       | S         | Synchronous updates: File updates are written synchronously.         |
-| 13       | T         | Top-level directory: Reserved for ext3/ext4 directory indexing.      |
-| 14       | h         | Huge file: Indicates a huge file (specific to ext4).                 |
-| 15       | E         | Encrypted: File is encrypted (ext4 encryption).                      |
+| Position | Attribute | Meaning                                                                 |
+| -------- | --------- | ----------------------------------------------------------------------- |
+| 1        | a         | Append-only: File can only be opened in append mode.                    |
+| 2        | c         | Compressed: File is compressed on disk automatically by the filesystem. |
+| 3        | d         | No dump: File will not be backed up by the dump program.                |
+| 4        | e         | Extents: File is using extents for mapping blocks (ext4-specific).      |
+| 5        | i         | Immutable: File cannot be modified, deleted, or renamed.                |
+| 6        | j         | Data journaling: All data is written to the journal first.              |
+| 7        | s         | Secure deletion: File contents are erased securely (if supported).      |
+| 8        | t         | No tail-merging: Disable tail-merging for this file.                    |
+| 9        | u         | Undeletable: File can be recovered after deletion.                      |
+| 10       | A         | No atime updates: Access timestamp is not updated.                      |
+| 11       | D         | Synchronous directory updates.                                          |
+| 12       | S         | Synchronous updates: File updates are written synchronously.            |
+| 13       | T         | Top-level directory: Reserved for ext3/ext4 directory indexing.         |
+| 14       | h         | Huge file: Indicates a huge file (specific to ext4).                    |
+| 15       | E         | Encrypted: File is encrypted (ext4 encryption).                         |
 
 
 - `chattr` 
@@ -275,9 +287,10 @@
   * They can be upper or lower case
 * Files with Set UID or Set GID can be read by using `ls`. The files will pop out with a red background
   * `-rwsr-xr-x 1 root root 59704 Nov 21 21:01 mount`
-* Red background + white letters = set UID
-* Yellow background + black letters = set GID
-* Red background + yellow letters = set UID and set GID
+* On my system:
+  * Red background + white letters = set UID
+  * Yellow background + black letters = set GID
+  * Red background + yellow letters = set UID and set GID
 
 
 
@@ -298,7 +311,7 @@
   chmod 4755 file  # Sets rwsr-xr-x
   ```
 ---
-2. **SGID - Set Group ID** 
+1. **SGID - Set Group ID** 
 - `s`/ `S` on group position
 - **Purpose:**
   - For files: Ensures the file executes with the permissions of its group.
@@ -316,7 +329,7 @@
   chmod 2755 file  # Sets rwxr-sr-x
   ```
 ---
-3. **Sticky Bit** 
+1. **Sticky Bit** 
 - `t` / `T` on others execute position
 - **Purpose:** Restricts deletion of files within a directory. Only the owner of a file, the owner of the directory, or the root user can delete files in that directory.
 - **Applicable to:** Directories (rarely used on files).
@@ -334,4 +347,6 @@
 
 ## LDAP
 
-* `sssd`
+
+## User resource limits
+
