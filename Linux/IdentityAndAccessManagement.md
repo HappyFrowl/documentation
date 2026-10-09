@@ -346,7 +346,24 @@
 
 
 ## LDAP
+- LDAP is a protocol to centralize user and group data across multiple hosts.
+- TODO:
+  - Install and configure an LDAP client using `nss-pam-ldapd` / `sssd`
+  - Configure `sssd.conf` for user and group lookup
+  - Verify identity resolution with `getent passwd`, `getent group`, and `id`
+  - Troubleshoot issues such as missing `nsswitch.conf` entries or auth failures 
 
 
 ## User resource limits
+- Resource limits control how much CPU, memory, processes, and file descriptors a user or service can consume
+- Practical examples are usually implemented through PAM and systemd/cgroups:
+  - [SystemAdministration.md](SystemAdministration.md) for `ulimit`, PAM limits, and cgroup/resource-limit concepts
+  - [Security.md](Security.md) for PAM integration and authentication-related restriction points
+  - [Monitoring.md](Monitoring.md) for diagnosing when a process hits limits or the system is under resource pressure
+- Common commands and files to review:
+  - `ulimit -a` and `ulimit -n <value>`
+  - `/etc/security/limits.conf`
+  - `/etc/security/limits.d/*.conf`
+  - `systemctl show <service>` / `systemd-run` / cgroup-aware systemd configuration when limits must be applied to a service rather than just a shell session
+- Practical rule of thumb: use `ulimit` for interactive shells and user sessions, and use PAM/systemd limits for persistent service or account-level restrictions.
 

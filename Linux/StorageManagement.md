@@ -22,7 +22,7 @@
 
 ## Storage and Filesystem Basics
 * **Section overview**
-    * This section will offer a brief overview over storage and filesystem basics
+    * This section will offer a brief overview of storage and filesystem basics
     * It covers the Linux filesystem, inodes, hard and symbolic linking, how to localize files, and the essential of RAID configuration
 
 ### The Linux Filesystem
@@ -445,7 +445,7 @@
         * rw        - mount filesystem with read/write permissions
         * sync      - input and output operations should be done synchronously
         * async     - input and output operations can be done asynchronously
-    * Mounting NFS
+    * Mounting NFS persistently:
       * `192.168.1.50:/path/to/share/on/NAS /local/path nfs defaults,noexec,nosuid,nodev 0 0`
 
 * `findmnt` - find mount
