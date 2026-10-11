@@ -102,12 +102,16 @@
   * **Commonly used commands:**
     * `-n {number of lines}` - specify number of lines printed
     * `-o <output format>` - specify output format
-    * `-f` - print nmost recent entries
-    * `-p` - filter log by severity
-    * `-u` - filter log output by name of the service
-    * `-b` - Displays messages since the last boot.
+    * `-f` - print most recent entries
+    * `-g` - Show entries with MESSAGE matching PATTERN
+    * `-p` - filter log by severity: crit, err, warning, info
+    * `-u` - filter log output by name or id of the service
+    * `-b 0` - Displays messages since the last boot.
+      * `-b -1` - Displays messages from last boot
     * `--since "2 days ago"` - Logs from 2 days ago.
     * `-xeu [service name]` - {-x} Augment log lines with explanation texts from the message catalog. {-e} Immediately jump to the end of the journal inside the implied pager tool
+    * `-S <HH:mm> -U <HH:mm>` - Since -- until
+    * 
     * `PID=<#number>` - look for a specific process ID
 
 

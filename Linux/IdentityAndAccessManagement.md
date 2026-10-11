@@ -3,6 +3,7 @@
   - [User and Group Management](#user-and-group-management)
     - [**Users**](#users)
     - [**Creating and managing users and groups:**](#creating-and-managing-users-and-groups)
+    - [Profiles](#profiles)
     - [**sudo groups**](#sudo-groups)
     - [Managing user sessions](#managing-user-sessions)
   - [File permissions and ownership](#file-permissions-and-ownership)
@@ -11,8 +12,8 @@
     - [Access Control Lists](#access-control-lists)
     - [File Attributes](#file-attributes)
     - [Special permissions](#special-permissions)
-  - [LDAP](#ldap)
   - [User resource limits](#user-resource-limits)
+  - [LDAP](#ldap)
 
 ## User and Group Management
 
@@ -47,16 +48,22 @@
     - Add users to `sudo` group 
     - `visudo -c` checks the sudoers file for errors
     - The basic structure of a sudoers rule is as follows:
-      - `<user> <host>= (<run-as user>) <command> : <SELinux role>`
+      - `<user> <host>=(<run-as user>) <command> : <SELinux role>`
+      - `who  where=(run-as-user)  command` 
+      - `ALL ALL=(ALL) /bin/command`  means that *any user*, on *any host* (covered by this rule) can *run* `/bin/command` *as any user*. 
+      - Leaving out (ALL) means the command runs as root by default
+
     - Examples
       - Add john to sudoers
-          - `john ALL=(ALL) ALL:ALL`
+          - `john ALL=(ALL) ALL`
       - Ensure all users can use `command`
           - `ALL ALL=(ALL) /bin/command`
       - Give `john` access to `command` and to `updatedb`
           - `john ALL=/path/to/command, /bin/updatedb`
-      - Let `user` use `updatedb` without prompting for password
-          - `username ALL=(ALL) NOPASSWD: /bin/updatedb`
+      - Let `john` use `updatedb` without prompting for password
+          - `john ALL=(ALL) NOPASSWD: /bin/updatedb`
+      - Let users in group `devs` use `/bin/command`
+        - `%devs ALL=(ALL) /bin/command`
 
 
 ### **Creating and managing users and groups:**
@@ -80,9 +87,10 @@
 - `usermod` - modify a user
     - `-l` - set new login name
     - `-u` - set new uid
-    - `-aG` - add the user to a group
+    - `-aG` - append group - add the user to a group
     - `-L` - lock user
     - `-U` - unlock user
+    - `-e` - expire - set user account to expire at <date>
 - `groupadd` - create a group
     - groups are stored in `/etc/group`
         - `groupname:grouppassword:gid:usersingroup`
@@ -98,9 +106,11 @@
     - `-a user group` - add user to group
     - `-d user group` - delete user from group
 - `chage` - change expiration date 
-    - `-E` - set expiration date for user account
+    - `-E` - set expiration date for *user account*
+    - `-d 0` - Mark password to be expired immediately
     - `-l` - list expiration date for user
     - `-w` - set a warning for a user
+    - `-d 0` - set date of last password change to immediately
 - `passwd` - change password for a user
     - Passwords are stored in `/etc/shadow`
         - It contains:
@@ -131,6 +141,20 @@
 
 * `vipw`
   * Manage users by editing the `/etc/passwd`
+
+### Profiles
+* `/etc/profile.d`
+  * Directory where scripts can be placed that will run at login
+* `/etc/profile.d`
+* `/etc/skel`
+  * Directory with files and directories that will be added as the default to every user home profile 
+* `/etc/environment`
+  * set env values for all users
+* `env` - check a user's environment
+  * adding environment variable
+  * add them to .bashrc
+  * export VAR=value
+  * source .bashrc
 
 ### **sudo groups**
 - `sudo`
@@ -274,8 +298,9 @@
 
 - `chattr` 
   - Change attributes of files or directories
-  - `chattr +i path/to/file_or_directory` - make a file or directory imutable to changes and deletion, even by superuser
-  - `chattr -i path/to/file_or_directory` - make it mutuable again
+  - `chattr +i <file>` - make a file or directory imutable to changes and deletion, even by superuser
+  - `chattr -i <file>` - make it mutuable again
+  - `chattr -a <file>` - make it append only
   - `chattr =abc /path/to/file_or_directory` - set the attributes to abc
   - `-R` - same but recursively
 
@@ -344,16 +369,6 @@
   chmod 1755 file  # Sets rwxr-xr-t
   ```
 
-
-## LDAP
-- LDAP is a protocol to centralize user and group data across multiple hosts.
-- TODO:
-  - Install and configure an LDAP client using `nss-pam-ldapd` / `sssd`
-  - Configure `sssd.conf` for user and group lookup
-  - Verify identity resolution with `getent passwd`, `getent group`, and `id`
-  - Troubleshoot issues such as missing `nsswitch.conf` entries or auth failures 
-
-
 ## User resource limits
 - Resource limits control how much CPU, memory, processes, and file descriptors a user or service can consume
 - Practical examples are usually implemented through PAM and systemd/cgroups:
@@ -361,9 +376,40 @@
   - [Security.md](Security.md) for PAM integration and authentication-related restriction points
   - [Monitoring.md](Monitoring.md) for diagnosing when a process hits limits or the system is under resource pressure
 - Common commands and files to review:
-  - `ulimit -a` and `ulimit -n <value>`
+  - `ulimit -a` - shows all security limits 
+  - `ulimit -n <value>`
   - `/etc/security/limits.conf`
   - `/etc/security/limits.d/*.conf`
   - `systemctl show <service>` / `systemd-run` / cgroup-aware systemd configuration when limits must be applied to a service rather than just a shell session
 - Practical rule of thumb: use `ulimit` for interactive shells and user sessions, and use PAM/systemd limits for persistent service or account-level restrictions.
+
+- The `limits.conf` file has a bunch of values, which will be explained here 
+  - **type** 
+    - hard = users cannot override
+    - soft = user can override
+    - - = hard and soft limit
+  - **item**
+    - nproc = max number of processes in a user session
+    - fsize = max file size created in a user session in KB
+    - cpu = max cputime (in 100%)
+-  package = `libnss-ldapd`
+   -  After installing it, you are prompted to configure it 
+      -  IP address of the LDAP server
+      -  domain info
+      -  which files to sync (passwd, shadow, group, to name a few)
+-  name server local daemon
+   -  `/etc/nslcd.conf` - config file
+   -  
+
+
+## LDAP 
+- Lightweight Directory Access Protocol
+- LDAP is a protocol to centralize user and group data across multiple hosts.
+- TODO:
+  - Install and configure an LDAP client using `nss-pam-ldapd` / `sssd`
+  - Configure `sssd.conf` for user and group lookup
+  - Verify identity resolution with `getent passwd`, `getent group`, and `id`
+  - Troubleshoot issues such as missing `nsswitch.conf` entries or auth failures 
+
+- 
 

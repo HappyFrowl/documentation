@@ -72,19 +72,37 @@
       * `/run/netplan`
       * `/etc/netplan`
       * `/lib/netplan`
+  * example config files can be found here `/usr/share/doc/netplan/examples`
+
 * **Configuration**
     * `/etc/netplan/*.yml`
     * `netplan try` 
         * Command to run to test the changes
     * `netplan apply`
         * Apply changes
-* Network bonds
-    * Same as NIC teaming
-    * Several mode, but two are important:
-        1. Mode 4: 802.3ad - industry standard for network bonds. It does require switch support
-        2. Mode 5: balance-alb (all load balance). Incoming and outgoing traffic is distributed over all available NICs. This mode does not require switch support
-    * Add section `bonds:` etc 
+    * or 
+        * `sudo netplan generate`
+        * `sudo networkctl reload`
+        * `sudo networkctl reconfigure enp6s0`
 
+* **Network bonds**
+    * Same as NIC teaming
+    * Two or more NICs are bonded together, increasing resiliency and throughput
+    * Network bonding modes - from 0 to 7... But two are important:
+        1. Mode 4: 802.3ad - industry standard for network bonds. It does require switch support. This mode does increase throughput  
+        2. Mode 5: adaptive transmit load balancing. Incoming and outgoing traffic is distributed over all available NICs. This mode does not require switch support. 
+      * to find them all, check `man netplan` and look for bond
+    * Add section `bonds:` in the netplan config yml
+    * `cat /proc/net/bonding/bond0` - get status
+
+* **Network bridge**
+  * Connect two or more NICs together such that devices connected to those NICs can communicate with each other as if they're on the same network
+  * 
+
+
+* **Port redirection**
+  *  First: enable IP forwarding in `/etc/sysctl.conf` or `/etc/sysctl.d/99-sysctl.conf`
+  *  then use ip tables
 
 ## Network troubleshooting
 
@@ -98,12 +116,23 @@
 
 - `ip` - IP address
     - Changes made with `ip` are non-persistent
+    - Popular objects
+      - `link` - manage network devices, e.g. eht0, lo
+      - `address` - manage ip addresses
+      - `route` - manage routes and gateways
     - **Options**:
-        - `ip a` - same as ifconfig
+        - `ip a` - same as ifconfig and ip address
         - `ip link show` - show available interfaces. This does not show the IP address etc as `ip a` does
         - `ip link set <interface> (up|down)` - bring an interface up or down. Same as `ifdown`/ `ifup`
-        - `ip a add` - add interface configuration      
-        - `ip r` - show configured routes. This also shows the default gateway
+        - `ip a add <ip> dev <dev>` - add an IP to a specific link device      
+        - `ip r[oute]` - show configured routes. This also shows the default gateway
+          -  `ip route add default via 192.168.1.1` - add default route
+
+* `/etc/network/interfaces`
+  * Network configuration file for Debian family distros
+* `/etc/sysconfig/network-script`
+  * for Red Hat
+  * 
 
 * `ethtool` - 
     * Query or control network driver and hardware settings
@@ -128,6 +157,16 @@
         - to: 10.8.0.0/16
             via: 192.168.1.1
         ```
+    * To apply: 
+        * `sudo netplan generate`
+        * `sudo networkctl reload`
+        * `sudo networkctl reconfigure enp6s0`
+
+    * **On debian**
+      * use `/etc/network/interfaces.d/`
+      * create a file in it 
+      * 
+
     * **On RedHat**
         * Use `nmcli connection modify <connection-name> +ipv4.routes "<dest> <router>"`
         * e.g.: `nmcli connection modify wlp4s0 +ipv4.routes 10.8.0.0/16 192.168.1.1` 
@@ -178,6 +217,13 @@
     * Combination of `ping` and `traceroute`
     * Enables testing the quality of a network connection
     * Identify packet loss
+
+* `tcpdump`
+  * Capture network packets
+  * `tcpdump -i eth0` - capture packets on specific interface
+  * `tcpdump -i eth0 tcp port 80` - capture on specific interface and port/ protocol
+  * `tcpdump -w capture.pcap` -  write it to a file
+  * `tcpdump -r capture.pcap` - read a file
 
 ## DNS
 
@@ -230,6 +276,8 @@
     * Configuration file for DHCP
     * Edited using `nmcli`
     * Add line `supersede domain-name-server <IP DNS servers>`.
+* `/var/log/syslog`  - this is where logs are written to
+* `systemctl status isc-dhcp-server` - check status dhcp server 
 
 
 ## File & data transfer
@@ -342,6 +390,7 @@
       * `-A`, `--append`: Append to the chain provided in parameters
       * `-D`, `--delete`: Delete rule from specified chain
       * `-C`, `--check`: Check if rule is present in the chain or not
+
   * **Common used options**
     * `-p`, `--proto` - protocol that the packet follows
     * `-s`, `--source` - source IP of the packet
@@ -359,9 +408,14 @@
     * Running just `iptables-save` dumps the contents of the configured iptables and does not save them
 * **Logging:**
     * Events for iptables are written to `/var/log/messages` or `/var/log/kern.log` files
-* **Examples**
-* `iptables -t[able] nat -A[ppend] POSTROUTING -d[estination] <IP> -p[rotocol] <protocol>  -j[ump] DNAT --to-destination <IP:port>`
-* `iptables -t nat -A PREROUTING -i <interface> -p <protocol> --dport <port> -j MASQUERADE`
+
+* **Examples - lets configure port forwarding**
+    * `iptables -t[able] nat -A[ppend] PREROUTING -d[estination] <IP> -p[rotocol] <protocol>  -j[ump] DNAT --to-destination <IP:port>`
+      * forward packets to IP:prot 
+    * `iptables -t nat -A POSTROUTING -i <interface> -p <protocol> --dport <port> -j MASQUERADE`
+      * Masquerades matching packets as they leave through <interface>
+      * This is needed to configure return routing properly
+  * Just use firewalld lmao
 
 
 ### Netfilter
@@ -378,12 +432,17 @@
   * interface for IP tables and is designed to simplify the process of configuring firewalls 
   * Like any firewall, allow and block traffic by port number and IP address
   * `status` - active/ inactive
+      * list the firewall rules
       * `verbose` - print more info
       * `numbered` - print the rule numbers
-      * list the firewall rules
   * `enable` / `disable`
+    * turn ufw on/off
   * `reset` - resets firewall to its default configuration
   * `default (allow|deny) (incoming|outgoing)` - manage the default rules
+    * in / out - is also accepted
+  * `delete <rule number>` - delete a firewall by specifying its number
+  * `insert <number> <fw rule>` - insert a fw rule with a specific number
+
   * **Managing incoming rules:**
       * `ufw (allow|deny) (service|subnet|IP)`  
       * `allow ssh` - allow incoming ssh traffic
@@ -391,11 +450,15 @@
       * `deny http` - deny http
       * `deny proto (tcp|udp) from (any|IP) to any port <port number, port number>` 
       * `(allow|deny) from (subnet|IP) to any port <port numbers>`
+
   * **Managing outgoing rules:**
-      * `ufw (allow|deny) out <to IP | on {interface}> <proto (tcp|udp)> <port number>`
-      * `ufw deny out to 93.214.56.31 proto tcp port 443` - deny 443/tcp to 93.214.56.31
+      * `ufw (allow|deny) out <to {IP} | on {interface}> <proto (tcp|udp)> <port number>`
+        * Allow or deny outgoing traffic to a specific IP or on a specific interface, and on a specific port/protocol
+      * `ufw deny out to 93.214.56.31 proto tcp port 443`
+        * deny 443/tcp to 93.214.56.31
       * `ufw deny out on eth0 to 192.168.1.100 port 80 proto tcp` - deny based on interface
-  * `delete <rule number>` - delete a firewall by specifying its number
+
+ 
 
 -----------
 
@@ -420,7 +483,7 @@
       * `firewall-cmd` 
           * Command line frontend for `iptables` or `nftables`
           * This injects the rules into `iptables` or `nftables` 
-          * 
+
   * **`firewalld` components:**
       * **Zones**
           * "A zone is a trust profile — public, internal, trusted, drop. Interfaces bind to one zone; their traffic gets that zone's allowed services and rules. I check bindings with get-active-zones."

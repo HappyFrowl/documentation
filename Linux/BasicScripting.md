@@ -131,7 +131,13 @@
 * **`sed`** - Stream Editor
   - Replace characters in a regular expression.
   - Syntax:
-    `sed 's/<pattern>/<replacement>/' <file>`
+    - `sed 's/<pattern>/<replacement>/' <file>`
+      - replace the FIRST instance of the pattern
+      - This only outputs the replacement, it doesnt do it in the file 
+    - `-i` - in place replacement
+    - to make sed case insentive add an `i` to the end 
+      - `sed 's/<pattern>/<replacement>/gi' <file>`
+      - replace ALL patterns, case insentive
 
 * **`awk`** - pattern scanning and text processing language
 

@@ -160,6 +160,7 @@
     * Context and labels are the central components of SElinux
     * **Security context** - or just context
         * Refers to a structured string: `user:role:type:level`
+          * This refers to the label which is something like `unconfined_u:object_r:user_home_t:s0`
         * It is the format/structure used to describe the SELinux security attributes of an object or process.
     * **Labels**
         * Is the *actual implementation* of a security context applied to an object (like a file or process)

@@ -5,19 +5,19 @@
     - [inodes](#inodes)
     - [Hard and Symbolic Links](#hard-and-symbolic-links)
     - [File types and localization](#file-types-and-localization)
-    - [RAID](#raid)
-    - [Swap management](#swap-management)
+  - [RAID](#raid)
+  - [Swap management](#swap-management)
   - [Disk, partition, and filesystem management](#disk-partition-and-filesystem-management)
     - [Introduction and overview](#introduction-and-overview)
     - [Managing disks and partitions](#managing-disks-and-partitions)
     - [Mounting \& unmounting](#mounting--unmounting)
+  - [Remote Filesystem Access](#remote-filesystem-access)
     - [Managing filesystems](#managing-filesystems)
     - [XFS-specific filesystem management tools](#xfs-specific-filesystem-management-tools)
   - [Logical Volume Manager](#logical-volume-manager)
     - [Tutorial: Creating LVM from a raw disk](#tutorial-creating-lvm-from-a-raw-disk)
   - [Archiving, Backup \& Recovery](#archiving-backup--recovery)
   - [Storage Troubleshooting](#storage-troubleshooting)
-  - [Remote Filesystem Access](#remote-filesystem-access)
 
 
 ## Storage and Filesystem Basics
@@ -83,7 +83,7 @@
 - Home directory for root 
 
 `/run`
-- Rendezvous point for running programs
+- For running programs
 
 `/sbin` - System Binaries
 - Contains core system binaries or executables for the superuser (root).
@@ -144,7 +144,7 @@
     - Check links with `ls -li`.
     - **Note**: Hard links are not allowed for directories.
   
-- **Symbolic (Soft) Link**
+- **Symbolic ("Soft") Link**
     - A link to another file name.
     - Can span across different filesystems.
     - Akin to shortcuts in Windows.
@@ -156,7 +156,7 @@
 * **File types** - and their symbol
   * Regular files   - `-`
   * Directories - `d`
-  * Character device fils   - `c`
+  * Character device files   - `c`
   * Block device files  - `b`
   * Local domain sockets  - `s`
   * Named pipes (FIFOs) - `p`
@@ -201,17 +201,16 @@
 - `stat`
     - Display file or filesystem status 
     - Output includes details like: 
-    -   File name 
-    -   File size 
-    -   Blocks allocated 
-    -   IO block size 
-    -   File type 
-    -   Device ID 
-    -   Inode number 
-    -   Links 
-    -   Access, Modify, and Change timestamps 
+    - File name 
+    - File size 
+    - Blocks allocated 
+    - IO block size 
+    - Device ID 
+    - Inode number 
+    - Links 
+    - Access, Modify, and Change timestamps 
 
-### RAID
+## RAID
 * RAID types
     * Striping
     * Mirroring
@@ -236,7 +235,7 @@
     * contains a snapshot of the kernel's RAID/ md state
  
 
-### Swap management
+## Swap management
 * Swap is a way of emulating RAM on the disk 
 * Useful for when you're low on RAM
 
@@ -255,13 +254,18 @@
 * `swapoff <file>`
     * Deactivate a swap partition
 
-* swap partition
+* Creating a swap partition 
     * `fdisk <disk>`
     * `t` - change the type
     * select a partition
     * enter hex code `82` - this changes the partition type to swap
     * `w` - to write the changes
-    * `swapon 
+    * `mkswap <partition>` 
+    * `swapon`
+  * this is non persistent!
+  
+* To make it persistent:
+  * declare it in `/etc/fstab`f
 
 
 ## Disk, partition, and filesystem management
@@ -404,6 +408,7 @@
     * Mounting NFS
       * `mount -t nfs <ip>:</path/to/share> </path/to/local/directory>`
       * Note: this is made persistent in `/etc/fstab`
+    * `mount -o remount,rw /` - Apply changes to a file system that is already mounted
 
 * `etc/fstab` - filesystem table
     * On modern distros, this file is processed by systemd, which converts the mount in a systemd mount
@@ -479,8 +484,6 @@
     * The automount and the mount filenames should be the same
     * An automount file makes sure that a mount is only performed when the directory is activated
     * 
-
-
  
 * `umount <mount point>` - unmount
     * unmount a filesystem
@@ -491,6 +494,19 @@
         * `-t <fs type>` - unmount all filesystem types specified
         * `-O` - unmount only the filesystems with specified options in the `/etc/fstab` file
         * `--fake` - dryrun it
+
+
+## Remote Filesystem Access
+**Network Block Devices (NBD)**
+* Use storage on another computer as if it were a local disk. 
+* Install packages: `nbd-server` and/or `nbd-client`
+* `/etc/nbd-server/config` - config file
+* NBD has it own module, nbd
+* `modprobe -a nbd` - non persistent
+* `echo nbd >> /etc/modules-load.d/modules.conf` - persistent
+* `ndb-client <ip> -N <partition>` - 
+  * This will create a block device, like `/dev/ndb0`
+  * This can then be mounted 
 
 ### Managing filesystems
 * `wipefs` - wipe filesystem
@@ -504,6 +520,8 @@
     - Some options:
         - `-v` - verbose
         - `-c` - check for bad blocks before building the filesystem
+        * `-L` -  Set the volume label for the file system to new-volume-label
+        * 
 
 * `/etc/crypttab` 
     * A file containing information about encrypted devices and partitions that must be unlocked and mounted on system boot
@@ -603,7 +621,7 @@
         * The Logical Volume (LV) are created as block devices fro mthe volume group and formatted with any filesystem
     * `/dev/mapper` contains all the logical volumes on a given system managed by LVM
 
-* Physical volume tools
+* PV - Physical volume tools 
     * `pvscan`      - scan for all physical devices being used as physical volumes
     * `pvcreate`    - Initializes a drive or partition to use as a physical volume
          * It all starts with this
@@ -614,9 +632,10 @@
     * `pvck`        - checks the metadata of physical volumes
     * `pvremove`    - removes physical volumes
 
-* Volume group tools
+* VG - Volume group tools
     * `vgscan`      - scan all physical devices for volume groups
     * `vgcreate`    - creates volumes groups
+      * `vgcreate <group name> <pv to use>`
     * `vgdisplay`   - lists attributes of volume groups
     * `vgchange`    - changes attributes of volume groups
     * `vgs`         - displays information about volume groups
@@ -628,7 +647,7 @@
     * `vgsplit`     - splits a volume group into two
     * `vgremove`    - removes volume groups
 
-* Logical volume tools
+* LV - Logical volume tools
     * `lvscan`      - scan for all physical devices for logical volumes
     * `lvcreate`    - creates logical volumes in a volume group 
     * `lvdisplay`   - lists attributes of logical volumes
@@ -640,16 +659,23 @@
     * `lvresize`    - resizes logical volumes
     * `lvremove`    - removes a logical volume
 
+* PE - Physical Extents
+  * Data in LVM is divided into multiple PEs
+  * 
+
 ### Tutorial: Creating LVM from a raw disk
 * `wipefs -a /dev/sdX`
-* `parted /dev/sdXY mklabel <label, e.g. gpt|mbr>`
-* `parted /dev/sdXY mkpart <partition_name> <size, e.g. 100%>s `
+* `parted /dev/sdXY mklabel <gpt|mbr>`
+* `parted /dev/sdXY mkpart <partition_name> <size, e.g. 100%>`
 * `pvcreate /dev/sdXY`
 * `vgcreate <volume_group_name> /dev/sdXY`
 * `lvcreate --size <size> --name <logical_volume_name> <volume_group_name>`
 
-
 After this you might need to run `xfs_growfs <path/to/mount>`  to increase the size on the fs itself
+
+When adding more storage to this later:
+* `lvresize --resizefs --size <size, 100%> <volume/partition>`
+
 
 ## Archiving, Backup & Recovery
 
@@ -739,8 +765,13 @@ After this you might need to run `xfs_growfs <path/to/mount>`  to increase the s
         * Modify `/etc/fstab` file
         * Add `,usrquota` after `defaults`
 
-
-## Remote Filesystem Access
+* `sysstat`
+  * set of packages for system statistics
+  * `iostat` - input output stats
+    * historical data since boot
+    * avgd since process was started
+  * `pidstat` - process id stats
+  * 
 
 
 

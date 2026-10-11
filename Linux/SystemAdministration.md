@@ -75,7 +75,7 @@
 * File system management
   * storing, organizing, and tracking files and data 
 * Virtual File System (VFS)
-  * Provides an sbstract view of the underlying data that is organized under complex structures
+  * Provides an abstract view of the underlying data that is organized under complex structures
   * All other file systems attach to it
 * Device management
   * Manages devices by controlling device access and in interfacing between user apps and hardware devices on the computer
@@ -508,6 +508,12 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     - Sync and set the date and tiem via NTP
   - Not necessary to use or configure, when using `systemd`
 
+* `systemd-timesyncd`
+  * Systemd tool to configure ntp client
+  * `timedatectl set-npt true`
+  * `/etc/systemd/timesyncd.conf` - config file where ntp servers can be configured
+  * 
+
 
 ## Process management
 
@@ -517,10 +523,12 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     - `a` - Displays all *user-triggered* processes. in other words: all processes except both session leaders and processes not associated with a terminal
     - `-A` - Select all processes, Identical to `-e`
     - `u` - "user-oriented": Show username instead of UID
+    - `-U <username>` - Show processes for a specific user
     - `x` - include processes without a terminal
     - `fax` - shows parent child relationship 
-    - `l`  - output a long format 
-    - `-f` - Do full-format listing. 
+    - `l`  - output a long format - includes niceness
+    - `f` - Do full-format listing. 
+      - `faux` - pretty good one 
   - Processes in **square brackets** are system or kernel processes.
   - The output of `ps aux` is as follows: 
     - Skipping USER, PID, %CPU, %MEM, for it being obvious
@@ -538,8 +546,9 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
       - N = Process has lower than normal priority
       - L = sem pages are locked in core
       - s = Process is a session leader
-    - TIME = CPU time the process has consumed
+    - TIME = Total CPU time the process has consumed. 1 sec is 100% usage of 1 CPU core 
     - COMMAND = command name and arguments (can be inaccurate)
+      - If a process is between brackets, it means it is a _kernel_ process
   - `ps lax` additionally shows:
     - PPID = parent PID
     - NI = niceness
@@ -547,6 +556,8 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 
 - `pgrep <process name>` - process grep
   -  identify a process ID based on the process name
+  -  `-a` - All, display process in which the command has been startedf
+  -  `pgrep --euid username process_name` - Search for processes run by a specific user
 
 - `pidof` - PID of 
   - Works similar to pgrep
@@ -557,7 +568,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 
 * `top`
   * Display Linux processes
-  * Print how much CPU, RAM, swap is used, its uptime, idle 
+  * Print how much CPU, RAM, swap is used, its uptime, idle, how many zombie processes there are
   * **Row information:**
     * time, uptime, signed in users, load average
     * **tasks:** zombie tasks are orphan processes - unparented child processes 
@@ -587,15 +598,19 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 
 * `nice`
   * Processes are prioritized based on a number ranging from -20 to 19
-  * The *lower* the number, the *higher* the priority
+  * The *lower* the number, the *higher* the priority, and so how less nice it is
   * 0 is the default
   * By default, `nice` prints the default nice number
-  * `-n` - increment the nice value
+  * Commands
+    * `nice` - Print the current niceness value:
+    * `nice -<value> <command>` - launch a program with lowered priority
+    * `nice --<value> <command>` - launch a program with heightened priority
+    * `nice -n <value> command` - Laungh a program with a specfic niceness 
 
 * `renice`
   * Alter the scheduling priority of an already running process
   * options: 
-    * `-n <number>` - specify the new nice value for a running process
+    * `renice <number> <process>` - specify the new nice value for a running process
     * `-g` - alter the nice value of a processes in a process group
     * `-u` - alter the nice value of the processes associated to a user
 
@@ -603,12 +618,16 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * Get performance stats for boot operations
   * Per unit it shows how long it took to start
   * Use it identify what slows down a boot process
-  * `blame` - subcommand to identify services and other units that make the system really slow during the bootup process
+  * `blame` - subcommand to identify services and other units that make the system really slow during the boot up process
 
 * `lsof` - list open files
   * `-c` - filter on process name
   * `-p` - filter on PID
   * `-u` - filter on a specific user
+  * This command is useful to know what processes another process has started. 
+    * `pgrep bash | lsof`
+  * Or to check what processes are using a specific file
+    * `lsof /var/log/auth.log`
 
 **Signals**:
   * Signals are process-level interrupt requests
@@ -626,6 +645,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     - Request the process to terminate gracefully
     - Allows time for cleanup, but the process can ignore it.
     - value 15
+    - Default, used when no signal is used with `kill`
   - **SIGSTOP**:
     - Pauses the process 
     - like Ctrl + z
@@ -699,7 +719,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     * It applies persistent `ulimit` settings to `/etc/security/limits.conf`    
       * Soft limits can be modified by the users
       * Hard limits implement an absolute ceiling
-    * **Commands**
+    * **Commands**w
       * `ulimit -n 512`   - limit for max open files is put for a particular user
       * `ulimit -a`       - see all currently  limits configured
 
@@ -1178,7 +1198,7 @@ Log management typically involes a few major subtasks:
   - Best for repetitive tasks
   - Works by command `crontab <options> <file / user>`
     - `-e` - Edit or create scheduled jobs.
-    - `-l` - List current cron jobs.
+    - `-l` - List cron jobs.
     - `-r` - Delete current crontab file
     - `-u` - Create crontab file for the specified user
   - **Access Control**:
