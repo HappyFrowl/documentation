@@ -11,10 +11,10 @@
   - [vim](#vim)
     - [Good shit](#good-shit)
   - [git](#git)
-    - [**git basics**](#git-basics)
-    - [**configuring git:**](#configuring-git)
-    - [**git branching and merging**](#git-branching-and-merging)
-    - [**git conflicts:**](#git-conflicts)
+    - [git basics](#git-basics)
+    - [configuring git](#configuring-git)
+    - [git branching and merging](#git-branching-and-merging)
+    - [git conflicts](#git-conflicts)
     - [Managing changes](#managing-changes)
     - [git history and rewrites](#git-history-and-rewrites)
     - [remote repos - e.g. github](#remote-repos---eg-github)
@@ -279,16 +279,10 @@ Regular expressions (regex) are sequences of symbols and characters used to expr
 
 
 - **`xargs`**: Process input line by line.
-  - Example:
-    ```bash
-    find . -name "*.txt" | xargs rm
-    ```
+  - `find . -name "*.txt" | xargs rm+`
 
 - **`tee`**: Redirect output to a file while also displaying it.
-  - Example:
-    ```bash
-    ls | tee output.txt
-    ```
+  - `ls | tee output.txt`
 
 
 ## Basic shell scripting
@@ -410,10 +404,13 @@ filepath="/home/user/projects/myproject/file.txt"
     - **`Shift+ZZ`** - Save and exit.
 
 * **Simple text manipulation**
-  * **`y`** - copy
-  * **`p`** - paste
-  * **`u`** - undo 
-  * **`ctrl+r`** - redo
+  * `dd` - cut line
+  * `#dd` - cut # lines, starting at the cursor
+  * `y` - copy
+  * `p` - paste
+  * `u` - undo 
+  * `^r` - (control r) - redo
+  * 
  
 * **Additional Commands:**
   * **`/`** - Search forward for a term.
@@ -421,24 +418,27 @@ filepath="/home/user/projects/myproject/file.txt"
   * **`n`** - Jump to the next search result.
   * **`N`** - Jump to the previous search result.
   * **`v`** - enter visual mode, use arrow keys to select a block 
-  * **`:%s/old/new/g`** - replace all occurrences of `old` with `new`
   * **`/<text>`** - search for text 
-  * **`:se number`** - show line numbers
 
   * `vimtutor` - command for opening the vim learning module 
 
 ### Good shit
+* `:set number` - show line numbers
 * `:%s/<oldstring>/<newstring>/g`
   * stream edit with in vim
   * replace **all** occurrences of `oldstring` by `newstring`
+  * `<...>/gi` - make it case insensitive 
 * `:m` - move a line
   * `:m-68` - move the line where the cursor by 68 lines upward
+  * `:500m20` - Move line 500 to line 21
+* `G` - jump to end of file
 * `$` - jump to end of line 
-* `0` - jump to beginning of line
+* `^` - jump to beginning of line
+
 
 ## git
 
-### **git basics**
+### git basics
 * `git init`- initialize a git repository or reinitialize an existing one.
 
 * `git add`
@@ -456,7 +456,9 @@ filepath="/home/user/projects/myproject/file.txt"
 * `git status` - Show the changes to files in a Git repository.
   * `--verbose --verbose` - see information on changes in both the staging are and working directory
 
-### **configuring git:**
+-----------
+
+### configuring git
 * `git config --global` - configure git: user info, default text editor
   * `user.name "<name>"`
   * `user.email "<email>"`
@@ -486,7 +488,9 @@ filepath="/home/user/projects/myproject/file.txt"
     - **`description`** → Used by GitWeb, not relevant for local repos.  
     - **`HEAD`** → Points to the currently checked-out branch.  
 
-### **git branching and merging**
+-----------
+
+### git branching and merging
 * `git branch` - by default it shows existing branches
   * branches are like timelines that can diverge and converge
   * `git branch <name>` - create a new branch
@@ -504,12 +508,16 @@ filepath="/home/user/projects/myproject/file.txt"
 * `git merge` - merge two branches
   * `git checkout master` - then merge from there
   
-### **git conflicts:**
+-----------
+
+### git conflicts
   * Resolving must be done manually in the code editor
   * The conflict is shown highlighted in green and blue 
   * Green - branch that you are on
   * Blue - conflict that came from another branch (merge)
   * Keep what you want, **remove markers** and save 
+
+-----------
 
 ### Managing changes
 * `git diff` - differences
@@ -535,6 +543,7 @@ filepath="/home/user/projects/myproject/file.txt"
   * `git stash list` - list all stashes
   * `git stash apply stash@{#}` - choose which stash to apply
 
+-----------
 
 ### git history and rewrites
 * `git rebase` 
@@ -552,6 +561,7 @@ filepath="/home/user/projects/myproject/file.txt"
       * after making the final commit, run: `git push --force` to apply the changes 
       * **Don't do this on branches where you collaborate**
 
+-----------
 
 ### remote repos - e.g. github
 * `git remote` - manage set a tracked repos
@@ -571,6 +581,8 @@ filepath="/home/user/projects/myproject/file.txt"
   * it brings it into the local repo
   * not into the working area, like `git pull`
   * `git pull` = `git fetch` + `git merge`
+
+----------
 
 ### Github specific
 

@@ -392,7 +392,13 @@
     - nproc = max number of processes in a user session
     - fsize = max file size created in a user session in KB
     - cpu = max cputime (in 100%)
--  package = `libnss-ldapd`
+
+
+
+## LDAP 
+- Lightweight Directory Access Protocol
+- LDAP is a protocol to centralize user and group data across multiple hosts.
+- Package = `libnss-ldapd`
    -  After installing it, you are prompted to configure it 
       -  IP address of the LDAP server
       -  domain info
@@ -400,16 +406,13 @@
 -  name server local daemon
    -  `/etc/nslcd.conf` - config file
    -  
+- Configure file for LDAP authentication `/etc/nsswitch.conf` ]
+```
+passwd:         files systemd ldap   # <-- update this: add ldap at the end
+group:          files systemd ldap
+shadow:         files ldap
+gshadow:        files
+```
 
-
-## LDAP 
-- Lightweight Directory Access Protocol
-- LDAP is a protocol to centralize user and group data across multiple hosts.
-- TODO:
-  - Install and configure an LDAP client using `nss-pam-ldapd` / `sssd`
-  - Configure `sssd.conf` for user and group lookup
-  - Verify identity resolution with `getent passwd`, `getent group`, and `id`
-  - Troubleshoot issues such as missing `nsswitch.conf` entries or auth failures 
-
-- 
+ 
 

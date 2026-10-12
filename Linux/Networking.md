@@ -97,7 +97,23 @@
 
 * **Network bridge**
   * Connect two or more NICs together such that devices connected to those NICs can communicate with each other as if they're on the same network
-  * 
+* Configure it under netplan: `/etc/netplan/99-bridge.yaml`
+```
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth1:
+      dhcp4: no
+    eth2:
+      dhcp4: no
+  bridges:
+    bridge1:
+      dhcp4: yes
+      interfaces:
+        - eth1
+        - eth2
+```
 
 
 * **Port redirection**
@@ -411,10 +427,15 @@
 
 * **Examples - lets configure port forwarding**
     * `iptables -t[able] nat -A[ppend] PREROUTING -d[estination] <IP> -p[rotocol] <protocol>  -j[ump] DNAT --to-destination <IP:port>`
-      * forward packets to IP:prot 
+      * forward packets to IP:port
     * `iptables -t nat -A POSTROUTING -i <interface> -p <protocol> --dport <port> -j MASQUERADE`
       * Masquerades matching packets as they leave through <interface>
       * This is needed to configure return routing properly
+  * Examples:
+```
+sudo iptables -t nat -A PREROUTING -p tcp -s 10.5.5.0/24 --dport 81 -j DNAT --to-destination 192.168.5.2:80
+sudo iptables -t nat -A POSTROUTING -s 10.5.5.0/24 -j MASQUERADE
+```
   * Just use firewalld lmao
 
 

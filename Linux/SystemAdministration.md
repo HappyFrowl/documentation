@@ -5,7 +5,6 @@
     - [Tuning the kernel](#tuning-the-kernel)
     - [Managing drivers and the kernel](#managing-drivers-and-the-kernel)
   - [Boot process and GRUB management](#boot-process-and-grub-management)
-    - [Boot components](#boot-components)
     - [Bootloader](#bootloader)
     - [init](#init)
     - [**The Boot Process**](#the-boot-process)
@@ -254,7 +253,10 @@
 
 ## Boot process and GRUB management
 
-### Boot components 
+**Boot components**
+
+Before going into the actual boot process, first some notes on some important components of the boot process. The main components of the boot process are: BIOS/UEFI, which will be taken as general knowledge, the Linux kernel, discussed above, the bootloader, and init, which will be discussed here.
+
 Before going into the actual boot process, first some notes on some important components of the boot process.
 The main components of the boot process are: BIOS/UEFI, which will be taken as general knowledge, the Linux kernel, discussed above, the bootloader, and init,  which will be discussed here. 
 
@@ -282,7 +284,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
       * To generate a new or update an existing `grub.cfg`, run:  
         * In RHEL-based systems: `sudo grub2-mkconfig -o /boot/path/to/grub.cfg`
         * In Debian-based systems: `sudo update-grub2` 
-
+----------------
 ### init
 * `init` is the default system for starting services in Linux
   * it brings up and maintains user space services 
@@ -325,6 +327,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * Analogous to `mkinitrd` but applies to `initfs`
   * Used on RHEL-based systems
 
+----------------
 
 ### **The Boot Process**
 
@@ -363,7 +366,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 * init/ systemd executes startup scripts
 * logind is started so can you can login
 
-
+----------------
 ### **Runlevels**
 * A runlevel defines how a system is started
   * What startup scripts must be run, and therefore what services must be started 
@@ -389,7 +392,6 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * 4. nothing
   * 5. multi user GUI
   * 6. reboot 
-
 
 ### **Boot Targets**
 * Boot targets are the modern equivalent of runlevels,
@@ -423,6 +425,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   - `sudo systemctl isolate <name.target>`
       - Temporarily change the boot target
       - this takes effect immediately
+----------------
 
 
 ### Troubleshooting the boot process
@@ -496,6 +499,8 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   - Current timezone configuration
   - File is symlinked to the appropriate timezone file
   - File cannot be read since it is a binary 
+
+----------------
 
 ### NTP
 * **Configure NTP *server*:**
@@ -711,6 +716,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     * name of every system call made by the process
     * Decodes the arguments and shows the result code that the kernel returns
 
+----------------
 
 ### Resource Limits
 * POSIX resource limits
@@ -805,6 +811,8 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     * This outputs all loaded and active services, sockets, targets, mounts, and devices
     * `--type=<type>` - show a specific unit type 
 
+----------------
+
 ### **Managing Services**
 * Services:
   * Running programs or processes that provide support for requests and monitoring from other processes or external clients
@@ -829,6 +837,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
       * linked    - Unit file available through a symlink     
       * masked    - Banished from the systemd world from a logical perspective    
       * static    - Depended upon by another unit; has no install requirements    
+----------------
 
 
 ### **Targets**
@@ -843,6 +852,8 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * `get-default`         
   * `set-default`         
 
+----------------
+
 ### **Editing systemd units**
 * `systemctl show <unit.type>`
   * Print all editable parameters
@@ -856,6 +867,8 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * Reload the systemd init daemon, including all unit files. 
   * Required when needing to reapply theconfiguration after using `systemctl edit`
 
+----------------
+
 ### systemd sockets
 * A socker is used witha service to start the service when traffic comes in on a specific socket
 * In other words: sockets are listeners that trigger service startup on incoming traffic
@@ -868,6 +881,8 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * Note: the socket and service must have the same name
   * Create a `servicename.socket` under `/lib/systemd/system`
 
+----------------
+
 ### systemd timers
 * `systemctl cat logrotate.timer`
   * When logrotate triggers 
@@ -876,6 +891,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
 * It basically replaces cron jobs
 * To create it, create a file in `/lib/systemd/systemd`
 
+----------------
 
 ### Control groups
 * aka cgroups
@@ -888,6 +904,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   * Manual creation happened through the **`cgconfig`** service and the **`cgred`** process
 * Docker and Kubernetes use `cgroups` to manage container resource allocation 
 
+----------------
 
 ### Depdendency management
  * Different statements can be used in the unit section to define unit file dependencies:
@@ -904,6 +921,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   ```
 * Targets  are better for a more consistent dependency management
 
+----------------
 
 ### systemd self-healing
 * Get service to restart when they get into a failed state
@@ -933,6 +951,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
     * subcommands:
       * `status`, `start`, `stop`, `restart`, `reload`
 
+----------------
 
 ## System monitoring
 * `uptime` 
