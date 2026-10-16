@@ -223,30 +223,30 @@
     * RAID 10 - 1+0, striped mirrors. min. 4 drives
 
 * `mdadm`
-    * tool for managing software-based RAID arrays
-    * options:
-        * `-F` - Activate monitor mode
-        * `-f` - Mark specified device
-        * `-r` - Remove specified device
-        * `-a` - Add device as hot-spare
+  * tool for managing software-based RAID arrays
+  * options:
+    * `-F` - Activate monitor mode
+    * `-f` - Mark specified device
+    * `-r` - Remove specified device
+    * `-a` - Add device as hot-spare
 
 * `/proc/mdstat`
-    * offers information on the current RAID configuration 
-    * contains a snapshot of the kernel's RAID/ md state
+  * offers information on the current RAID configuration 
+  * contains a snapshot of the kernel's RAID/ md state
  
 
 ## Swap management
 * Swap is a way of emulating RAM on the disk 
 * Useful for when you're low on RAM
 
-* `dd if=/dev/zero of=/swapfile bs=1M count=1024`
-
 * `mkswap <file>`
-    * Create swap space on a storage partition
-    * options:
-        * `-c` - check for bad sectors before making the swap space
-        * `-p` - Set the page size to be used
-        * `-L` - Active swap space using labels applied to partition or filesystems
+  * Create swap space on a storage partition
+  * options:
+    * `-c` - check for bad sectors before making the swap space
+    * `-p` - Set the page size to be used
+    * `-L` - Active swap space using labels applied to partition or filesystems
+  * Example:
+    * `mdadm -c /dev/md0 --level=1 --raid-devices=2 /dev/hd[ac]1` - Create /dev/md0 as a RAID1 array consisting of /dev/hda1 and /dev/hdc1
 
 * `swapon <file>`
     * Activate a swap partition
@@ -256,6 +256,7 @@
 
 * Creating a swap partition 
     * `fdisk <disk>`
+      * or use `cfdisk` for a more tui experience 
     * `t` - change the type
     * select a partition
     * enter hex code `82` - this changes the partition type to swap
@@ -265,7 +266,7 @@
   * this is non persistent!
   
 * To make it persistent:
-  * declare it in `/etc/fstab`f
+  * declare it in `/etc/fstab`
 
 
 ## Disk, partition, and filesystem management
@@ -293,7 +294,7 @@
         * ext2/3/4
             * Native Linux
         * XFS
-            * high-performance journalisting filesystem
+            * high-performance journaling filesystem
             * fast recovery
             * handles large files very well
         * BTRFS
@@ -301,18 +302,19 @@
     * Other filesystems
         * ZFS
             * Comparable to btrfs, but not supported by the Linux Kernel, only through fuse
+            * Used by NAS
             * see VFS
         * FAT
             * older
             * compatible with most other OS
         * ntfs-ng
-            * Windows NRFS compatible filesystem
+            * W*ndows NTFS compatible filesystem
         * NFS
             * Network filesystem
             * Default for file sharing 
         * CIFS
             * Common Internet File System
-            * USed to access Windows shares
+            * Used to access Windows shares
 
     * **VFS** - virtual filesystem
         * VFS is a generic abstraction of all filesystems
@@ -331,7 +333,7 @@
 * `lsblk` - list block
     - Lists information about storage devices, such as
         - `NAME` - Device and partition name
-        - `MAJ:MIN` - Major Number (Maj): Identifies the device type (e.g., 8 is for SCSI/SATA disks) and Minor Number (Min): Differentiates individual devices or partitions under the same major number.
+        - `MAJ:MIN` - Major Number (Maj): Ident ifies the device type (e.g., 8 is for SCSI/SATA disks) and Minor Number (Min): Differentiates individual devices or partitions under the same major number.
             - `/proc/devices` contains the Major numbers and linking them to block device modules. E.g. `259 blkext`
         - `RM` - is the device removable. `0` for No , `1` for yes 
         - `SIZE` - size of the device or partition
@@ -342,30 +344,30 @@
     - Options:
         - `-a` - list empty devices
         - `-r` - use raw output format
-        - `-f` - output info about filesystems, e.g. UUID 
+        - `-f` - output info about filesystems and the UUID 
         - `-l` - output list instead of tree
         - `-m` - display device permission info
     * Common disk block device names include:
         * sda - first SCSI/SATA disk
         * vda - virtual disk that uses the KVM virtio driver
         * xvda - virtual disk in a Xen environment
-        * nvme0n1 - first nvme disk 
+        * nvme0n - nvme disk 
     
 * `blkid` - block id
     * Print the UUID of devices 
     * Use this to add the devices to `/etc/fstab` for mounting devices
     * See below on mounting
 
-* `fdisk </dev>` / `gdisk </dev>`
+* `fdisk </dev>` / `cfdisk </dev>` / `gdisk </dev>` 
     * Manage partition tables and partitions on a hard disk
-    * `fdisk` is for MBR, `gdisk` for GPT
+    * `fdisk` is for MBR, `gdisk` for GPT, `cfdisk` is `fdisk` but in a more tui environment
     * **options:**
         * `-l` - list partitions 
         * `-b` - Specify number of drive sectors
         * `-H` - specify number of drive heads
         * `-S` - specify number of sectors per tracks
         * `-s` - print partition size in blocks
-    * Within the `f/disk` / `gdisk` tool, there are several options:
+    * Within the `fdisk` / `gdisk` tool, there are several options:
         * `m` or `?` - for help, displaying all options
 
 * `parted`
@@ -501,12 +503,18 @@
 * Use storage on another computer as if it were a local disk. 
 * Install packages: `nbd-server` and/or `nbd-client`
 * `/etc/nbd-server/config` - config file
-* NBD has it own module, nbd
+* NBD has it own module, `nbd`
 * `modprobe -a nbd` - non persistent
 * `echo nbd >> /etc/modules-load.d/modules.conf` - persistent
 * `ndb-client <ip> -N <partition>` - 
   * This will create a block device, like `/dev/ndb0`
   * This can then be mounted 
+
+
+**NFS server**
+* Config file`/etc/exports`
+* Run after changes: `exportfs -r`
+
 
 ### Managing filesystems
 * `wipefs` - wipe filesystem
@@ -543,11 +551,12 @@
     * `e2fsck`
         * filesystem check
 
-    * `fsck [options] <dev/fs name>`- filesystem check
-        - Check the integrity of a filesystem or repair it
-        - **Note**: cannot run on mounted disks.
-        - `-a` - immediately repair all damaged blocks
-        - `-r` - repair
+  * `fsck [options] </dev/fs name>`- filesystem check
+    - Check the integrity of a filesystem or repair it
+    - **Note**: cannot run on mounted disks.
+    - `-a` - immediately repair all damaged blocks
+    - `-r` - repair
+    - 
 
     * `resize2fs [options] <dev> [<size>]`
         * resize ext2, ext3, or ext4 **filesystems**
@@ -689,6 +698,7 @@ When adding more storage to this later:
         - `-v` - Verbose (list files being processed).
         - `-z` - Compress or decompress with **gzip**
         - `-C` - Specify the output file
+        - `-P` - Don't strip leading slashes from file names when creating archive 
     - **Examples:**
         * `tar -cvf <file>.tar <files>` - Create a tarball from specified files  
         * `tar -xvf <file>.tar` - Extract **all** files in tarball

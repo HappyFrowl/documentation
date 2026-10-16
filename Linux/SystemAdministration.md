@@ -247,10 +247,6 @@
   - The `/tmp` directory is often mounted as `tmpfs`.
 
 
-
-
-
-
 ## Boot process and GRUB management
 
 **Boot components**
@@ -451,7 +447,7 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   - `iconv -f utf-8 -t iso_8653-1 < file.txt > output.txt`
   - Convert between encodings
   - `iconv -l`
-    -  Print supported encodngs
+    -  Print supported encodings
 
 - **`file <filename>`**
   - Detect file encoding
@@ -1092,6 +1088,8 @@ Log management typically involes a few major subtasks:
   * `-r` - remove
   * `-l` - list all packages/ info on one package
   * `-s` - report whether package is installed
+  * `-L` - List files installed to your system from package-name. So list files that are created by <packagename>
+  * `-S` - Search for a filename from installed packages
 
 * `apt`
   * Frontend manager for `dpkg`
@@ -1117,7 +1115,7 @@ Log management typically involes a few major subtasks:
 
 
 ### Compiling software
-* **compiling**
+**compiling**
   * Compiling is the process of translating the source code into binary, something the computer can actually understand
   * `gcc` - GNU Compiler Collection. This is the built in Linux compiler
 * All dependencies of the software are in the `.h` or the `.a` file - the header or library file
@@ -1158,6 +1156,13 @@ Log management typically involes a few major subtasks:
       * Generates build script for target toolchain
     * **Build stage**
       * Your chosen toolchain or build-system does the actual build 
+
+* **tutorial**
+  * Down binaries from github
+  * Read instructions
+  * `./autostarts.sh` -  dependent on instructions
+  * `./configure` - dependent on instructions
+  * `make install` - to actually install it 
 
 ### Software troubleshooting
 * **Package mananger config file**

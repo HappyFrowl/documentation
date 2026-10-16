@@ -91,6 +91,8 @@
         5. Restart Apache
         6. Verify
 
+
+
 ## System auditing
 * `auditd` - audit daemon
     * It enables records to be used to audit what is being written to storage and what actions are happening

@@ -121,12 +121,12 @@
 
 * **options:**
   * `-i` - ignore case. Otherwise `grep` is **case sensitive**
+  * `-w` - match whole words instead of also parts
   * `-v` - show lines that **do not** match pattern
   * `-l` - list file names that contain pattern, without showing matching lines
   * `-A5` - show line that matches pattern as well as 5 lines after 
   * `-B5` - show line that matches pattern as well as 5 lines before
   * `-C5` - combination of `-A5` and `-B5`
-  * 
   
 * **`sed`** - Stream Editor
   - Replace characters in a regular expression.

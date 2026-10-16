@@ -14,6 +14,7 @@
     - [Special permissions](#special-permissions)
   - [User resource limits](#user-resource-limits)
   - [LDAP](#ldap)
+  - [Pluggable Authentication Modules](#pluggable-authentication-modules)
 
 ## User and Group Management
 
@@ -298,9 +299,9 @@
 
 - `chattr` 
   - Change attributes of files or directories
-  - `chattr +i <file>` - make a file or directory imutable to changes and deletion, even by superuser
+  - `chattr +i <file>` - make a file or directory immutable to changes and deletion, even by superuser
   - `chattr -i <file>` - make it mutuable again
-  - `chattr -a <file>` - make it append only
+  - `chattr +a <file>` - make it append only
   - `chattr =abc /path/to/file_or_directory` - set the attributes to abc
   - `-R` - same but recursively
 
@@ -398,7 +399,7 @@
 ## LDAP 
 - Lightweight Directory Access Protocol
 - LDAP is a protocol to centralize user and group data across multiple hosts.
-- Package = `libnss-ldapd`
+- Pwackage = `libnss-ldapd`
    -  After installing it, you are prompted to configure it 
       -  IP address of the LDAP server
       -  domain info
@@ -406,7 +407,7 @@
 -  name server local daemon
    -  `/etc/nslcd.conf` - config file
    -  
-- Configure file for LDAP authentication `/etc/nsswitch.conf` ]
+- Configure file for LDAP authentication `/etc/nsswitch.conf` 
 ```
 passwd:         files systemd ldap   # <-- update this: add ldap at the end
 group:          files systemd ldap
@@ -414,5 +415,16 @@ shadow:         files ldap
 gshadow:        files
 ```
 
+## Pluggable Authentication Modules
+**PAM**
+* Way of implementing direct connection to authentication systems
+* PAM config files are a series of one-liners, each of which names a particular PAM modules to be used on the system
+  * `module-type control-flag module-path <arguments>`
+  * `module-type` - `auth`, `account`, `session`, or `password`
+  * `control-flag` - `include`, `optional`, `required`, `requisite`, `sufficient` 
+    * specifies how the modules in the tack should interact to produce an ultimate result for the stack.
+    * 
+* The order in which modules appear is important 
+* 
  
 
