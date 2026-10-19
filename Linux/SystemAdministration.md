@@ -496,6 +496,10 @@ The main components of the boot process are: BIOS/UEFI, which will be taken as g
   - File is symlinked to the appropriate timezone file
   - File cannot be read since it is a binary 
 
+* `chronyd`
+  * More reliable than timedatectl
+  * w
+
 ----------------
 
 ### NTP

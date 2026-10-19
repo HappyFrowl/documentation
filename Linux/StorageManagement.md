@@ -714,6 +714,10 @@ When adding more storage to this later:
         - Compression tool that produces files with `.gz` extension 
         - Use with `tar` with `-z` option
             - `tar -czvf <file>.tar <files>` - archive and compress
+              - `-C` - using this option creates the compressed archive in another directory
+        - `gzip -l` - list compression ratio
+        - `gzip <files>` - create compression
+        - `gunzip file.tar.gz` - decompression
         
     * **`bzip2`**
         * Better compression, but takes longer 

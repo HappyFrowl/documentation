@@ -448,8 +448,13 @@ network:
       * This is needed to configure return routing properly
   * Examples:
 ```
+# route to other IP
 sudo iptables -t nat -A PREROUTING -p tcp -s 10.5.5.0/24 --dport 81 -j DNAT --to-destination 192.168.5.2:80
 sudo iptables -t nat -A POSTROUTING -s 10.5.5.0/24 -j MASQUERADE
+
+# route to other post
+iptables -t nat -A PREROUTING -p "$proto" --dport 6000 -j REDIRECT --to-ports 6001
+iptables -t nat -A OUTPUT     -p "$proto" --dport 6000 -j REDIRECT --to-ports 6001
 ```
   * Just use firewalld lmao
 
